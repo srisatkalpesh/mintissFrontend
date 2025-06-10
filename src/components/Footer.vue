@@ -1,0 +1,65 @@
+<template>
+  <footer class="bg-light text-dark py-3 border-top shadow-sm">
+    <div class="container">
+      <div class="row gy-4 align-items-center">
+        <!-- Links Section -->
+        <div class="col-md-4">
+          <h5 class="fw-semibold mb-3">Quick Links</h5>
+          <ul class="list-unstyled">
+            <li><a href="/" class="footer-link">Home</a></li>
+            <li><a href="/about" class="footer-link">About</a></li>
+            <li><a href="/contact" class="footer-link">Contact</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact & Support -->
+        <div class="col-md-4">
+          <h5 class="fw-semibold mb-3">Support</h5>
+          <p class="mb-2">
+            <i class="bi bi-envelope-fill text-primary me-2"></i>
+            <a href="mailto:support@mintiss.com" class="footer-link text-primary">
+              support@mintiss.com
+            </a>
+          </p>
+          <p class="mb-0">
+            <i class="bi bi-telephone-fill text-primary me-2"></i>
+            <a href="tel:+91 9825714909" class="footer-link text-primary"> +91 9825714909 </a>
+          </p>
+        </div>
+
+        <!-- Copyright -->
+        <div class="col-md-4 text-center text-md-end">
+          <p class="mb-1">&copy; 2025 <strong>Mintiss</strong>. All rights reserved.</p>
+          <p class="small text-muted">Crafted with 💙 by Axit Patel & team</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+</template>
+
+<script>
+export default {
+  name: "AppFooter",
+};
+</script>
+
+<style scoped>
+footer {
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(to right, #e0f7ff, #ffffff);
+  transition: background 0.3s ease;
+}
+
+.footer-link {
+  display: inline-block;
+  color: #343a40;
+  text-decoration: none;
+  padding: 4px 0;
+  transition: color 0.2s;
+}
+
+.footer-link:hover {
+  color: #0d6efd;
+  text-decoration: underline;
+}
+</style>
