@@ -30,6 +30,11 @@
             <div v-if="errors.password" class="text-danger small mt-1">{{ errors.password[0] }}</div>
           </div>
 
+          <div class="mb-3">
+            <input type="password" v-model="confirmPassword" class="form-control" placeholder="Confirm Password" required />
+            <div v-if="errors.confirmPassword" class="text-danger small mt-1">{{ errors.confirmPassword[0] }}</div>
+          </div>
+
           <button type="submit" class="btn btn-primary w-100 fw-bold" :disabled="loading">
             <span v-if="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
             <span v-if="!loading">Sign Up</span>
@@ -59,6 +64,7 @@ export default {
       email: '',
       phone: '',
       password: '',
+      confirmPassword: '',
       errors: {},
       loading: false
     };
@@ -66,6 +72,13 @@ export default {
   methods: {
     async handleSignup() {
       this.errors = {};
+      
+      // Validate password confirmation
+      if (this.password !== this.confirmPassword) {
+        this.errors.confirmPassword = ['Passwords do not match'];
+        return;
+      }
+
       this.loading = true;
       try {
         const baseURL = process.env.VUE_APP_API_BASE_URL;
