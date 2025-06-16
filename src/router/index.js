@@ -39,6 +39,12 @@ const routes = [
     component: () => import("../views/usersite/UserSignup.vue"),
   },
   {
+    path: "/profile",
+    name: "Profile",
+    component: () => import("../views/usersite/Profile.vue"),
+    meta: { requiresAuth: true }
+  },
+  {
     path: "/category/:id",
     name: "Category",
     component: () => import("../views/usersite/CategoryView.vue"),

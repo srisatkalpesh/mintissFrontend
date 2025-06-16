@@ -5,27 +5,28 @@
       <img class="mintiss-logo-img" :src="mintiss1" alt="Mintiss Welcome" />
       <h1 class="main-title">Welcome to Mintiss</h1>
       <p class="subtitle">Experience the future of Mintiss — rewards that grow every day, with every purchase.</p>
-      <div class="cta-buttons">
-        <button class="mintiss-btn primary" @click="goToSignup">Get mintiss</button>
-        <button class="mintiss-btn secondary" @click="goToSignup">Create account</button>
-      </div>
     </section>
 
     <!-- Mintiss Value Section -->
     <section class="mintiss-value-section">
       <div class="value-content">
         <div class="value-label">Current Mintiss Value</div>
-        <div v-if="isLoading" class="value-counter">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
+        <div class="value-counter">
+          ₹<span>{{ isLoading ? '0.00000000' : animatedValue }}</span>
         </div>
-        <div v-else class="value-counter">
-          ₹<span>{{ animatedValue }}</span>
+        <div class="user-balance mt-3">
+          <div class="value-label">Your Mintiss Balance</div>
+          <div class="value-counter">
+            ₹<span>{{ userBalance || '0.00000000' }}</span>
+          </div>
         </div>
         <div class="value-explanation">
           <i class="bi bi-graph-up-arrow"></i>
           Mintiss's value grows every day! The more you shop, the more valuable your rewards become. Join the movement and watch your Mintiss grow with us.
+        </div>
+        <div class="cta-buttons">
+          <button class="mintiss-btn primary" @click="goToSignup">Get mintiss</button>
+          <button class="mintiss-btn secondary" @click="goToSignup">Create account</button>
         </div>
       </div>
     </section>
@@ -155,11 +156,13 @@ export default {
       mintiss4,
       animatedValue: 0,
       targetValue: 0,
-      isLoading: true
+      isLoading: true,
+      userBalance: null
     };
   },
   async mounted() {
     await this.fetchMintissValue();
+    this.calculateUserBalance();
   },
   methods: {
     async fetchMintissValue() {
@@ -171,6 +174,12 @@ export default {
         console.error('Error fetching mintiss value:', error);
       } finally {
         this.isLoading = false;
+      }
+    },
+    calculateUserBalance() {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user && user.mintiss) {
+        this.userBalance = (parseFloat(user.mintiss) * this.targetValue).toFixed(8);
       }
     },
     animateValue() {
@@ -187,6 +196,7 @@ export default {
           requestAnimationFrame(animate);
         } else {
           this.animatedValue = end.toFixed(8);
+          this.calculateUserBalance(); // Recalculate user balance after animation
         }
       };
       requestAnimationFrame(animate);
@@ -210,7 +220,7 @@ export default {
 .welcome-section {
   text-align: center;
   margin-bottom: 3rem;
-  background: linear-gradient(90deg, #e3f2fd 0%, #87ceeb 100%);
+  background:  #87ceeb ;
   border-radius: 1.5rem;
   box-shadow: 0 2px 16px rgba(135, 206, 235, 0.08);
   padding: 2.5rem 1rem 2rem 1rem;
@@ -251,7 +261,7 @@ export default {
   box-shadow: 0 2px 8px rgba(135, 206, 235, 0.10);
 }
 .mintiss-btn.primary {
-  background: linear-gradient(90deg, #e3f2fd 0%, #87ceeb 100%);
+  background:  #87ceeb ;
   color: #fff;
 }
 .mintiss-btn.secondary {
@@ -260,12 +270,11 @@ export default {
   border: 2px solid #87ceeb;
 }
 .mintiss-btn.primary:hover {
-  background: linear-gradient(90deg, #e3f2fd 0%, #87ceeb 100%);
-
+  background:  #87ceeb ;
   color: #fff;
 }
 .mintiss-btn.secondary:hover {
-  background: linear-gradient(90deg, #e3f2fd 0%, #87ceeb 100%);
+  background:  #87ceeb ;
   color: #1976d2;
 }
 
@@ -429,7 +438,7 @@ export default {
 }
 
 .mintiss-value-section {
-  background: linear-gradient(90deg, #e3f2fd 0%, #87ceeb 100%);
+    background:  #87ceeb ;
   border-radius: 1.5rem;
   margin: 2rem 0 3rem 0;
   padding: 2rem 1rem 1.5rem 1rem;
@@ -468,6 +477,40 @@ export default {
 .value-explanation i {
   font-size: 1.5rem;
   color: #1976d2;
+}
+
+.user-balance {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 1rem;
+  margin-top: 1rem;
+}
+
+.mintiss-value-display {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  border-radius: 1rem;
+  margin: 1rem auto;
+  max-width: 400px;
+}
+
+.current-value, .user-balance {
+  text-align: center;
+}
+
+.value-label {
+  font-size: 1.1rem;
+  color: #fff;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.value-amount {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 1px;
 }
 
 @media (max-width: 900px) {

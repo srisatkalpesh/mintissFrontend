@@ -21,6 +21,12 @@
             </router-link>
           </li>
           <li class="nav-item" v-if="isLoggedIn">
+            <router-link to="/profile" class="nav-link text-white mx-2">
+              <i class="bi bi-person-circle me-1"></i>
+              Profile
+            </router-link>
+          </li>
+          <li class="nav-item" v-if="isLoggedIn">
             <a href="#" class="nav-link text-white mx-2" @click.prevent="handleLogout">
               <i class="bi bi-box-arrow-right me-1"></i>
               Logout
