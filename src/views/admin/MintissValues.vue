@@ -115,9 +115,9 @@ export default {
       this.isSubmitting = true;
       try {
         if (this.isEditing) {
-          await axios.put(`/admin/mintiss-values`, this.formData);
+          await axios.put(`/admin/mintiss-value`, this.formData);
         } else {
-          await axios.post(`/admin/mintiss-values`, this.formData);
+          await axios.post(`/admin/mintiss-value`, this.formData);
         }
         this.resetForm();
         this.fetchValue();
