@@ -86,7 +86,8 @@ export default {
           name: this.name,
           email: this.email,
           phone: this.phone,
-          password: this.password
+          password: this.password,
+          password_confirmation: this.confirmPassword
         });
 
         const { user, token } = response.data;
