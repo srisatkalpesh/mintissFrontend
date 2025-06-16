@@ -1,9 +1,17 @@
 <template>
     <div class="admin-layout">
+        <!-- Mobile Toggle Button -->
+        <button class="btn btn-dark d-md-none sidebar-toggle" @click="toggleSidebar">
+            <i class="bi bi-list"></i>
+        </button>
+
         <!-- Sidebar -->
-        <div class="sidebar bg-dark text-white">
-            <div class="sidebar-header p-3">
+        <div class="sidebar bg-dark text-white" :class="{ 'show': isSidebarOpen }">
+            <div class="sidebar-header p-3 d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Admin Panel</h5>
+                <button class="btn btn-dark d-md-none" @click="toggleSidebar">
+                    <i class="bi bi-x"></i>
+                </button>
             </div>
             <ul class="nav flex-column">
                 <li class="nav-item">
@@ -24,6 +32,18 @@
                         Products
                     </router-link>
                 </li>
+                <li class="nav-item">
+                    <router-link to="/admin/mintiss-values" class="nav-link text-white">
+                        <i class="bi bi-currency-dollar me-2"></i>
+                        Mintiss Values
+                    </router-link>
+                </li>
+                <li class="nav-item">
+                    <router-link to="/admin/signup-bonus" class="nav-link text-white">
+                        <i class="bi bi-gift me-2"></i>
+                        Signup Bonus
+                    </router-link>
+                </li>
             </ul>
         </div>
 
@@ -36,7 +56,17 @@
 
 <script>
 export default {
-    name: 'AdminLayout'
+    name: 'AdminLayout',
+    data() {
+        return {
+            isSidebarOpen: false
+        }
+    },
+    methods: {
+        toggleSidebar() {
+            this.isSidebarOpen = !this.isSidebarOpen;
+        }
+    }
 }
 </script>
 
@@ -53,12 +83,14 @@ export default {
     top: 0;
     left: 0;
     z-index: 1000;
+    transition: transform 0.3s ease;
 }
 
 .main-content {
     flex: 1;
     margin-left: 250px;
     background-color: #f8f9fa;
+    min-height: 100vh;
 }
 
 .nav-link {
@@ -77,12 +109,21 @@ export default {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.sidebar-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1001;
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .sidebar {
-        width: 100%;
-        position: relative;
-        min-height: auto;
+        transform: translateX(-100%);
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
     }
 
     .main-content {

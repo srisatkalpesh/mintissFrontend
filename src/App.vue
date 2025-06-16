@@ -1,9 +1,8 @@
 <template>
   <div id="app">
-    <HeaderNavbar />
+    <HeaderNavbar v-if="!isAdminRoute" />
     <router-view />
-    <AppFooter />
-
+    <AppFooter v-if="!isAdminRoute" />
   </div>
 </template>
 
@@ -17,5 +16,10 @@ export default {
     HeaderNavbar,
     AppFooter,
   },
+  computed: {
+    isAdminRoute() {
+      return this.$route.path.startsWith('/admin');
+    }
+  }
 };
 </script>

@@ -63,6 +63,16 @@ const routes = [
         path: "products",
         name: "AdminProducts",
         component: () => import("../views/admin/Products.vue")
+      },
+      {
+        path: "mintiss-values",
+        name: "AdminMintissValues",
+        component: () => import("../views/admin/MintissValues.vue")
+      },
+      {
+        path: "signup-bonus",
+        name: "AdminSignupBonus",
+        component: () => import("../views/admin/SignupBonus.vue")
       }
     ]
   }
@@ -85,10 +95,25 @@ router.beforeEach((to, from, next) => {
     if (userObj.role !== 'admin') {
       next('/')
     } else {
-      next()
+      // Redirect admin to categories page after login
+      if (from.path === '/login' && to.path === '/admin') {
+        next('/admin/categories')
+      } else {
+        next()
+      }
     }
   } else {
-    next()
+    // If admin is accessing login page and is already logged in, redirect to categories
+    if (to.path === '/login' && token && user) {
+      const userObj = JSON.parse(user)
+      if (userObj.role === 'admin') {
+        next('/admin/categories')
+      } else {
+        next()
+      }
+    } else {
+      next()
+    }
   }
 })
 

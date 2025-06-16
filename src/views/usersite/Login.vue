@@ -70,15 +70,15 @@ export default {
 
                 const { user, token } = response.data;
 
-                // Store user and token in localStorage
                 localStorage.setItem('user', JSON.stringify(user));
+                console.log(user);
                 localStorage.setItem('token', token);
 
                 console.log("Login successful:", user);
 
                 // Redirect based on user type
                 if (user.role === 'admin' || user.type === 'admin') {
-                    this.$router.push({ name: 'home' });
+                    this.$router.push('/admin/categories');
                 } else {
                     this.$router.push('/');
                 }
