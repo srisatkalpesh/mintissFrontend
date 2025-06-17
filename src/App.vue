@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <HeaderNavbar v-if="!isAdminRoute" />
-    <router-view />
+    <keep-alive>
+      <router-view />
+    </keep-alive>
     <AppFooter v-if="!isAdminRoute" />
   </div>
 </template>

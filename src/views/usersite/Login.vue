@@ -71,19 +71,17 @@ export default {
                 const { user, token } = response.data;
 
                 localStorage.setItem('user', JSON.stringify(user));
-                console.log(user);
                 localStorage.setItem('token', token);
-
-                console.log("Login successful:", user);
 
                 // Redirect based on user type
                 if (user.role === 'admin' || user.type === 'admin') {
                     this.$router.push('/admin/categories');
                 } else {
-                    this.$router.push('/');
+                    window.location.href = '/';
                 }
 
             } catch (error) {
+                this.loading = false;
                 if (error.response && error.response.data) {
                     const responseErrors = error.response.data.errors || {};
                     this.errors = { ...responseErrors };
@@ -94,12 +92,8 @@ export default {
                 } else {
                     this.errors.general = 'Login failed. Please check your credentials.';
                 }
-            } finally {
-                this.loading = false;
             }
         }
-
-
     }
 };
 </script>

@@ -21,16 +21,16 @@
             </router-link>
           </li>
           <li class="nav-item" v-if="isLoggedIn">
-            <router-link to="/profile" class="nav-link text-white mx-2">
-              <i class="bi bi-person-circle me-1"></i>
-              Profile
-            </router-link>
+            <div class="nav-link text-white mx-2 d-flex align-items-center">
+              <i class="bi bi-wallet2 me-1"></i>
+              <span>₹{{ userBalance || '0.00000000' }}</span>
+            </div>
           </li>
           <li class="nav-item" v-if="isLoggedIn">
-            <a href="#" class="nav-link text-white mx-2" @click.prevent="handleLogout">
-              <i class="bi bi-box-arrow-right me-1"></i>
-              Logout
-            </a>
+            <router-link to="/profile" class="nav-link text-white mx-2">
+              <i class="bi bi-person-circle me-1"></i>
+              {{ userName }}
+            </router-link>
           </li>
         </ul>
       </div>
@@ -45,10 +45,16 @@
             </router-link>
           </li>
           <li class="mb-3" v-if="isLoggedIn">
-            <a href="#" class="text-white fw-semibold" @click.prevent="handleLogout">
-              <i class="bi bi-box-arrow-right me-1"></i>
-              Logout
-            </a>
+            <div class="text-white fw-semibold d-flex align-items-center">
+              <i class="bi bi-wallet2 me-2"></i>
+              <span>₹{{ userBalance || '0.00000000' }}</span>
+            </div>
+          </li>
+          <li class="mb-3" v-if="isLoggedIn">
+            <router-link to="/profile" class="text-white fw-semibold" @click="toggleMenu">
+              <i class="bi bi-person-circle me-2"></i>
+              {{ userName }}
+            </router-link>
           </li>
         </ul>
       </div>
@@ -69,6 +75,8 @@ export default {
   data() {
     return {
       isCollapsed: false,
+      userBalance: null,
+      mintissValue: 0
     };
   },
   computed: {
@@ -77,9 +85,48 @@ export default {
     },
     isLoggedIn() {
       return !!localStorage.getItem('token');
+    },
+    userName() {
+      const user = JSON.parse(localStorage.getItem('user'));
+      return user ? user.name : '';
+    }
+  },
+  watch: {
+    isLoggedIn: {
+      immediate: true,
+      handler(newVal) {
+        if (newVal) {
+          this.fetchMintissValue();
+          this.calculateUserBalance();
+        } else {
+          this.userBalance = null;
+          this.mintissValue = 0;
+        }
+      }
+    }
+  },
+  async mounted() {
+    if (this.isLoggedIn) {
+      await this.fetchMintissValue();
+      this.calculateUserBalance();
     }
   },
   methods: {
+    async fetchMintissValue() {
+      try {
+        const response = await axios.get('/mintiss-value/latest');
+        this.mintissValue = parseFloat(response.data.data.value);
+        this.calculateUserBalance();
+      } catch (error) {
+        console.error('Error fetching mintiss value:', error);
+      }
+    },
+    calculateUserBalance() {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user && user.mintiss) {
+        this.userBalance = (parseFloat(user.mintiss) * this.mintissValue).toFixed(8);
+      }
+    },
     toggleMenu() {
       this.isCollapsed = !this.isCollapsed;
     },
@@ -153,12 +200,34 @@ export default {
   left: 0;
 }
 
-.mobile-menu a {
+.mobile-menu a,
+.mobile-menu div {
   display: block;
-  padding: 10px 0;
+  padding: 12px 0;
   color: #fff;
   text-decoration: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.mobile-menu a:hover,
+.mobile-menu div:hover {
+  background: rgba(255, 255, 255, 0.1);
+  padding-left: 10px;
+}
+
+.mobile-menu .active {
+  color: #ffd700;
+  font-weight: bold;
+}
+
+.mobile-menu i {
+  font-size: 1.1rem;
+}
+
+.mobile-menu span {
+  font-weight: 600;
+  font-size: 0.95rem;
 }
 
 .overlay {
@@ -169,5 +238,10 @@ export default {
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.4);
   z-index: 1040;
+}
+
+.nav-link span {
+  font-weight: 600;
+  font-size: 0.95rem;
 }
 </style>

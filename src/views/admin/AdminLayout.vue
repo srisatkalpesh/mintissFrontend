@@ -44,6 +44,12 @@
                         Signup Bonus
                     </router-link>
                 </li>
+                <li class="nav-item mt-auto">
+                    <a href="#" class="nav-link text-white" @click.prevent="handleLogout">
+                        <i class="bi bi-box-arrow-right me-2"></i>
+                        Logout
+                    </a>
+                </li>
             </ul>
         </div>
 
@@ -55,6 +61,9 @@
 </template>
 
 <script>
+import axios from '@/axios';
+import toastService from '@/services/toastService';
+
 export default {
     name: 'AdminLayout',
     data() {
@@ -65,6 +74,21 @@ export default {
     methods: {
         toggleSidebar() {
             this.isSidebarOpen = !this.isSidebarOpen;
+        },
+        async handleLogout() {
+            try {
+                await axios.get('/logout');
+                // Clear local storage
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                // Show success message
+                toastService.success('Logged out successfully');
+                // Redirect to login page
+                window.location.href = '/login';
+            } catch (error) {
+                console.error('Logout error:', error);
+                toastService.error('Failed to logout');
+            }
         }
     }
 }
@@ -133,5 +157,10 @@ export default {
     .admin-layout {
         flex-direction: column;
     }
+}
+
+.nav-item.mt-auto {
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 </style> 
