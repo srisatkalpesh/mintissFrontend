@@ -17,7 +17,8 @@
         </div>
         <div class="value-explanation">
           <i class="bi bi-graph-up-arrow"></i>
-          Mintiss's value grows every day! The more you shop, the more valuable your rewards become. Join the movement and watch your Mintiss grow with us.
+          Mintiss's value grows every day! The more you shop, the more valuable your rewards become. Join the movement
+          and watch your Mintiss grow with us.
         </div>
         <div class="cta-buttons">
           <button class="mintiss-btn primary" @click="goToSignup">Get mintiss</button>
@@ -335,7 +336,8 @@ export default {
 
 .mintiss-btn.primary:hover {
   background: #1177bf;
-  color: #fff;;
+  color: #fff;
+  ;
 }
 
 .mintiss-btn.secondary:hover {
@@ -638,7 +640,8 @@ export default {
   max-width: 400px;
 }
 
-.current-value, .user-balance {
+.current-value,
+.user-balance {
   text-align: center;
 }
 
@@ -662,16 +665,19 @@ export default {
     flex-direction: column;
     align-items: center;
   }
+
   .gallery-img-wrapper {
     width: 100%;
     max-width: 600px;
   }
+
   .how-steps,
   .benefits-grid,
   .testimonials-grid {
     flex-direction: column;
     align-items: center;
   }
+
   .how-step,
   .benefit,
   .testimonial {
@@ -684,17 +690,17 @@ export default {
   .welcome-section {
     padding: 4rem 1rem;
   }
-  
+
   .welcome-content {
     padding: 2rem;
   }
-  
+
   .main-title {
-    font-size: 2.5rem;
+    font-size: 1.5rem;
   }
-  
+
   .subtitle {
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
 }
 </style>
