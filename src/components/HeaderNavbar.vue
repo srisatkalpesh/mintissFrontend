@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-lg bg-primary shadow-sm sticky-top" style="border-radius: 10px;">
+  <nav class="navbar navbar-expand-lg bgprimary shadow-sm sticky-top" >
     <div class="container-fluid">
       <!-- Brand -->
       <router-link class="navbar-brand fw-bold text-white fs-4" to="/">
@@ -55,6 +55,12 @@
               <i class="bi bi-person-circle me-2"></i>
               {{ userName }}
             </router-link>
+          </li>
+          <li class="mb-3" v-if="isLoggedIn">
+            <div class="text-white fw-semibold" style="cursor:pointer;" @click="logoutAndClose">
+              <i class="bi bi-box-arrow-right me-2"></i>
+              Logout
+            </div>
           </li>
         </ul>
       </div>
@@ -144,6 +150,10 @@ export default {
         console.error('Logout error:', error);
         toastService.error('Failed to logout');
       }
+    },
+    logoutAndClose() {
+      this.handleLogout();
+      this.toggleMenu();
     }
   },
 };
@@ -165,6 +175,10 @@ export default {
 .nav-link.active {
   font-weight: bold;
   color: #ffd700 !important;
+}
+
+.bgprimary {
+  background-color: #1177bf;
 }
 
 .nav-link::after {
@@ -190,7 +204,7 @@ export default {
   left: -250px;
   width: 250px;
   height: 100vh;
-  background-color: #0d6efd;
+  background-color: #1177bf;
   overflow-y: auto;
   transition: left 0.3s ease-in-out;
   z-index: 1050;

@@ -39,16 +39,6 @@
           <div class="gallery-caption">Share and connect with Mintiss</div>
         </div>
       </div>
-      <div class="gallery-row">
-        <div class="gallery-img-wrapper">
-          <img :src="mintiss3" alt="Secure Payment" class="gallery-img" />
-          <div class="gallery-caption">Shop securely, pay easily</div>
-        </div>
-        <div class="gallery-img-wrapper">
-          <img :src="mintiss4" alt="Mintiss Conversation" class="gallery-img" />
-          <div class="gallery-caption">All your rewards in one app</div>
-        </div>
-      </div>
     </section>
 
     <!-- How Mintiss Works Section -->
@@ -88,16 +78,6 @@
           <p>Get rewarded for every purchase, every day.</p>
         </div>
         <div class="benefit">
-          <div class="benefit-icon"><i class="bi bi-shield-lock"></i></div>
-          <h4>Shop Securely</h4>
-          <p>Your data and payments are always protected.</p>
-        </div>
-        <div class="benefit">
-          <div class="benefit-icon"><i class="bi bi-arrow-repeat"></i></div>
-          <h4>Easy Returns</h4>
-          <p>Hassle-free returns and quick refunds.</p>
-        </div>
-        <div class="benefit">
           <div class="benefit-icon"><i class="bi bi-chat-dots"></i></div>
           <h4>24/7 Support</h4>
           <p>We're here for you, anytime you need help.</p>
@@ -106,26 +86,25 @@
     </section>
 
     <!-- Testimonials Section -->
+    <!--
     <section class="testimonials-section">
       <h2>What Our Users Say</h2>
       <div class="testimonials-grid">
         <div class="testimonial">
-          <!-- <div class="avatar"><i class="bi bi-emoji-smile"></i></div> -->
           <p class="quote">"Mintiss makes shopping so much more rewarding! I love the instant cashback."</p>
           <div class="user">— Priya S.</div>
         </div>
         <div class="testimonial">
-          <!-- <div class="avatar"><i class="bi bi-emoji-sunglasses"></i></div> -->
           <p class="quote">"The app is super easy to use and the support team is fantastic."</p>
           <div class="user">— Rahul M.</div>
         </div>
         <div class="testimonial">
-          <!-- <div class="avatar"><i class="bi bi-emoji-heart-eyes"></i></div> -->
           <p class="quote">"I've saved so much with Mintiss rewards. Highly recommended!"</p>
           <div class="user">— Anjali K.</div>
         </div>
       </div>
     </section>
+    -->
 
     <!-- Footer Call-to-Action -->
     <section class="footer-cta-section">
@@ -258,7 +237,7 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url('@/assets/mintiss1.png');
+  background-image: url('@/assets/hero-bg.png');
   background-size: cover;
   background-position: center;
   z-index: 1;
@@ -309,23 +288,30 @@ export default {
 
 .cta-buttons {
   display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   justify-content: center;
   gap: 1rem;
+  width: 100%;
+  overflow-x: auto;
 }
 
 .mintiss-btn {
-  padding: 0.75rem 2rem;
-  border: none;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0.3rem;
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
   box-shadow: 0 2px 8px rgba(135, 206, 235, 0.10);
+  border: none;
 }
 
 .mintiss-btn.primary {
-  background: #1177bf;
-  color: #fff;
+  background: #fff;
+  color: #1177bf;
+  border: 2px solid #fff;
 }
 
 .mintiss-btn.secondary {
@@ -337,7 +323,6 @@ export default {
 .mintiss-btn.primary:hover {
   background: #1177bf;
   color: #fff;
-  ;
 }
 
 .mintiss-btn.secondary:hover {
@@ -701,6 +686,15 @@ export default {
 
   .subtitle {
     font-size: 1rem;
+  }
+
+  footer .row {
+    text-align: center;
+    justify-content: center !important;
+  }
+  footer .col-md-4 {
+    text-align: center;
+    margin-bottom: 1rem;
   }
 }
 </style>

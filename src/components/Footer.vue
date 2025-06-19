@@ -1,39 +1,39 @@
 <template>
   <footer class="bg-light text-dark py-3 border-top shadow-sm">
     <div class="container">
-      <div class="row gy-4 align-items-center">
-        <!-- Links Section -->
-        <div class="col-md-4">
-          <h5 class="fw-semibold mb-3">Quick Links</h5>
-          <ul class="list-unstyled">
-            <li><a href="/" class="footer-link">Home</a></li>
-            <li><a href="/about" class="footer-link">About</a></li>
-            <li><a href="/contact" class="footer-link">Contact</a></li>
-          </ul>
-        </div>
-
-        <!-- Contact & Support -->
-        <div class="col-md-4">
-          <h5 class="fw-semibold mb-3">Support</h5>
-          <p class="mb-2">
-            <i class="bi bi-envelope-fill text-primary me-2"></i>
-            <a href="mailto:support@mintiss.com" class="footer-link text-primary">
-              support@mintiss.com
-            </a>
-          </p>
-          <p class="mb-0">
-            <i class="bi bi-telephone-fill text-primary me-2"></i>
-            <a href="tel:+91 9825714909" class="footer-link text-primary"> +91 9825714909 </a>
-          </p>
-        </div>
-
-        <!-- Copyright -->
-        <div class="col-md-4 text-center text-md-end">
-          <p class="mb-1">&copy; 2025 <strong>Mintiss</strong>. All rights reserved.</p>
-          <p class="small text-muted">Crafted with 💙 by Axit Patel & team</p>
-        </div>
-      </div>
+  <div class="row gy-4 align-items-center justify-content-between">
+       <!-- Quick Links - CENTER -->
+       <div class="col-md-4 order-2 order-md-2 d-flex flex-column align-items-center">
+      <h5 class="fw-semibold mb-3 text-center">Quick Links</h5>
+      <ul class="list-unstyled text-center">
+        <li><a href="/" class="footer-link">Home</a></li>
+        <li><a href="/about" class="footer-link">About</a></li>
+        <li><a href="/contact" class="footer-link">Contact</a></li>
+      </ul>
     </div>
+    <!-- Support -->
+    <div class="col-md-4 order-1 order-md-1 text-md-start text-center">
+      <h5 class="fw-semibold mb-3">Support</h5>
+      <p class="mb-2">
+        <i class="bi bi-envelope-fill text-primary me-2"></i>
+        <a href="mailto:support@mintiss.com" class="footer-link text-primary">support@mintiss.com</a>
+      </p>
+      <p class="mb-0">
+        <i class="bi bi-telephone-fill text-primary me-2"></i>
+        <a href="tel:+91 9825714909" class="footer-link text-primary">+91 9825714909</a>
+      </p>
+    </div>
+
+ 
+
+    <!-- Copyright -->
+    <div class="col-md-4 order-3 order-md-3 text-md-end text-center">
+      <p class="mb-1">&copy; 2025 <strong>Mintiss</strong>. All rights reserved.</p>
+      <p class="small text-muted">Crafted with 💙 by Axit Patel & team</p>
+    </div>
+  </div>
+</div>
+
   </footer>
 </template>
 
@@ -62,4 +62,20 @@ footer {
   color: #0d6efd;
   text-decoration: underline;
 }
+@media (min-width: 768px) {
+  footer .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  footer .col-md-4:nth-child(2) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+}
 </style>
+
+
