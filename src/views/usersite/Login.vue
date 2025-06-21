@@ -31,6 +31,19 @@
                     </button>
                 </form>
 
+                <!-- Divider -->
+                <div class="text-center my-3">
+                    <span class="bg-white px-3 text-muted">or</span>
+                    <hr class="mt-n3">
+                </div>
+
+                <!-- Google Login Button -->
+                <button @click="handleGoogleLogin" class="btn btn-outline-secondary w-100 fw-bold" :disabled="googleLoading">
+                    <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" class="me-2" style="width: 18px; height: 18px;">
+                    <span v-if="googleLoading" class="spinner-border spinner-border-sm me-2"></span>
+                    {{ googleLoading ? 'Connecting to Google...' : 'Continue with Google' }}
+                </button>
+
                 <p v-if="errors.general" class="text-danger text-center mt-3">{{ errors.general }}</p>
 
                 <!-- Signup Redirect -->
@@ -45,7 +58,7 @@
 
 <script>
 import axios from '@/axios';
-
+import googleAuthService from '@/services/googleAuthService';
 
 export default {
     name: "Login",
@@ -54,8 +67,19 @@ export default {
             phone: '',
             password: '',
             errors: {},
-            loading: false
+            loading: false,
+            googleLoading: false
         };
+    },
+    mounted() {
+        // Check for error in URL query parameters (from Google callback)
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        if (error) {
+            this.errors.general = error;
+            // Clear the URL query parameters
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
     },
     methods: {
         async handleLogin() {
@@ -92,6 +116,28 @@ export default {
                 } else {
                     this.errors.general = 'Login failed. Please check your credentials.';
                 }
+            }
+        },
+
+        async handleGoogleLogin() {
+            this.errors = {};
+            this.googleLoading = true;
+            
+            try {
+                // Set up error handler
+                window.googleAuthError = (error) => {
+                    this.googleLoading = false;
+                    this.errors.general = 'Google login failed. Please try again.';
+                    console.error('Google auth error:', error);
+                };
+
+                // Use redirect flow for better compatibility
+                googleAuthService.redirectToGoogle();
+                
+            } catch (error) {
+                this.googleLoading = false;
+                this.errors.general = 'Google login failed. Please try again.';
+                console.error('Google login error:', error);
             }
         }
     }

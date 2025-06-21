@@ -20,6 +20,11 @@
           Mintiss's value grows every day! The more you shop, the more valuable your rewards become. Join the movement
           and watch your Mintiss grow with us.
         </div>
+        <!-- Area Chart for Mintiss Value History -->
+        <div v-if="!isChartLoading" class="mintiss-area-chart">
+          <apexchart type="area" height="320"  :options="chartOptions" :series="chartSeries" />
+        </div>
+        <div v-else class="text-white text-center py-3">Loading chart...</div>
         <div class="cta-buttons">
           <button class="mintiss-btn primary" @click="goToSignup">Get mintiss</button>
           <button v-if="!isLoggedIn" class="mintiss-btn secondary" @click="goToSignup">Create account</button>
@@ -120,9 +125,13 @@ import mintiss2 from '@/assets/mintiss2.png';
 import mintiss3 from '@/assets/mintiss3.png';
 import mintiss4 from '@/assets/mintiss4.png';
 import axios from '@/axios';
+import VueApexCharts from 'vue3-apexcharts';
 
 export default {
   name: "HomeView",
+  components: {
+    apexchart: VueApexCharts,
+  },
   data() {
     return {
       mintiss1,
@@ -133,7 +142,46 @@ export default {
       targetValue: 0,
       isLoading: true,
       userBalance: null,
-      isLoggedIn: false
+      isLoggedIn: false,
+      // Chart data
+      chartSeries: [{ name: 'Mintiss Value', data: [] }],
+      chartOptions: {
+        chart: {
+          type: 'area',
+          toolbar: { show: false },
+          zoom: { enabled: false },
+          background: 'transparent',
+          width: '100%',
+        },
+        dataLabels: { enabled: false },
+        stroke: { curve: 'smooth', width: 2 },
+        xaxis: {
+          type: 'category',
+          labels: { rotate: -45, style: { colors: '#fff', fontSize: '14px', fontWeight: 600 } },
+          axisBorder: { show: false },
+          axisTicks: { show: false },
+          tooltip: { enabled: true },
+        },
+        yaxis: {
+          labels: { style: { colors: '#fff', fontSize: '14px', fontWeight: 600 } },
+          axisBorder: { show: false },
+          axisTicks: { show: false },
+        },
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shadeIntensity: 1,
+            opacityFrom: 0.5,
+            opacityTo: 0.1,
+            stops: [0, 90, 100]
+          }
+        },
+        grid: { borderColor: 'rgba(255,255,255,0.15)', strokeDashArray: 4 },
+        tooltip: { x: { format: 'dd-MM-yyyy' } },
+        colors: ['#ffd700'],
+        background: 'transparent',
+      },
+      isChartLoading: true,
     };
   },
   beforeRouteEnter(to, from, next) {
@@ -147,6 +195,7 @@ export default {
       sessionStorage.setItem('pageRefreshed', 'true');
       window.location.reload();
     }
+    this.fetchMintissChartData();
   },
   activated() {
     // This will be called every time the component is re-visited
@@ -203,7 +252,24 @@ export default {
     },
     goToSignup() {
       this.$router.push('/signup');
-    }
+    },
+    async fetchMintissChartData() {
+      this.isChartLoading = true;
+      try {
+        const response = await axios.get('/mintiss-values');
+        // Group by date and get the last value for each date
+        const grouped = {};
+        response.data.forEach(item => {
+          grouped[item.date] = item.value;
+        });
+        const chartData = Object.entries(grouped).map(([date, value]) => ({ x: date, y: value }));
+        this.chartSeries = [{ name: 'Mintiss Value', data: chartData }];
+      } catch (error) {
+        console.error('Error fetching mintiss values for chart:', error);
+      } finally {
+        this.isChartLoading = false;
+      }
+    },
   }
 };
 </script>
@@ -645,6 +711,17 @@ export default {
   letter-spacing: 1px;
 }
 
+.mintiss-area-chart {
+  background: transparent;
+  border-radius: 0.5rem;
+  margin: 1.5rem 0 0.5rem 0;
+  padding: 0;
+  width: 100%;
+  min-width: 0;
+  display: block;
+  box-shadow: none;
+}
+
 @media (max-width: 900px) {
   .gallery-row {
     flex-direction: column;
@@ -668,6 +745,19 @@ export default {
   .testimonial {
     width: 90%;
     max-width: 400px;
+  }
+
+  .mintiss-area-chart {
+    max-width: 100vw;
+    padding: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .mintiss-area-chart {
+    max-width: 100vw;
+    padding: 0;
+    border-radius: 0.3rem;
   }
 }
 

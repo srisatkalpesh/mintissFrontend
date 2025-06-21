@@ -42,6 +42,19 @@
           </button>
         </form>
 
+        <!-- Divider -->
+        <div class="text-center my-3">
+          <span class="bg-white px-3 text-muted">or</span>
+          <hr class="mt-n3">
+        </div>
+
+        <!-- Google Signup Button -->
+        <button @click="handleGoogleSignup" class="btn btn-outline-secondary w-100 fw-bold" :disabled="googleLoading">
+          <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" class="me-2" style="width: 18px; height: 18px;">
+          <span v-if="googleLoading" class="spinner-border spinner-border-sm me-2"></span>
+          {{ googleLoading ? 'Connecting to Google...' : 'Sign up with Google' }}
+        </button>
+
         <p v-if="errors.general" class="text-danger text-center mt-3">{{ errors.general }}</p>
 
         <p class="text-center mt-3 small">
@@ -55,6 +68,7 @@
 
 <script>
 import axios from '@/axios';
+import googleAuthService from '@/services/googleAuthService';
 
 export default {
   name: "UserSignup",
@@ -66,7 +80,8 @@ export default {
       password: '',
       confirmPassword: '',
       errors: {},
-      loading: false
+      loading: false,
+      googleLoading: false
     };
   },
   methods: {
@@ -114,6 +129,28 @@ export default {
         }
       } finally {
         this.loading = false;
+      }
+    },
+
+    async handleGoogleSignup() {
+      this.errors = {};
+      this.googleLoading = true;
+      
+      try {
+        // Set up error handler
+        window.googleAuthError = (error) => {
+          this.googleLoading = false;
+          this.errors.general = 'Google signup failed. Please try again.';
+          console.error('Google auth error:', error);
+        };
+
+        // Use redirect flow for better compatibility
+        googleAuthService.redirectToGoogle();
+        
+      } catch (error) {
+        this.googleLoading = false;
+        this.errors.general = 'Google signup failed. Please try again.';
+        console.error('Google signup error:', error);
       }
     }
   }

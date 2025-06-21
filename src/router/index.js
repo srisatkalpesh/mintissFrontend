@@ -39,6 +39,11 @@ const routes = [
     component: () => import("../views/usersite/UserSignup.vue"),
   },
   {
+    path: "/auth/google/callback/:params?",
+    name: "GoogleCallback",
+    component: () => import("../views/usersite/GoogleCallback.vue"),
+  },
+  {
     path: "/profile",
     name: "Profile",
     component: () => import("../views/usersite/Profile.vue"),
@@ -59,6 +64,11 @@ const routes = [
         path: "categories",
         name: "AdminCategories",
         component: () => import("../views/admin/Categories.vue")
+      },
+      {
+        path: "users",
+        name: "Adminusers",
+        component: () => import("../views/admin/Users.vue")
       },
       {
         path: "sub-categories",

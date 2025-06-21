@@ -33,6 +33,12 @@
                     </router-link>
                 </li>
                 <li class="nav-item">
+                    <router-link to="/admin/users" class="nav-link text-white">
+                        <i class="bi bi-people me-2"></i>
+                        Users
+                    </router-link>
+                </li>
+                <li class="nav-item">
                     <router-link to="/admin/mintiss-values" class="nav-link text-white">
                         <i class="bi bi-currency-dollar me-2"></i>
                         Mintiss Values
