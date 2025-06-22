@@ -389,10 +389,11 @@ export default {
 
 .form-group select,
 .form-group input {
+  width: 100%;
+  box-sizing: border-box;
   padding: 0.75rem;
   border: 1px solid #ced4da;
   border-radius: 6px;
-  font-size: 1rem;
 }
 
 .form-group select:focus,
@@ -481,6 +482,12 @@ export default {
   text-align: center;
   color: #6c757d;
   font-style: italic;
+}
+
+@media (max-width: 992px) {
+  .form-row {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (max-width: 768px) {

@@ -1,8 +1,8 @@
 <template>
     <div class="container-fluid min-vh-86 d-flex justify-content-center align-items-center bg-light">
-        <div class="card shadow-lg rounded-4 border-0 w-100" style="max-width: 500px;">
+        <div class="card shadow-lg border-0 w-100 my-5" style="max-width: 500px;">
             <!-- Header -->
-            <div class="bg-primary text-white rounded-top-4 p-4 text-center">
+            <div class="bg-primary text-white p-4 text-center">
                 <h2 class="mb-1 fs-3">Welcome Back</h2>
                 <p class="mb-0 small">Please login to your account</p>
             </div>
@@ -11,7 +11,22 @@
             <div class="card-body p-4">
                 <form @submit.prevent="handleLogin">
                     <div class="mb-3">
-                        <input type="tel" v-model="phone" class="form-control" placeholder="Phone Number" required />
+                        <vue-tel-input
+                            v-model="phone"
+                            :inputOptions="{
+                                placeholder: 'Phone Number',
+                                required: true
+                            }"
+                            :dropdownOptions="{
+                                showDialCodeInSelection: true,
+                                showDialCodeInList: true
+                            }"
+                            :enabledCountryCode="true"
+                            :enabledFlags="true"
+                            :preferredCountries="['US', 'GB', 'IN', 'CA', 'AU']"
+                            :validCharactersOnly="true"
+                            @input="onPhoneInput"
+                        />
                         <div v-if="errors.phone" class="text-danger small mt-1">
                             {{ errors.phone[0] }}
                         </div>
@@ -82,6 +97,11 @@ export default {
         }
     },
     methods: {
+        onPhoneInput(formattedNumber, phoneObject) {
+            if (phoneObject) {
+                this.phone = phoneObject.number;
+            }
+        },
         async handleLogin() {
             this.errors = {};
             this.loading = true;
@@ -153,5 +173,59 @@ export default {
 
 .min-vh-86 {
     min-height: 86vh;
+}
+
+/* Custom styles for vue-tel-input */
+:deep(.vue-tel-input) {
+    border-radius: 0.375rem;
+    border: 1px solid #ced4da;
+}
+
+:deep(.vue-tel-input.vti--focus) {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+:deep(.vti__dropdown) {
+    border: none;
+    background: transparent;
+    padding: 0.375rem 0.75rem;
+}
+
+:deep(.vti__dropdown-list) {
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+:deep(.vti__dropdown-item) {
+    padding: 0.5rem 0.75rem;
+}
+
+:deep(.vti__dropdown-item:hover) {
+    background-color: #f8f9fa;
+}
+
+:deep(.vti__dropdown-item.selected) {
+    background-color: #e9ecef;
+}
+
+:deep(.vti__input) {
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0.375rem 0.75rem;
+    height: 36px;
+    box-sizing: border-box;
+}
+
+:deep(.vti__flag) {
+    margin-right: 0.5rem;
+}
+
+:deep(.vti__selection) {
+    display: flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
 }
 </style>
