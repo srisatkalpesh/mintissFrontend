@@ -2,7 +2,7 @@
     <div class="container-fluid min-vh-86 d-flex justify-content-center align-items-center bg-light">
         <div class="card shadow-lg border-0 w-100 my-5" style="max-width: 500px;">
             <!-- Header -->
-            <div class="bg-primary text-white p-4 text-center">
+            <div class="text-white p-4 text-center" style="background-color: #1177bf;">
                 <h2 class="mb-1 fs-3">Welcome Back</h2>
                 <p class="mb-0 small">Please login to your account</p>
             </div>

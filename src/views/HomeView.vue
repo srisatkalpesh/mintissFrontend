@@ -331,25 +331,19 @@ export default {
 }
 
 .main-title {
-  font-size: 3.5rem;
-  font-weight: 800;
+  font-size: 2.5rem;
   color: white;
-  margin-bottom: 1.5rem;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
   letter-spacing: -0.5px;
-  line-height: 1.2;
 }
 
 .subtitle {
-  font-size: 1.5rem;
+  font-size: 1rem;
   color: white;
-  margin-bottom: 2rem;
-  line-height: 1.6;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
-  padding: 0 1rem;
 }
 
 .cta-buttons {
@@ -771,11 +765,11 @@ export default {
   }
 
   .main-title {
-    font-size: 1.5rem;
+    font-size: 1rem;
   }
 
   .subtitle {
-    font-size: 1rem;
+    font-size: 0.8rem;
   }
 
   footer .row {
