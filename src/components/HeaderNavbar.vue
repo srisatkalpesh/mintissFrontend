@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-lg bgprimary shadow-sm sticky-top" >
+  <nav v-if="!isSeller" class="navbar navbar-expand-lg bgprimary shadow-sm sticky-top" >
     <div class="container-fluid">
       <!-- Brand -->
       <router-link class="navbar-brand fw-bold text-white fs-4" to="/">
@@ -19,6 +19,23 @@
               :to="link.path">
               {{ link.name }}
             </router-link>
+          </li>
+          <!-- Admin-specific quick links -->
+          <li class="nav-item" v-if="isAdmin">
+            <div class="dropdown">
+              <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-gear me-1"></i>
+                Admin
+              </button>
+              <ul class="dropdown-menu">
+                <li><router-link class="dropdown-item" to="/admin/categories">Categories</router-link></li>
+                <li><router-link class="dropdown-item" to="/admin/users">Users</router-link></li>
+                <li><router-link class="dropdown-item" to="/admin/products">Products</router-link></li>
+                <li><router-link class="dropdown-item" to="/admin/sub-categories">Sub Categories</router-link></li>
+                <li><router-link class="dropdown-item" to="/admin/mintiss-values">Mintiss Values</router-link></li>
+                <li><router-link class="dropdown-item" to="/admin/signup-bonus">Signup Bonus</router-link></li>
+              </ul>
+            </div>
           </li>
           <li class="nav-item" v-if="isLoggedIn">
             <div class="nav-link text-white mx-2 d-flex align-items-center">
@@ -43,6 +60,33 @@
               @click="toggleMenu">
               {{ link.name }}
             </router-link>
+          </li>
+          <!-- Admin-specific mobile links -->
+          <li class="mb-3" v-if="isAdmin">
+            <div class="text-white fw-semibold mb-2">
+              <i class="bi bi-gear me-2"></i>
+              Admin Panel
+            </div>
+            <ul class="list-unstyled ms-3">
+              <li class="mb-2">
+                <router-link to="/admin/categories" class="text-white" @click="toggleMenu">Categories</router-link>
+              </li>
+              <li class="mb-2">
+                <router-link to="/admin/users" class="text-white" @click="toggleMenu">Users</router-link>
+              </li>
+              <li class="mb-2">
+                <router-link to="/admin/products" class="text-white" @click="toggleMenu">Products</router-link>
+              </li>
+              <li class="mb-2">
+                <router-link to="/admin/sub-categories" class="text-white" @click="toggleMenu">Sub Categories</router-link>
+              </li>
+              <li class="mb-2">
+                <router-link to="/admin/mintiss-values" class="text-white" @click="toggleMenu">Mintiss Values</router-link>
+              </li>
+              <li class="mb-2">
+                <router-link to="/admin/signup-bonus" class="text-white" @click="toggleMenu">Signup Bonus</router-link>
+              </li>
+            </ul>
           </li>
           <li class="mb-3" v-if="isLoggedIn">
             <div class="text-white fw-semibold d-flex align-items-center">
@@ -95,6 +139,14 @@ export default {
     userName() {
       const user = JSON.parse(localStorage.getItem('user'));
       return user ? user.name : '';
+    },
+    isSeller() {
+      const user = JSON.parse(localStorage.getItem('user'));
+      return user ? (user.role === 'Seller' || user.role === 'seller') : false;
+    },
+    isAdmin() {
+      const user = JSON.parse(localStorage.getItem('user'));
+      return user ? (user.role === 'Admin' || user.role === 'admin') : false;
     }
   },
   watch: {

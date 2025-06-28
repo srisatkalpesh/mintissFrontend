@@ -114,7 +114,7 @@
     <!-- Footer Call-to-Action -->
     <section class="footer-cta-section">
       <h2>Ready to start earning with Mintiss?</h2>
-      <button class="mintiss-btn primary" @click="goToSignup">Join Now</button>
+      <button class="mintiss-btn primary" @click="goToSellerSignup">Join Now</button>
     </section>
   </div>
 </template>
@@ -252,6 +252,9 @@ export default {
     },
     goToSignup() {
       this.$router.push('/signup');
+    },
+    goToSellerSignup() {
+      this.$router.push('/seller/signup');
     },
     async fetchMintissChartData() {
       this.isChartLoading = true;

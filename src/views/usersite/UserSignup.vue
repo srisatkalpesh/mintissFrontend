@@ -99,10 +99,22 @@ export default {
       googleLoading: false
     };
   },
+  watch: {
+    phone: {
+      handler(newValue) {
+        // Ensure phone number is always cleaned of spaces
+        if (newValue && newValue !== newValue.replace(/\s/g, '')) {
+          this.phone = newValue.replace(/\s/g, '');
+        }
+      },
+      immediate: true
+    }
+  },
   methods: {
     onPhoneInput(formattedNumber, phoneObject) {
       if (phoneObject) {
-        this.phone = phoneObject.number;
+        // Remove all spaces from the phone number
+        this.phone = phoneObject.number.replace(/\s/g, '');
       }
     },
     async handleSignup() {
@@ -116,11 +128,14 @@ export default {
 
       this.loading = true;
       try {
+        // Clean phone number by removing all spaces
+        const cleanPhone = this.phone.replace(/\s/g, '');
+        
         const baseURL = process.env.VUE_APP_API_BASE_URL;
         const response = await axios.post(`${baseURL}/signup`, {
           name: this.name,
           email: this.email,
-          phone: this.phone,
+          phone: cleanPhone,
           password: this.password,
           password_confirmation: this.confirmPassword
         });
@@ -133,8 +148,15 @@ export default {
 
         console.log("Signup successful:", user);
 
-        // Redirect to dashboard or other protected route after signup
-        this.$router.push('/');
+        // Redirect based on user type
+        if (user.role === 'admin' || user.type === 'admin' || user.role === 'Admin' || user.type === 'Admin') {
+            this.$router.push('/admin/categories');
+        } else if (user.role === 'Seller' || user.type === 'Seller' || user.role === 'seller' || user.type === 'seller') {
+            this.$router.push('/seller/dashboard');
+        } else {
+            // Redirect to dashboard or other protected route after signup
+            window.location.href = '/';
+        }
 
       } catch (error) {
         if (error.response && error.response.data) {

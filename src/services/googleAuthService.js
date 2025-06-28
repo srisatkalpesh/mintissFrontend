@@ -37,8 +37,10 @@ class GoogleAuthService {
                 localStorage.setItem('token', token);
 
                 // Redirect based on user type
-                if (user.role === 'admin' || user.type === 'admin') {
+                if (user.role === 'admin' || user.type === 'admin' || user.role === 'Admin' || user.type === 'Admin') {
                     window.location.href = '/admin/categories';
+                } else if (user.role === 'Seller' || user.type === 'Seller' || user.role === 'seller' || user.type === 'seller') {
+                    window.location.href = '/seller/dashboard';
                 } else {
                     window.location.href = '/';
                 }
@@ -120,8 +122,10 @@ class GoogleAuthService {
             localStorage.setItem('token', token);
 
             // Redirect based on user type
-            if (user.role === 'admin' || user.type === 'admin') {
+            if (user.role === 'admin' || user.type === 'admin' || user.role === 'Admin' || user.type === 'Admin') {
                 window.location.href = '/admin/categories';
+            } else if (user.role === 'Seller' || user.type === 'Seller' || user.role === 'seller' || user.type === 'seller') {
+                window.location.href = '/seller/dashboard';
             } else {
                 window.location.href = '/';
             }

@@ -96,19 +96,37 @@ export default {
             window.history.replaceState({}, document.title, window.location.pathname);
         }
     },
+    watch: {
+      phone: {
+        handler(newValue) {
+          // Ensure phone number is always cleaned of spaces
+          if (newValue && newValue !== newValue.replace(/\s/g, '')) {
+            this.phone = newValue.replace(/\s/g, '');
+          }
+        },
+        immediate: true
+      }
+    },
     methods: {
         onPhoneInput(formattedNumber, phoneObject) {
             if (phoneObject) {
-                this.phone = phoneObject.number;
+                // Remove all spaces from the phone number
+                this.phone = phoneObject.number.replace(/\s/g, '');
             }
         },
         async handleLogin() {
             this.errors = {};
             this.loading = true;
             try {
+                // Clean phone number by removing all spaces
+                const cleanPhone = this.phone.replace(/\s/g, '');
+                
+                console.log('Original phone:', this.phone);
+                console.log('Clean phone:', cleanPhone);
+                
                 const baseURL = process.env.VUE_APP_API_BASE_URL;
                 const response = await axios.post(`${baseURL}/login`, {
-                    phone: this.phone,
+                    phone: cleanPhone,
                     password: this.password
                 });
 
@@ -116,11 +134,19 @@ export default {
 
                 localStorage.setItem('user', JSON.stringify(user));
                 localStorage.setItem('token', token);
-
+                console.log('User object:', user);
+                console.log('User role:', user.role);
+                console.log('User type:', user.type);
+                
                 // Redirect based on user type
-                if (user.role === 'admin' || user.type === 'admin') {
+                if (user.role === 'admin' || user.type === 'admin' || user.role === 'Admin' || user.type === 'Admin') {
+                    console.log('Redirecting to admin');
                     this.$router.push('/admin/categories');
+                } else if (user.role === 'Seller' || user.type === 'Seller' || user.role === 'seller' || user.type === 'seller') {
+                    console.log('Seller called');
+                    this.$router.push('/seller/dashboard');
                 } else {
+                    console.log('Redirecting to home');
                     window.location.href = '/';
                 }
 

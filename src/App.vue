@@ -1,10 +1,10 @@
 <template>
   <div id="app">
-    <HeaderNavbar v-if="!isAdminRoute" />
+    <HeaderNavbar v-if="!isAdminRoute && !isSellerRoute" />
     <keep-alive>
       <router-view />
     </keep-alive>
-    <AppFooter v-if="!isAdminRoute" />
+    <AppFooter v-if="!isAdminRoute && !isSellerRoute" />
   </div>
 </template>
 
@@ -21,6 +21,9 @@ export default {
   computed: {
     isAdminRoute() {
       return this.$route.path.startsWith('/admin');
+    },
+    isSellerRoute() {
+      return this.$route.path.startsWith('/seller');
     }
   }
 };
