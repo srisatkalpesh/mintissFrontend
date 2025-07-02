@@ -15,24 +15,6 @@
             </div>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <router-link to="/admin/categories" class="nav-link text-white">
-                        <i class="bi bi-grid me-2"></i>
-                        Categories
-                    </router-link>
-                </li>
-                <li class="nav-item">
-                    <router-link to="/admin/sub-categories" class="nav-link text-white">
-                        <i class="bi bi-grid-3x3 me-2"></i>
-                        Sub Categories
-                    </router-link>
-                </li>
-                <li class="nav-item">
-                    <router-link to="/admin/products" class="nav-link text-white">
-                        <i class="bi bi-box me-2"></i>
-                        Products
-                    </router-link>
-                </li>
-                <li class="nav-item">
                     <router-link to="/admin/users" class="nav-link text-white">
                         <i class="bi bi-people me-2"></i>
                         Users

@@ -14,11 +14,7 @@ const routes = [
     name: "about",
     component: () => import("../views/AboutView.vue"),
   },
-  {
-    path: "/shop",
-    name: "Shop",
-    component: () => import("../views/usersite/UserShop.vue"),
-  },
+
   {
     path: "/cart",
     name: "Cart",
@@ -56,11 +52,6 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: "/category/:id",
-    name: "Category",
-    component: () => import("../views/usersite/CategoryView.vue"),
-  },
-  {
     path: "/admin",
     name: "Admin",
     component: AdminLayout,
@@ -68,27 +59,12 @@ const routes = [
     children: [
       {
         path: "",
-        redirect: "/admin/categories"
-      },
-      {
-        path: "categories",
-        name: "AdminCategories",
-        component: () => import("../views/admin/Categories.vue")
+        redirect: "/admin/users"
       },
       {
         path: "users",
         name: "Adminusers",
         component: () => import("../views/admin/Users.vue")
-      },
-      {
-        path: "sub-categories",
-        name: "AdminSubCategories",
-        component: () => import("../views/admin/SubCategories.vue")
-      },
-      {
-        path: "products",
-        name: "AdminProducts",
-        component: () => import("../views/admin/Products.vue")
       },
       {
         path: "mintiss-values",
@@ -113,24 +89,9 @@ const routes = [
         redirect: "/seller/dashboard"
       },
       {
-        path: "test",
-        name: "SellerTest",
-        component: () => import("../views/sellersite/Test.vue")
-      },
-      {
         path: "dashboard",
         name: "SellerDashboard",
         component: () => import("../views/sellersite/Dashboard.vue")
-      },
-      {
-        path: "products",
-        name: "SellerProducts",
-        component: () => import("../views/sellersite/Products.vue")
-      },
-      {
-        path: "orders",
-        name: "SellerOrders",
-        component: () => import("../views/sellersite/Orders.vue")
       },
       {
         path: "analytics",

@@ -150,7 +150,7 @@ export default {
 
         // Redirect based on user type
         if (user.role === 'admin' || user.type === 'admin' || user.role === 'Admin' || user.type === 'Admin') {
-            this.$router.push('/admin/categories');
+            this.$router.push('/admin');
         } else if (user.role === 'Seller' || user.type === 'Seller' || user.role === 'seller' || user.type === 'seller') {
             this.$router.push('/seller/dashboard');
         } else {

@@ -15,12 +15,6 @@
             </div>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <router-link to="/seller/test" class="nav-link text-white">
-                        <i class="bi bi-bug me-2"></i>
-                        Test Page
-                    </router-link>
-                </li>
-                <li class="nav-item">
                     <router-link to="/seller/dashboard" class="nav-link text-white">
                         <i class="bi bi-speedometer2 me-2"></i>
                         Dashboard
@@ -30,12 +24,6 @@
                     <router-link to="/seller/products" class="nav-link text-white">
                         <i class="bi bi-box me-2"></i>
                         My Products
-                    </router-link>
-                </li>
-                <li class="nav-item">
-                    <router-link to="/seller/orders" class="nav-link text-white">
-                        <i class="bi bi-cart me-2"></i>
-                        Orders
                     </router-link>
                 </li>
                 <li class="nav-item">

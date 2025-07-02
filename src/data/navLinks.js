@@ -7,13 +7,8 @@ export function getRoutes() {
     const userObj = JSON.parse(user);
 
     if (userObj.role === "admin" || userObj.role === "Admin") {
-      // Admin-specific routes
       routes = [
-        { name: "Admin Panel", path: "/admin/categories" },
-        { name: "Categories", path: "/admin/categories" },
         { name: "Users", path: "/admin/users" },
-        { name: "Products", path: "/admin/products" },
-        { name: "Sub Categories", path: "/admin/sub-categories" },
         { name: "Mintiss Values", path: "/admin/mintiss-values" },
         { name: "Signup Bonus", path: "/admin/signup-bonus" },
       ];
