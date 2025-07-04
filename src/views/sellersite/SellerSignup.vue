@@ -50,6 +50,35 @@
               <div v-if="errors.confirmPassword" class="text-danger small mt-1">{{ errors.confirmPassword[0] }}</div>
             </div>
   
+            <div class="mb-3">
+              <input type="text" v-model="store_name" class="form-control" placeholder="Store Name" required />
+              <div v-if="errors.store_name" class="text-danger small mt-1">{{ errors.store_name[0] }}</div>
+            </div>
+            <div class="mb-3">
+              <input type="text" v-model="store_category" class="form-control" placeholder="Store Category" required />
+              <div v-if="errors.store_category" class="text-danger small mt-1">{{ errors.store_category[0] }}</div>
+            </div>
+            <div class="mb-3">
+              <textarea v-model="store_description" class="form-control" placeholder="Store Description" required></textarea>
+              <div v-if="errors.store_description" class="text-danger small mt-1">{{ errors.store_description[0] }}</div>
+            </div>
+            <div class="mb-3">
+              <input type="text" v-model="store_address" class="form-control" placeholder="Store Address" required />
+              <div v-if="errors.store_address" class="text-danger small mt-1">{{ errors.store_address[0] }}</div>
+            </div>
+            <div class="mb-3">
+              <input type="text" v-model="store_city" class="form-control" placeholder="Store City" required />
+              <div v-if="errors.store_city" class="text-danger small mt-1">{{ errors.store_city[0] }}</div>
+            </div>
+            <div class="mb-3">
+              <input type="text" v-model="store_state" class="form-control" placeholder="Store State" required />
+              <div v-if="errors.store_state" class="text-danger small mt-1">{{ errors.store_state[0] }}</div>
+            </div>
+            <div class="mb-3">
+              <input type="text" v-model="store_zip_code" class="form-control" placeholder="Store Zip Code" required />
+              <div v-if="errors.store_zip_code" class="text-danger small mt-1">{{ errors.store_zip_code[0] }}</div>
+            </div>
+  
             <button type="submit" class="btn btn-primary w-100 fw-bold" :disabled="loading">
               <span v-if="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
               <span v-if="!loading">Sign Up</span>
@@ -62,13 +91,6 @@
             <span class="bg-white px-3 text-muted">or</span>
             <hr class="mt-n3">
           </div>
-  
-          <!-- Google Signup Button -->
-          <button @click="handleGoogleSignup" class="btn btn-outline-secondary w-100 fw-bold" :disabled="googleLoading">
-            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" class="me-2" style="width: 18px; height: 18px;">
-            <span v-if="googleLoading" class="spinner-border spinner-border-sm me-2"></span>
-            {{ googleLoading ? 'Connecting to Google...' : 'Sign up with Google' }}
-          </button>
   
           <p v-if="errors.general" class="text-danger text-center mt-3">{{ errors.general }}</p>
   
@@ -94,6 +116,13 @@
         phone: '',
         password: '',
         confirmPassword: '',
+        store_name: '',
+        store_category: '',
+        store_description: '',
+        store_address: '',
+        store_city: '',
+        store_state: '',
+        store_zip_code: '',
         errors: {},
         loading: false,
         googleLoading: false
@@ -125,6 +154,15 @@
           this.errors.confirmPassword = ['Passwords do not match'];
           return;
         }
+        // Validate required store fields
+        if (!this.store_name) this.errors.store_name = ['The store name field is required.'];
+        if (!this.store_category) this.errors.store_category = ['The store category field is required.'];
+        if (!this.store_description) this.errors.store_description = ['The store description field is required.'];
+        if (!this.store_address) this.errors.store_address = ['The store address field is required.'];
+        if (!this.store_city) this.errors.store_city = ['The store city field is required.'];
+        if (!this.store_state) this.errors.store_state = ['The store state field is required.'];
+        if (!this.store_zip_code) this.errors.store_zip_code = ['The store zip code field is required.'];
+        if (Object.keys(this.errors).length > 0) return;
   
         this.loading = true;
         try {
@@ -137,7 +175,14 @@
             email: this.email,
             phone: cleanPhone,
             password: this.password,
-            password_confirmation: this.confirmPassword
+            password_confirmation: this.confirmPassword,
+            store_name: this.store_name,
+            store_category: this.store_category,
+            store_description: this.store_description,
+            store_address: this.store_address,
+            store_city: this.store_city,
+            store_state: this.store_state,
+            store_zip_code: this.store_zip_code
           });
   
           const { user, token } = response.data;

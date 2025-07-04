@@ -27,12 +27,6 @@
                     </router-link>
                 </li>
                 <li class="nav-item">
-                    <router-link to="/seller/analytics" class="nav-link text-white">
-                        <i class="bi bi-graph-up me-2"></i>
-                        Analytics
-                    </router-link>
-                </li>
-                <li class="nav-item">
                     <router-link to="/seller/profile" class="nav-link text-white">
                         <i class="bi bi-person me-2"></i>
                         Profile

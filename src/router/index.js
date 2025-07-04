@@ -94,14 +94,24 @@ const routes = [
         component: () => import("../views/sellersite/Dashboard.vue")
       },
       {
-        path: "analytics",
-        name: "SellerAnalytics",
-        component: () => import("../views/sellersite/Analytics.vue")
-      },
-      {
         path: "profile",
         name: "SellerProfile",
         component: () => import("../views/sellersite/Profile.vue")
+      },
+      {
+        path: "products",
+        name: "SellerProducts",
+        component: () => import("../views/sellersite/Products.vue")
+      },
+      {
+        path: "products/add",
+        name: "SellerAddProduct",
+        component: () => import("../views/sellersite/AddProduct.vue")
+      },
+      {
+        path: "products/:id/edit",
+        name: "SellerEditProduct",
+        component: () => import("../views/sellersite/EditProduct.vue")
       }
     ]
   }
