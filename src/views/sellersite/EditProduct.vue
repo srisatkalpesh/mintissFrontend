@@ -15,6 +15,10 @@
         <input v-model="form.price" type="number" step="0.01" class="form-control" required />
       </div>
       <div class="mb-3">
+        <label class="form-label">Canceled Price</label>
+        <input v-model="form.canceled_price" type="number" step="0.01" class="form-control" />
+      </div>
+      <div class="mb-3">
         <label class="form-label">Purchase URL</label>
         <input v-model="form.purchase_url" type="url" class="form-control" required />
       </div>
@@ -40,8 +44,11 @@
         </div>
       </div>
       <div v-if="error" class="alert alert-danger">{{ error }}</div>
-      <button type="submit" class="btn btn-primary">Update Product</button>
-      <router-link to="/seller/products" class="btn btn-secondary ms-2">Cancel</router-link>
+      <button type="submit" class="btn btn-primary" :disabled="loading">
+        <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
+        Update Product
+      </button>
+      <router-link to="/seller/products" class="btn btn-secondary ms-2" :disabled="loading">Cancel</router-link>
     </form>
     <div v-else class="text-center py-5">
       <div class="spinner-border text-primary"></div>
@@ -59,6 +66,7 @@ export default {
         name: '',
         description: '',
         price: '',
+        canceled_price: '',
         purchase_url: '',
         cta_label: '',
         unique_code: '',
@@ -67,7 +75,8 @@ export default {
       previewImages: [],
       existingImages: [],
       error: '',
-      loaded: false
+      loaded: false,
+      loading: false
     };
   },
   async mounted() {
@@ -85,6 +94,7 @@ export default {
           name: p.name,
           description: p.description,
           price: p.price,
+          canceled_price: p.canceled_price,
           purchase_url: p.purchase_url,
           cta_label: p.cta_label,
           unique_code: p.unique_code,
@@ -103,6 +113,7 @@ export default {
     },
     async submitForm() {
       this.error = '';
+      this.loading = true;
       const formData = new FormData();
       for (const key in this.form) {
         if (key === 'images') {
@@ -120,6 +131,8 @@ export default {
         this.$router.push('/seller/products');
       } catch (e) {
         this.error = e.response?.data?.message || 'Failed to update product.';
+      } finally {
+        this.loading = false;
       }
     }
   }

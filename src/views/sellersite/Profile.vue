@@ -5,7 +5,7 @@
                 <h2 class="mb-4">Profile</h2>
             </div>
         </div>
-        
+
         <div class="row">
             <div class="col-md-4 mb-4">
                 <div class="card">
@@ -18,9 +18,8 @@
                         </button>
                     </div>
                 </div>
-                
             </div>
-            
+
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">
@@ -37,12 +36,12 @@
                                 <input type="text" v-model="profile.storeCategory" class="form-control" readonly>
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Store Description</label>
                             <textarea v-model="profile.storeDescription" class="form-control" rows="3" readonly></textarea>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Address</label>
@@ -53,7 +52,7 @@
                                 <input type="text" v-model="profile.city" class="form-control" readonly>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">State</label>
@@ -68,7 +67,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Edit Profile Modal -->
         <div class="modal fade" :class="{ 'show d-block': showEditModal }" tabindex="-1">
             <div class="modal-dialog modal-lg">
@@ -93,12 +92,12 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="mb-3">
                                 <label class="form-label">Phone</label>
                                 <input type="tel" v-model="editForm.phone" class="form-control" required>
                             </div>
-                            
+
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
@@ -113,12 +112,12 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="mb-3">
                                 <label class="form-label">Store Description</label>
                                 <textarea v-model="editForm.storeDescription" class="form-control" rows="3"></textarea>
                             </div>
-                            
+
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="mb-3">
@@ -127,7 +126,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="mb-3">
@@ -157,7 +156,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Modal Backdrops -->
         <div v-if="showEditModal" class="modal-backdrop fade show"></div>
     </div>
@@ -165,6 +164,7 @@
 
 <script>
 import axios from '@/axios';
+
 export default {
     name: 'SellerProfile',
     data() {
@@ -196,7 +196,7 @@ export default {
                 state: '',
                 zipCode: ''
             }
-        }
+        };
     },
     mounted() {
         this.loadProfile();
@@ -206,35 +206,51 @@ export default {
             try {
                 const token = localStorage.getItem('token');
                 const response = await axios.get('/seller/profile', {
-                  headers: { Authorization: `Bearer ${token}` }
+                    headers: { Authorization: `Bearer ${token}` }
                 });
                 const { user, store } = response.data;
                 this.profile = {
-                  name: user.name,
-                  email: user.email,
-                  phone: user.phone,
-                  avatar: user.avatar || 'https://via.placeholder.com/150',
-                  created_at: user.created_at,
-                  storeName: store?.name || '',
-                  storeCategory: store?.category || '',
-                  storeDescription: store?.description || '',
-                  address: store?.address || '',
-                  city: store?.city || '',
-                  state: store?.state || '',
-                  zipCode: store?.zip_code || ''
+                    name: user.name,
+                    email: user.email,
+                    phone: user.phone,
+                    avatar: user.avatar || 'https://via.placeholder.com/150',
+                    created_at: user.created_at,
+                    storeName: store?.name || '',
+                    storeCategory: store?.category || '',
+                    storeDescription: store?.description || '',
+                    address: store?.address || '',
+                    city: store?.city || '',
+                    state: store?.state || '',
+                    zipCode: store?.zip_code || ''
                 };
                 this.editForm = { ...this.profile };
             } catch (error) {
                 console.error('Error loading profile:', error);
             }
         },
-        formatDate(dateString) {
-            return new Date(dateString).toLocaleDateString();
-        },
         async saveProfile() {
             try {
-                // TODO: Implement save profile API call if needed
-                this.profile = { ...this.profile, ...this.editForm };
+                const token = localStorage.getItem('token');
+                const payload = {
+                    name: this.editForm.name,
+                    email: this.editForm.email,
+                    phone: this.editForm.phone,
+                    store_name: this.editForm.storeName,
+                    store_category: this.editForm.storeCategory,
+                    store_description: this.editForm.storeDescription,
+                    address: this.editForm.address,
+                    city: this.editForm.city,
+                    state: this.editForm.state,
+                    zip_code: this.editForm.zipCode
+                };
+
+                await axios.put('/seller/edit', payload, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                // Reload the profile after successful update
+                await this.loadProfile();
+
                 this.closeEditModal();
             } catch (error) {
                 console.error('Error saving profile:', error);
@@ -245,5 +261,5 @@ export default {
             this.editForm = { ...this.profile };
         }
     }
-}
-</script> 
+};
+</script>

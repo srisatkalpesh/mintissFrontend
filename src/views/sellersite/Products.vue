@@ -27,6 +27,7 @@ export default {
         { key: 'name', label: 'Name' },
         { key: 'description', label: 'Description' },
         { key: 'price', label: 'Price' },
+        { key: 'canceled_price', label: 'Canceled Price' },
         { key: 'purchase_url', label: 'Purchase URL' },
         { key: 'cta_label', label: 'CTA Label' },
         { key: 'unique_code', label: 'Unique Code' },
