@@ -25,12 +25,14 @@ export function getRoutes() {
       // Regular user routes
       routes = [
         { name: "Home", path: "/" },
+        { name: 'Stores', path: '/stores' },
       ];
     }
   } else {
     // Not logged in
     routes = [
       { name: "Home", path: "/" },
+      { name: 'Stores', path: '/stores' },
       { name: "Login", path: "/login" },
     ];
   }

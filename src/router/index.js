@@ -114,7 +114,12 @@ const routes = [
         component: () => import("../views/sellersite/EditProduct.vue")
       }
     ]
-  }
+  },
+  {
+    path: "/stores",
+    name: "StoreFeed",
+    component: () => import("../views/usersite/Products.vue"),
+  },
 ];
 
 const router = createRouter({
