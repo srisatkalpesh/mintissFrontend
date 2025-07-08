@@ -1,132 +1,74 @@
 <template>
-  <nav v-if="!isSeller" class="navbar navbar-expand-lg bgprimary shadow-sm sticky-top" >
+  <nav
+    v-if="!isSeller"
+    class="navbar navbar-expand-lg bgprimary shadow-sm sticky-top curved-navbar"
+  >
     <div class="container-fluid">
       <!-- Brand -->
       <router-link class="navbar-brand fw-bold text-white fs-4" to="/">
         Mintiss
       </router-link>
 
-      <!-- Toggle Button (Only visible on small screens) -->
-      <button class="navbar-toggler border-white" type="button" @click="toggleMenu">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+      <!-- Key Info Row (desktop only) -->
+      <div
+        class="key-info-row d-none d-lg-flex align-items-center justify-content-center"
+      >
+        <router-link
+          class="nav-link text-white mx-2"
+          :class="{ active: $route.path === '/' }"
+          to="/"
+        >
+          Home
+        </router-link>
+        <router-link
+          class="nav-link text-white mx-2"
+          :class="{ active: $route.path === '/stores' }"
+          to="/stores"
+        >
+          Stores
+        </router-link>
 
-      <!-- Desktop Nav -->
-      <div class="d-none d-lg-flex ms-auto">
-        <ul class="navbar-nav mb-2 mb-lg-0">
-          <li class="nav-item" v-for="link in navLinks" :key="link.path">
-            <router-link class="nav-link text-white mx-2" :class="{ active: $route.path === link.path }"
-              :to="link.path">
-              {{ link.name }}
-            </router-link>
-          </li>
-          <!-- Admin-specific quick links -->
-          <li class="nav-item" v-if="isAdmin">
-            <div class="dropdown">
-              <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                <i class="bi bi-gear me-1"></i>
-                Admin
-              </button>
-              <ul class="dropdown-menu">
-                <li><router-link class="dropdown-item" to="/admin/categories">Categories</router-link></li>
-                <li><router-link class="dropdown-item" to="/admin/users">Users</router-link></li>
-                <li><router-link class="dropdown-item" to="/admin/products">Products</router-link></li>
-                <li><router-link class="dropdown-item" to="/admin/sub-categories">Sub Categories</router-link></li>
-                <li><router-link class="dropdown-item" to="/admin/mintiss-values">Mintiss Values</router-link></li>
-                <li><router-link class="dropdown-item" to="/admin/signup-bonus">Signup Bonus</router-link></li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item" v-if="isLoggedIn">
-            <div class="nav-link text-white mx-2 d-flex align-items-center">
-              <i class="bi bi-wallet2 me-1"></i>
-              <span>₹{{ userBalance || '0.00000000' }}</span>
-            </div>
-          </li>
-          <li class="nav-item" v-if="isLoggedIn">
-            <router-link to="/profile" class="nav-link text-white mx-2">
-              <i class="bi bi-person-circle me-1"></i>
-              {{ userName }}
-            </router-link>
-          </li>
-        </ul>
+        <div class="nav-link text-white mx-2 d-flex align-items-center">
+          <i class="bi bi-wallet2 me-1"></i>
+          <span>₹{{ userBalance || '0.00000000' }}</span>
+        </div>
+        <router-link to="/profile" class="nav-link text-white mx-2">
+          <i class="bi bi-person-circle me-1"></i>
+          {{ userName || 'User' }}
+        </router-link>
       </div>
 
-      <!-- Mobile Sidebar -->
-      <div class="mobile-menu" :class="{ open: isCollapsed }">
-        <ul class="list-unstyled p-3">
-          <li class="mb-3" v-for="link in navLinks" :key="link.path">
-            <router-link class="text-white fw-semibold" :class="{ active: $route.path === link.path }" :to="link.path"
-              @click="toggleMenu">
-              {{ link.name }}
-            </router-link>
-          </li>
-          <!-- Admin-specific mobile links -->
-          <li class="mb-3" v-if="isAdmin">
-            <div class="text-white fw-semibold mb-2">
-              <i class="bi bi-gear me-2"></i>
-              Admin Panel
-            </div>
-            <ul class="list-unstyled ms-3">
-              <li class="mb-2">
-                <router-link to="/admin/categories" class="text-white" @click="toggleMenu">Categories</router-link>
-              </li>
-              <li class="mb-2">
-                <router-link to="/admin/users" class="text-white" @click="toggleMenu">Users</router-link>
-              </li>
-              <li class="mb-2">
-                <router-link to="/admin/products" class="text-white" @click="toggleMenu">Products</router-link>
-              </li>
-              <li class="mb-2">
-                <router-link to="/admin/sub-categories" class="text-white" @click="toggleMenu">Sub Categories</router-link>
-              </li>
-              <li class="mb-2">
-                <router-link to="/admin/mintiss-values" class="text-white" @click="toggleMenu">Mintiss Values</router-link>
-              </li>
-              <li class="mb-2">
-                <router-link to="/admin/signup-bonus" class="text-white" @click="toggleMenu">Signup Bonus</router-link>
-              </li>
-            </ul>
-          </li>
-          <li class="mb-3" v-if="isLoggedIn">
-            <div class="text-white fw-semibold d-flex align-items-center">
-              <i class="bi bi-wallet2 me-2"></i>
-              <span>₹{{ userBalance || '0.00000000' }}</span>
-            </div>
-          </li>
-          <li class="mb-3" v-if="isLoggedIn">
-            <router-link to="/profile" class="text-white fw-semibold" @click="toggleMenu">
-              <i class="bi bi-person-circle me-2"></i>
-              {{ userName }}
-            </router-link>
-          </li>
-          <li class="mb-3" v-if="isLoggedIn">
-            <div class="text-white fw-semibold" style="cursor:pointer;" @click="logoutAndClose">
-              <i class="bi bi-box-arrow-right me-2"></i>
-              Logout
-            </div>
-          </li>
-        </ul>
+      <!-- Mobile Wallet/Profile (mobile only) -->
+      <div
+        class="mobile-profile-wallet-row d-flex align-items-center justify-content-end d-lg-none"
+      >
+        <div class="nav-link text-white d-flex align-items-center">
+          <i class="bi bi-wallet2 me-1"></i>
+          <span>₹{{ userBalance || '0.00000000' }}</span>
+        </div>
+        <router-link
+          to="/profile"
+          class="nav-link text-white d-flex align-items-center ms-2"
+        >
+          <i class="bi bi-person-circle me-1"></i>
+          {{ userName || 'User' }}
+        </router-link>
       </div>
-
-      <!-- Overlay -->
-      <div class="overlay" v-if="isCollapsed" @click="toggleMenu"></div>
     </div>
   </nav>
 </template>
 
 <script>
-import { getRoutes } from '@/data/navLinks';
-import axios from '@/axios';
-import toastService from '@/services/toastService';
+import { getRoutes } from "@/data/navLinks";
+import axios from "@/axios";
+import toastService from "@/services/toastService";
 
 export default {
   name: "HeaderNavbar",
   data() {
     return {
-      isCollapsed: false,
       userBalance: null,
-      mintissValue: 0
+      mintissValue: 0,
     };
   },
   computed: {
@@ -134,20 +76,20 @@ export default {
       return getRoutes();
     },
     isLoggedIn() {
-      return !!localStorage.getItem('token');
+      return !!localStorage.getItem("token");
     },
     userName() {
-      const user = JSON.parse(localStorage.getItem('user'));
-      return user ? user.name : '';
+      const user = JSON.parse(localStorage.getItem("user"));
+      return user ? user.name : "";
     },
     isSeller() {
-      const user = JSON.parse(localStorage.getItem('user'));
-      return user ? (user.role === 'Seller' || user.role === 'seller') : false;
+      const user = JSON.parse(localStorage.getItem("user"));
+      return user ? user.role?.toLowerCase() === "seller" : false;
     },
     isAdmin() {
-      const user = JSON.parse(localStorage.getItem('user'));
-      return user ? (user.role === 'Admin' || user.role === 'admin') : false;
-    }
+      const user = JSON.parse(localStorage.getItem("user"));
+      return user ? user.role?.toLowerCase() === "admin" : false;
+    },
   },
   watch: {
     isLoggedIn: {
@@ -160,8 +102,8 @@ export default {
           this.userBalance = null;
           this.mintissValue = 0;
         }
-      }
-    }
+      },
+    },
   },
   async mounted() {
     if (this.isLoggedIn) {
@@ -172,50 +114,114 @@ export default {
   methods: {
     async fetchMintissValue() {
       try {
-        const response = await axios.get('/mintiss-value/latest');
+        const response = await axios.get("/mintiss-value/latest");
         this.mintissValue = parseFloat(response.data.data.value);
         this.calculateUserBalance();
       } catch (error) {
-        console.error('Error fetching mintiss value:', error);
+        console.error("Error fetching mintiss value:", error);
       }
     },
     calculateUserBalance() {
-      const user = JSON.parse(localStorage.getItem('user'));
+      const user = JSON.parse(localStorage.getItem("user"));
       if (user && user.mintiss) {
-        this.userBalance = (parseFloat(user.mintiss) * this.mintissValue).toFixed(8);
+        this.userBalance = (
+          parseFloat(user.mintiss) * this.mintissValue
+        ).toFixed(8);
       }
-    },
-    toggleMenu() {
-      this.isCollapsed = !this.isCollapsed;
     },
     async handleLogout() {
       try {
-        await axios.get('/logout');
-        // Clear local storage
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        // Show success message
-        toastService.success('Logged out successfully');
-        // Reload the page
+        await axios.get("/logout");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        toastService.success("Logged out successfully");
         window.location.reload();
       } catch (error) {
-        console.error('Logout error:', error);
-        toastService.error('Failed to logout');
+        console.error("Logout error:", error);
+        toastService.error("Failed to logout");
       }
     },
-    logoutAndClose() {
-      this.handleLogout();
-      this.toggleMenu();
-    }
   },
 };
-
 </script>
 
 <style scoped>
 /* General Styles */
 .navbar {
   transition: all 0.3s ease-in-out;
+  border-bottom-left-radius: 2rem;
+  border-bottom-right-radius: 2rem;
+  box-shadow: 0 4px 24px rgba(17, 119, 191, 0.1);
+}
+.curved-navbar {
+  border-bottom-left-radius: 2rem;
+  border-bottom-right-radius: 2rem;
+  box-shadow: 0 4px 24px rgba(17, 119, 191, 0.1);
+}
+.key-info-row {
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  margin-left: 2rem;
+}
+.key-info-row .nav-link {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 1.2rem;
+  padding: 0.5rem 1.2rem;
+  margin: 0 0.3rem;
+  transition: background 0.2s, color 0.2s;
+}
+.key-info-row .nav-link.active,
+.key-info-row .nav-link:hover {
+  background: #ffd700;
+  color: #1177bf !important;
+}
+.key-info-row .nav-link i {
+  margin-right: 0.5rem;
+}
+.mobile-profile-wallet-row {
+  display: none;
+}
+@media (max-width: 991px) {
+  .key-info-row {
+    display: none !important;
+  }
+  .mobile-profile-wallet-row {
+    display: flex !important;
+    flex-direction: row;
+    flex-wrap: nowrap; /* Prevent wrapping */
+    align-items: center;
+    gap: 0.5rem;
+    background: #1177bf;
+    border-radius: 0 0 1.5rem 1.5rem;
+    margin-bottom: 0;
+    box-shadow: 0 2px 8px rgba(17, 119, 191, 0.1);
+    width: 100%; /* Ensure it uses full width */
+  }
+  .mobile-profile-wallet-row .nav-link {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 1.2rem;
+    margin: 0 0.1rem;
+    transition: background 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    white-space: nowrap; /* Prevent text from wrapping */
+    min-width: 0; /* Allow shrinking if needed */
+    flex-shrink: 1; /* Allow to shrink to fit */
+  }
+  .mobile-profile-wallet-row .nav-link.active,
+  .mobile-profile-wallet-row .nav-link:hover {
+    background: #ffd700;
+    color: #1177bf !important;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.1);
+  }
 }
 
 .nav-link {
@@ -247,63 +253,6 @@ export default {
 .nav-link:hover::after,
 .nav-link.active::after {
   width: 100%;
-}
-
-/* Mobile Menu Styles */
-.mobile-menu {
-  position: fixed;
-  top: 0;
-  left: -250px;
-  width: 250px;
-  height: 100vh;
-  background-color: #1177bf;
-  overflow-y: auto;
-  transition: left 0.3s ease-in-out;
-  z-index: 1050;
-}
-
-.mobile-menu.open {
-  left: 0;
-}
-
-.mobile-menu a,
-.mobile-menu div {
-  display: block;
-  padding: 12px 0;
-  color: #fff;
-  text-decoration: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
-}
-
-.mobile-menu a:hover,
-.mobile-menu div:hover {
-  background: rgba(255, 255, 255, 0.1);
-  padding-left: 10px;
-}
-
-.mobile-menu .active {
-  color: #ffd700;
-  font-weight: bold;
-}
-
-.mobile-menu i {
-  font-size: 1.1rem;
-}
-
-.mobile-menu span {
-  font-weight: 600;
-  font-size: 0.95rem;
-}
-
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.4);
-  z-index: 1040;
 }
 
 .nav-link span {

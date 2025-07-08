@@ -1,35 +1,45 @@
 <template>
   <div class="store-feed">
     <HeaderNavbar />
-    <div class="top-info-cards pro">
-      <div class="info-card pro cashback-card">
-        <i class="bi bi-cash-coin info-icon"></i>
-        <div class="info-title">MAKE <span>100%</span> CASH BACK</div>
-      </div>
-      <div class="info-card pro free-mintiss-card">
-        <i class="bi bi-gift info-icon"></i>
-        <div class="info-title">FREE MINTISS <span>sign up now</span></div>
-      </div>
-      <div class="info-card pro mintiss-value-card">
-        <i class="bi bi-graph-up-arrow info-icon"></i>
-        <div class="info-title">today’s mintiss value</div>
-        <div class="mintiss-value-amount">₹{{ mintissValueDisplay }}</div>
-      </div>
-      <div class="info-card pro reward-redemption-card">
-        <i class="bi bi-trophy info-icon"></i>
-        <div class="info-title">reward redemption <span>starting soon</span></div>
-      </div>
+    <div class="top-info-cards">
+  <div class="info-card cashback-card">
+    <div class="icon-wrapper">
+      <i class="bi bi-cash-coin"></i>
     </div>
-    <div class="user-info-bar curved-bar" v-if="showUserInfo">
-      <div class="user-name">
-        <i class="bi bi-person-circle"></i>
-        {{ userName }}
-      </div>
-      <div class="user-points">
-        <i class="bi bi-wallet2"></i>
-        ₹{{ userBalance || '0.00000000' }}
-      </div>
+    <div class="info-content">
+      <div class="info-title">Make <span>100%</span> Cash Back</div>
     </div>
+  </div>
+
+  <div class="info-card free-mintiss-card">
+    <div class="icon-wrapper">
+      <i class="bi bi-gift"></i>
+    </div>
+    <div class="info-content">
+      <div class="info-title">Free Mintiss <span>Sign up now</span></div>
+    </div>
+  </div>
+
+  <div class="info-card mintiss-value-card">
+    <div class="icon-wrapper">
+      <i class="bi bi-graph-up-arrow"></i>
+    </div>
+    <div class="info-content">
+      <div class="info-title">Today’s Mintiss Value</div>
+      <div class="mintiss-value-amount">₹{{ mintissValueDisplay }}</div>
+    </div>
+  </div>
+
+  <div class="info-card reward-redemption-card">
+    <div class="icon-wrapper">
+      <i class="bi bi-trophy"></i>
+    </div>
+    <div class="info-content">
+      <div class="info-title">Reward Redemption <span>Starting Soon</span></div>
+    </div>
+  </div>
+</div>
+
     
     <div class="feed-content">
       <div v-if="loading" class="skeleton-loader">
@@ -59,28 +69,32 @@
           <div class="store-header">
             <div class="store-name">{{ store.name }}</div>
             <div class="store-category">{{ store.category }}</div>
-            <div class="store-location">{{ store.city }}, {{ store.state }}</div>
           </div>
           <div class="store-description">{{ store.description }}</div>
           <div class="products-carousel-wrapper">
             <div class="products-row-controls">
-              <button class="row-scroll-btn left" @click="scrollProducts(idx, -1)">&lt;</button>
-              <div class="products-row carousel" :ref="el => setCarouselRef(el, idx)">
-                <div v-for="product in store.products" :key="product.unique_code" class="product-card-horizontal pro">
-                  <div class="product-img-wrap pro">
-                    <img v-if="product.images && product.images.length" :src="product.images[0]" class="product-img-horizontal pro" />
-                  </div>
-                  <div class="product-info-horizontal pro">
-                    <div class="product-name-horizontal pro">{{ product.name }}</div>
-                    <div class="product-pricing-horizontal pro">
-                      <span class="product-price-horizontal pro">₹{{ product.price }}</span>
-                      <span v-if="product.canceled_price" class="product-canceled-horizontal pro">₹{{ product.canceled_price }}</span>
+              <Swiper
+                :slides-per-view="1.2"
+                :space-between="20"
+                :breakpoints="{600: {slidesPerView: 2.2, spaceBetween: 24}, 900: {slidesPerView: 3.2, spaceBetween: 32}}"
+                class="products-swiper"
+              >
+                <SwiperSlide v-for="(product, pidx) in store.products" :key="product.unique_code">
+                  <div :class="['product-card-horizontal', 'pro', 'modern-product-card']">
+                    <div class="modern-img-container">
+                      <img v-if="product.images && product.images.length" :src="product.images[0]" class="modern-product-img" />
                     </div>
-                    <button class="cta-btn-horizontal pro" @click="openProduct(product.purchase_url)">{{ product.cta_label || 'Shop now' }}</button>
+                    <div class="modern-product-info">
+                      <div class="modern-product-name">{{ product.name }}</div>
+                      <div class="modern-product-pricing">
+                        <span class="modern-product-price">₹{{ product.price }}</span>
+                        <span v-if="product.canceled_price" class="modern-product-canceled">₹{{ product.canceled_price }}</span>
+                      </div>
+                      <button class="modern-cta-btn" @click="openProduct(product.purchase_url)">{{ product.cta_label || 'Shop now' }}</button>
+                    </div>
                   </div>
-                </div>
-              </div>
-              <button class="row-scroll-btn right" @click="scrollProducts(idx, 1)">&gt;</button>
+                </SwiperSlide>
+              </Swiper>
             </div>
           </div>
         </div>
@@ -91,9 +105,12 @@
 
 <script>
 import axios from '@/axios';
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import 'swiper/swiper-bundle.css';
 
 export default {
   name: 'StoreFeed',
+  components: { Swiper, SwiperSlide },
   data() {
     return {
       stores: [],
@@ -109,10 +126,6 @@ export default {
     userName() {
       const user = JSON.parse(localStorage.getItem('user'));
       return user ? user.name : '';
-    },
-    showUserInfo() {
-      const user = JSON.parse(localStorage.getItem('user'));
-      return user && user.mintiss && parseFloat(user.mintiss) > 0;
     },
     mintissValueDisplay() {
       return this.mintissValue ? this.mintissValue.toFixed(8) : '0.00000000';
@@ -193,6 +206,64 @@ export default {
   min-height: 100vh;
   font-family: 'Inter', Arial, sans-serif;
 }
+.top-info-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin: 2rem 0;
+}
+@media (max-width: 900px) {
+  .top-info-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.info-card {
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.info-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.icon-wrapper {
+  background: #fff;
+  border-radius: 50%;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 2rem;
+  color: #4a90e2;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.info-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.info-title span {
+  color: #4a90e2;
+  font-weight: 700;
+}
+
+.mintiss-value-amount {
+  margin-top: 0.5rem;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #27ae60;
+}
+
 .user-info-bar.curved-bar {
   display: flex;
   justify-content: center;
@@ -244,54 +315,48 @@ export default {
   position: relative;
   width: 100%;
 }
-.products-row.carousel {
-  display: flex;
-  flex-direction: row;
-  gap: 1.2rem;
-  overflow-x: auto;
-  padding-bottom: 0.5rem;
-  margin-bottom: 1.2rem;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  width: 100%;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  box-sizing: border-box;
-  scroll-behavior: smooth;
-}
-.products-row.carousel::-webkit-scrollbar {
-  display: none;
-}
-.carousel-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
-  background: rgba(255,255,255,0.95);
-  border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-size: 2rem;
-  color: #1177bf;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-  cursor: pointer;
-  opacity: 0;
-  pointer-events: none;
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s, opacity 0.2s;
+.products-row-controls {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 0.5rem;
+  position: relative;
+  width: 100%;
 }
-.products-carousel-wrapper:hover .carousel-arrow {
-  opacity: 1;
-  pointer-events: auto;
+/* Remove horizontal scroll and fade indicators for carousel */
+.products-row.carousel {
+  overflow-x: unset !important;
+  scrollbar-width: none !important;
 }
-.carousel-arrow.left {
-  left: 0.2rem;
+.products-row.carousel::-webkit-scrollbar {
+  display: none !important;
 }
-.carousel-arrow.right {
-  right: 0.2rem;
+.carousel-fade-left, .carousel-fade-right {
+  display: none !important;
+}
+.products-swiper {
+  width: 100%;
+  padding-bottom: 2rem;
+}
+.swiper-button-next, .swiper-button-prev {
+  color: #1177bf;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(17,119,191,0.10);
+  width: 36px;
+  height: 36px;
+  top: 40%;
+}
+/* Remove Swiper navigation arrow styles and after pseudo-elements */
+.swiper-button-next,
+.swiper-button-prev {
+  display: none !important;
+}
+@media (max-width: 600px) {
+  .swiper-button-next, .swiper-button-prev {
+    width: 28px;
+    height: 28px;
+    top: 35%;
+  }
 }
 .store-card {
   background: #fff;
@@ -643,151 +708,116 @@ export default {
   .carousel-arrow {
     display: none !important;
   }
-}
-/* Product Card Professional Styles */
-.product-card-horizontal.pro {
-  min-width: 320px;
-  max-width: 340px;
-  background: var(--card-bg);
-  border-radius: var(--border-radius);
-  box-shadow: var(--card-shadow);
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  padding: 0 0 1.5rem 0;
-  margin-bottom: 0.5rem;
-  position: relative;
-  border: 1px solid #f0f0f0;
-  transition: box-shadow 0.18s, transform 0.18s;
-}
-.product-card-horizontal.pro:hover {
-  box-shadow: 0 6px 24px rgba(17,119,191,0.10);
-  transform: translateY(-4px) scale(1.02);
-  z-index: 2;
-}
-.product-img-wrap.pro {
-  width: 100%;
-  height: 210px;
-  background: var(--gray);
-  border-radius: var(--border-radius) var(--border-radius) 0 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-.product-img-horizontal.pro {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: var(--border-radius) var(--border-radius) 0 0;
-  background: #e0e0e0;
-}
-.product-info-horizontal.pro {
-  padding: 1.2rem 1.5rem 0 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  flex: 1;
-}
-.product-name-horizontal.pro {
-  font-size: 1.18rem;
-  font-weight: 700;
-  color: var(--text-main);
-  margin-bottom: 0.3rem;
-  min-height: 2.2em;
-}
-.product-pricing-horizontal.pro {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  margin-bottom: 0.7rem;
-}
-.product-price-horizontal.pro {
-  font-size: 1.18rem;
-  font-weight: 700;
-  color: var(--accent);
-}
-.product-canceled-horizontal.pro {
-  font-size: 1.05rem;
-  color: #c00;
-  text-decoration: line-through;
-}
-.cta-btn-horizontal.pro {
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: 1.2rem;
-  padding: 0.8rem 1.5rem;
-  font-size: 1.08rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s;
-  margin-top: auto;
-  box-shadow: 0 1px 4px rgba(17,119,191,0.08);
-}
-.product-card-horizontal.pro:hover .cta-btn-horizontal.pro {
-  opacity: 1;
-  pointer-events: auto;
-}
-.cta-btn-horizontal.pro:hover {
-  background: #0d5c9e;
-}
-@media (max-width: 600px) {
-  .product-card-horizontal.pro {
-    min-width: 85vw;
-    max-width: 90vw;
-    padding: 0 0 1rem 0;
-  }
-  .product-img-wrap.pro {
-    height: 150px;
-  }
-  .product-info-horizontal.pro {
-    padding: 0.8rem 0.7rem 0 0.7rem;
-  }
-  .product-name-horizontal.pro {
-    font-size: 1.05rem;
-  }
-  .product-price-horizontal.pro {
-    font-size: 1.05rem;
-  }
-  .cta-btn-horizontal.pro {
-    opacity: 1 !important;
-    pointer-events: auto !important;
-  }
-}
-/* Add styles for row-scroll-btn and products-row-controls */
-.products-row-controls {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  gap: 0.5rem;
-}
-.row-scroll-btn {
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  font-size: 1.5rem;
-  color: #1177bf;
-  box-shadow: 0 1px 4px rgba(17,119,191,0.08);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
-}
-.row-scroll-btn:hover {
-  background: #1177bf;
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(17,119,191,0.13);
-}
-@media (max-width: 600px) {
   .row-scroll-btn {
     display: none !important;
   }
   .products-row-controls {
     gap: 0;
   }
+}
+/* Modern Hopscotch-style Product Card */
+.modern-product-card {
+  background: #fff;
+  border-radius: 1.5rem;
+  box-shadow: 0 2px 16px rgba(17,119,191,0.10);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0 0 1.2rem 0;
+  margin-bottom: 2rem;
+  border: none;
+  overflow: hidden;
+  min-width: 260px;
+  max-width: 340px;
+}
+.modern-img-container {
+  position: relative;
+  width: 100%;
+  background: #f4f6fa;
+  border-radius: 1.5rem 1.5rem 0 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+}
+.modern-product-img {
+  width: 100%;
+  height: 220px;
+  object-fit: contain;
+  border-radius: 1.5rem 1.5rem 0 0;
+  background: #e0e0e0;
+}
+.modern-banner {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #1177bf;
+  color: #fff;
+  padding: 0.7rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 0 0 1.5rem 1.5rem;
+  font-size: 1.08rem;
+  font-weight: 600;
+}
+.modern-banner-text {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.modern-product-info {
+  padding: 1.2rem 1.5rem 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+.modern-product-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1177bf;
+  margin-bottom: 0.3rem;
+  min-height: 2.2em;
+}
+.modern-product-pricing {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.7rem;
+}
+.modern-product-price {
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: #1177bf;
+}
+.modern-product-canceled {
+  font-size: 1.05rem;
+  color: #c00;
+  text-decoration: line-through;
+}
+.modern-cta-btn {
+  background: #1177bf;
+  color: #fff;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.8rem 1.5rem;
+  font-size: 1.08rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  margin-top: 1rem;
+  box-shadow: 0 1px 4px rgba(17,119,191,0.08);
+}
+.modern-cta-btn:hover {
+  background: #0d5c9e;
+}
+/* Remove large/small card width classes */
+.product-card-horizontal--large,
+.product-card-horizontal--small {
+  flex: unset !important;
+  max-width: unset !important;
+  min-width: unset !important;
 }
 </style> 
