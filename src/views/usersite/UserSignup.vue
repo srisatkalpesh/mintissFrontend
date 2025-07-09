@@ -1,8 +1,8 @@
 <template>
-  <div class="container-fluid min-vh-86 d-flex justify-content-center align-items-center bg-light">
+  <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center bg-light">
     <div class="card shadow-lg border-0 w-100 my-5" style="max-width: 500px;">
       <!-- Header -->
-      <div class="text-white p-4 text-center" style="background-color: #1177bf;">
+      <div class="text-white p-4 text-center bg-primary">
         <h2 class="mb-1 fs-3">Create Account</h2>
         <p class="mb-0 small">Please sign up to continue</p>
       </div>
@@ -200,66 +200,4 @@ export default {
 </script>
 
 <style scoped>
-.min-vh-86 {
-  min-height: 86vh;
-}
-
-@media (max-width: 400px) {
-  .card-body {
-    padding: 1rem !important;
-  }
-}
-
-/* Custom styles for vue-tel-input */
-:deep(.vue-tel-input) {
-  border-radius: 0.375rem;
-  border: 1px solid #ced4da;
-}
-
-:deep(.vue-tel-input.vti--focus) {
-  border-color: #86b7fe;
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-}
-
-:deep(.vti__dropdown) {
-  border: none;
-  background: transparent;
-  padding: 0.375rem 0.75rem;
-}
-
-:deep(.vti__dropdown-list) {
-  border: 1px solid #ced4da;
-  border-radius: 0.375rem;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-}
-
-:deep(.vti__dropdown-item) {
-  padding: 0.5rem 0.75rem;
-}
-
-:deep(.vti__dropdown-item:hover) {
-  background-color: #f8f9fa;
-}
-
-:deep(.vti__dropdown-item.selected) {
-  background-color: #e9ecef;
-}
-
-:deep(.vti__input) {
-  border: none;
-  outline: none;
-  background: transparent;
-  padding: 0.375rem 0.75rem;
-  height: 36px;
-  box-sizing: border-box;
-}
-
-:deep(.vti__flag) {
-  margin-right: 0.5rem;
-}
-
-:deep(.vti__selection) {
-  display: flex;
-  align-items: center;
-}
 </style>

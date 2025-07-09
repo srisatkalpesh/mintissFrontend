@@ -1,65 +1,61 @@
 <template>
-  <nav
-    v-if="!isSeller"
-    class="navbar navbar-expand-lg bgprimary shadow-sm sticky-top curved-navbar"
-  >
-    <div class="container-fluid">
-      <!-- Brand -->
-      <router-link class="navbar-brand fw-bold text-white fs-4" to="/">
-        Mintiss
+  <nav class="navbar bg-primary shadow-sm sticky-top w-100 curved-navbar">
+    <div class="container-fluid px-2 px-sm-4">
+      <!-- Desktop Layout -->
+      <div class="d-none d-md-flex align-items-center justify-content-between w-100" style="min-height: 64px;">
+        <!-- Logo Left -->
+        <span class="fw-bold text-white fs-4">Mintiss</span>
+        <!-- Global Search Center -->
+        <form class="d-flex flex-grow-1 justify-content-center mx-4" style="max-width: 400px;">
+          <input class="form-control w-100" type="search" placeholder="Global Search" aria-label="Search" disabled />
+        </form>
+        <!-- Wallet + Profile or Auth Button Right -->
+        <div class="d-flex align-items-center gap-4">
+          <template v-if="isLoggedIn">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-wallet2 text-white me-2 fs-4"></i>
+              <span class="text-white fw-bold">₹{{ userBalance || '0.00000000' }}</span>
+            </div>
+            <router-link to="/profile" class="d-flex align-items-center text-decoration-none">
+              <i class="bi bi-person-circle text-white fs-3 me-2"></i>
+              <span class="text-white fw-semibold">{{ userName }}</span>
       </router-link>
-
-      <!-- Key Info Row (desktop only) -->
-      <div
-        class="key-info-row d-none d-lg-flex align-items-center justify-content-center"
-      >
-        <router-link
-          class="nav-link text-white mx-2"
-          :class="{ active: $route.path === '/' }"
-          to="/"
-        >
-          Home
-        </router-link>
-        <router-link
-          class="nav-link text-white mx-2"
-          :class="{ active: $route.path === '/stores' }"
-          to="/stores"
-        >
-          Stores
-        </router-link>
-
-        <div class="nav-link text-white mx-2 d-flex align-items-center">
-          <i class="bi bi-wallet2 me-1"></i>
-          <span>₹{{ userBalance || '0.00000000' }}</span>
+          </template>
+          <template v-else>
+            <router-link to="/login" class="btn btn-warning fw-bold px-4 py-2 rounded-pill shadow-sm">Login / Sign Up</router-link>
+          </template>
         </div>
-        <router-link to="/profile" class="nav-link text-white mx-2">
-          <i class="bi bi-person-circle me-1"></i>
-          {{ userName || 'User' }}
-        </router-link>
       </div>
-
-      <!-- Mobile Wallet/Profile (mobile only) -->
-      <div
-        class="mobile-profile-wallet-row d-flex align-items-center justify-content-end d-lg-none"
-      >
-        <div class="nav-link text-white d-flex align-items-center">
-          <i class="bi bi-wallet2 me-1"></i>
-          <span>₹{{ userBalance || '0.00000000' }}</span>
+      <!-- Mobile Layout -->
+      <div class="d-flex d-md-none flex-column align-items-center w-100">
+        <!-- Logo Top Center -->
+        <span class="fw-bold text-white fs-3">Mintiss</span>
+        <!-- Global Search Centered -->
+        <form class="d-flex w-100 justify-content-center mb-1" style="max-width: 350px;">
+          <input class="form-control w-100" type="search" placeholder="Global Search" aria-label="Search" disabled />
+        </form>
+        <!-- Wallet + Profile or Auth Button in one row -->
+        <div class="d-flex w-100 align-items-center justify-content-center gap-3 pb-1">
+          <template v-if="isLoggedIn">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-wallet2 text-white me-1 fs-5"></i>
+              <span class="text-white fw-bold small">₹{{ userBalance || '0.00000000' }}</span>
+            </div>
+            <router-link to="/profile" class="d-flex align-items-center text-decoration-none">
+              <i class="bi bi-person-circle text-white fs-4 me-1"></i>
+              <span class="text-white fw-semibold small">{{ userName }}</span>
+            </router-link>
+          </template>
+          <template v-else>
+            <router-link to="/login" class="btn btn-warning fw-bold w-100 rounded-pill shadow-sm py-2">Login / Sign Up</router-link>
+          </template>
         </div>
-        <router-link
-          to="/profile"
-          class="nav-link text-white d-flex align-items-center ms-2"
-        >
-          <i class="bi bi-person-circle me-1"></i>
-          {{ userName || 'User' }}
-        </router-link>
       </div>
     </div>
   </nav>
 </template>
 
 <script>
-import { getRoutes } from "@/data/navLinks";
 import axios from "@/axios";
 import toastService from "@/services/toastService";
 
@@ -72,23 +68,12 @@ export default {
     };
   },
   computed: {
-    navLinks() {
-      return getRoutes();
-    },
     isLoggedIn() {
       return !!localStorage.getItem("token");
     },
     userName() {
       const user = JSON.parse(localStorage.getItem("user"));
       return user ? user.name : "";
-    },
-    isSeller() {
-      const user = JSON.parse(localStorage.getItem("user"));
-      return user ? user.role?.toLowerCase() === "seller" : false;
-    },
-    isAdmin() {
-      const user = JSON.parse(localStorage.getItem("user"));
-      return user ? user.role?.toLowerCase() === "admin" : false;
     },
   },
   watch: {
@@ -146,117 +131,10 @@ export default {
 </script>
 
 <style scoped>
-/* General Styles */
-.navbar {
-  transition: all 0.3s ease-in-out;
-  border-bottom-left-radius: 2rem;
-  border-bottom-right-radius: 2rem;
-  box-shadow: 0 4px 24px rgba(17, 119, 191, 0.1);
-}
 .curved-navbar {
   border-bottom-left-radius: 2rem;
   border-bottom-right-radius: 2rem;
   box-shadow: 0 4px 24px rgba(17, 119, 191, 0.1);
 }
-.key-info-row {
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-  gap: 1.5rem;
-  margin-left: 2rem;
-}
-.key-info-row .nav-link {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #fff !important;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 1.2rem;
-  padding: 0.5rem 1.2rem;
-  margin: 0 0.3rem;
-  transition: background 0.2s, color 0.2s;
-}
-.key-info-row .nav-link.active,
-.key-info-row .nav-link:hover {
-  background: #ffd700;
-  color: #1177bf !important;
-}
-.key-info-row .nav-link i {
-  margin-right: 0.5rem;
-}
-.mobile-profile-wallet-row {
-  display: none;
-}
-@media (max-width: 991px) {
-  .key-info-row {
-    display: none !important;
-  }
-  .mobile-profile-wallet-row {
-    display: flex !important;
-    flex-direction: row;
-    flex-wrap: nowrap; /* Prevent wrapping */
-    align-items: center;
-    gap: 0.5rem;
-    background: #1177bf;
-    border-radius: 0 0 1.5rem 1.5rem;
-    margin-bottom: 0;
-    box-shadow: 0 2px 8px rgba(17, 119, 191, 0.1);
-    width: 100%; /* Ensure it uses full width */
-  }
-  .mobile-profile-wallet-row .nav-link {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #fff !important;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 1.2rem;
-    margin: 0 0.1rem;
-    transition: background 0.2s, color 0.2s;
-    display: flex;
-    align-items: center;
-    white-space: nowrap; /* Prevent text from wrapping */
-    min-width: 0; /* Allow shrinking if needed */
-    flex-shrink: 1; /* Allow to shrink to fit */
-  }
-  .mobile-profile-wallet-row .nav-link.active,
-  .mobile-profile-wallet-row .nav-link:hover {
-    background: #ffd700;
-    color: #1177bf !important;
-    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.1);
-  }
-}
-
-.nav-link {
-  position: relative;
-  transition: color 0.3s ease;
-}
-
-.nav-link:hover,
-.nav-link.active {
-  font-weight: bold;
-  color: #ffd700 !important;
-}
-
-.bgprimary {
-  background-color: #1177bf;
-}
-
-.nav-link::after {
-  content: "";
-  position: absolute;
-  width: 0%;
-  height: 2px;
-  left: 0;
-  bottom: 0;
-  background-color: #ffd700;
-  transition: width 0.3s;
-}
-
-.nav-link:hover::after,
-.nav-link.active::after {
-  width: 100%;
-}
-
-.nav-link span {
-  font-weight: 600;
-  font-size: 0.95rem;
-}
 </style>
+

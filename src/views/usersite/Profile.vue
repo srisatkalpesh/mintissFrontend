@@ -81,23 +81,4 @@ export default {
         }
     }
 }
-</script>
-
-<style scoped>
-.form-control {
-    border: none;
-    padding: 0.75rem;
-}
-
-.btn-danger {
-    background-color: #dc3545;
-    border: none;
-    transition: all 0.3s ease;
-}
-
-.btn-danger:hover {
-    background-color: #bb2d3b;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
-}
-</style> 
+</script> 

@@ -29,10 +29,4 @@ export default {
     }
   }
 };
-</script>
-
-<style scoped>
-.min-vh-100 {
-  min-height: 100vh;
-}
-</style> 
+</script> 
