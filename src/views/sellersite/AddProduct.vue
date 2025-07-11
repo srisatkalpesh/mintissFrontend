@@ -33,6 +33,7 @@
       <div class="mb-3">
         <label class="form-label">Images</label>
         <input ref="imageInput" type="file" class="form-control" multiple @change="handleImageChange" accept="image/*" />
+        <div class="form-text">Recommended image size: 650x450px for best appearance.</div>
         <div class="mt-2 d-flex flex-wrap">
           <img v-for="(img, i) in previewImages" :key="i" :src="img" style="width:60px;height:60px;object-fit:cover;margin-right:5px;" />
         </div>

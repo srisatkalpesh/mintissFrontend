@@ -1,15 +1,15 @@
 <template>
   <div class="container-fluid bg-light min-vh-100 font-monospace">
-    <HeaderNavbar />
+    <!-- HeaderNavbar removed, now handled globally -->
     <div class="row row-cols-2 row-cols-md-4 g-3 my-4 justify-content-center">
       <div class="col d-flex justify-content-center" v-for="card in infoCards" :key="card.title">
-        <div class="card text-center border-0 shadow-lg rounded-4 card-hover-effect d-flex align-items-stretch" style="transition: transform 0.2s, box-shadow 0.2s; width: 140px; height: 140px; min-width: 140px; min-height: 140px; max-width: 140px; max-height: 140px;">
+        <div class="card text-center border-0 shadow-lg rounded-4 card-hover-effect d-flex align-items-stretch" style="transition: transform 0.2s, box-shadow 0.2s; width: 180px; height: 180px; min-width: 180px; min-height: 180px; max-width: 180px; max-height: 180px;">
           <div class="card-body d-flex flex-column align-items-center justify-content-center w-100 h-100 p-2" style="min-height: 0;">
-            <div class="mb-2 d-flex align-items-center justify-content-center rounded-circle" style="background: linear-gradient(135deg, #1177bf 60%, #ffd700 100%); width: 40px; height: 40px;">
-              <i :class="card.icon + ' text-white'" style="font-size: 1.3rem;"></i>
+            <div class="mb-2 d-flex align-items-center justify-content-center rounded-circle" style="background: linear-gradient(135deg, #1177bf 60%, #ffd700 100%); width: 56px; height: 56px;">
+              <i :class="card.icon + ' text-white'" style="font-size: 2rem;"></i>
             </div>
-            <h6 class="card-title fw-bold mt-2 mb-1" style="font-size: 0.95rem;">{{ card.title }} <span v-if="card.span" class="text-primary">{{ card.span }}</span></h6>
-            <div v-if="card.value" class="fw-bold text-success mt-1" style="font-size: 0.95rem;">{{ card.value }}</div>
+            <h6 class="card-title fw-bold mt-2 mb-1" style="font-size: 1.15rem;">{{ card.title }} <span v-if="card.span" class="text-primary">{{ card.span }}</span></h6>
+            <div v-if="card.value" class="fw-bold text-success mt-1" style="font-size: 1.1rem;">{{ card.value }}</div>
           </div>
         </div>
       </div>
@@ -45,34 +45,42 @@
         </div>
       </div>
       <template v-else>
-        <div v-for="(store, idx) in stores" :key="store.name" class="card mb-4 shadow-sm border-0">
-          <div class="card-body">
-            <div class="d-flex flex-column mb-2">
-              <span class="fs-5 fw-bold text-primary">{{ store.name }}</span>
-              <span class="text-muted small">{{ store.category }}</span>
-            </div>
-            <div class="mb-2 text-secondary">{{ store.description }}</div>
-            <div class="products-carousel-wrapper">
-              <Swiper :slides-per-view="1.2" :space-between="20"
-                :breakpoints="{ 600: { slidesPerView: 2.2, spaceBetween: 24 }, 900: { slidesPerView: 4.2, spaceBetween: 32 } }"
-                class="products-swiper">
-                <SwiperSlide v-for="(product, pidx) in store.products" :key="product.unique_code">
-                  <div class="card h-100 border-0 shadow-sm">
-                    <div class="ratio ratio-4x3 bg-light d-flex align-items-center justify-content-center">
-                      <img v-if="product.images && product.images.length" :src="product.images[0]"
-                        class="img-fluid object-fit-contain" />
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                      <div class="fw-bold text-primary mb-1">{{ product.name }}</div>
-                      <div class="mb-2">
-                        <span class="fw-bold text-success">₹{{ product.price }}</span>
-                        <span v-if="product.canceled_price" class="text-decoration-line-through text-danger ms-2">₹{{ product.canceled_price }}</span>
+        <div v-if="noResults" class="d-flex flex-column align-items-center justify-content-center my-5">
+          <i class="bi bi-emoji-frown text-danger mb-2" style="font-size: 3rem;"></i>
+          <div class="text-center text-danger fw-bold" style="font-size: 1.2rem;">We don't have this product or store.</div>
+        </div>
+        <div v-else>
+          <div v-for="(store, idx) in stores" :key="store.name" class="card mb-4 shadow-sm border-0">
+            <div class="card-body">
+              <div class="d-flex flex-column mb-2">
+                <span class="fs-5 fw-bold text-primary">{{ store.name }}</span>
+              </div>
+              <div class="mb-2 text-secondary">{{ store.description }}</div>
+              <div class="products-carousel-wrapper">
+                <Swiper :slides-per-view="1.2" :space-between="20"
+                  :breakpoints="{ 600: { slidesPerView: 2.2, spaceBetween: 24 }, 900: { slidesPerView: 4.2, spaceBetween: 32 } }"
+                  class="products-swiper">
+                  <SwiperSlide v-for="(product, pidx) in store.products" :key="product.unique_code">
+                    <div class="card h-100 border-0 shadow-sm product-card-hover" @click="openProduct(product.purchase_url)" style="cursor: pointer;">
+                      <div class="ratio ratio-4x3 bg-light d-flex align-items-center justify-content-center">
+                        <img v-if="product.images && product.images.length" :src="product.images[0]"
+                          class="img-fluid product-image-fit" />
                       </div>
-                      <button class="btn btn-primary mt-auto" @click="openProduct(product.purchase_url)">{{ product.cta_label || 'Shop now' }}</button>
+                      <div class="card-body d-flex flex-column">
+                        <div class="fw-bold text-primary mb-1">{{ product.name }}</div>
+                        <div class="mb-2">
+                          <span class="fw-bold text-success">₹{{ product.price }}</span>
+                          <span v-if="product.canceled_price" class="text-decoration-line-through text-danger ms-2">₹{{ product.canceled_price }}</span>
+                        </div>
+                        <div class="d-flex align-items-center mt-auto gap-2">
+                          <div class="flex-grow-1 text-secondary small text-truncate" style="max-width: 120px;">{{ product.description }}</div>
+                          <button class="btn btn-sm btn-primary ms-auto px-3" tabindex="-1">{{ product.cta_label || 'Shop now' }}</button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </SwiperSlide>
-              </Swiper>
+                  </SwiperSlide>
+                </Swiper>
+              </div>
             </div>
           </div>
         </div>
@@ -89,10 +97,17 @@ import 'swiper/swiper-bundle.css';
 export default {
   name: 'StoreFeed',
   components: { Swiper, SwiperSlide },
+  props: {
+    searchQuery: {
+      type: String,
+      default: '',
+    },
+  },
   data() {
     return {
       stores: [],
       loading: true,
+      noResults: false,
       currentTab: 'home',
       userBalance: null,
       mintissValue: 0,
@@ -105,6 +120,14 @@ export default {
         { icon: 'bi bi-trophy', title: 'Reward Redemption', span: 'Starting Soon' },
       ],
     };
+  },
+  watch: {
+    searchQuery: {
+      immediate: true,
+      handler(newVal) {
+        this.fetchStores(newVal);
+      },
+    },
   },
   computed: {
     userName() {
@@ -123,13 +146,22 @@ export default {
     this.infoCards[2].value = `₹${this.mintissValueDisplay}`;
   },
   methods: {
-    async fetchStores() {
+    async fetchStores(query = null) {
       this.loading = true;
+      this.noResults = false;
       try {
-        const res = await axios.get('/showall/products');
-        this.stores = res.data.stores || res.data || [];
+        let res;
+        if (query) {
+          res = await axios.get('/showall/products', { params: { search: query } });
+        } else {
+          res = await axios.get('/showall/products');
+        }
+        const storesData = res.data.stores || res.data || [];
+        this.stores = storesData;
+        this.noResults = Array.isArray(storesData) && storesData.length === 0;
       } catch (e) {
-        // handle error
+        this.stores = [];
+        this.noResults = true;
       } finally {
         this.loading = false;
       }
@@ -180,5 +212,17 @@ export default {
 .card-hover-effect:hover {
   transform: translateY(-8px) scale(1.03);
   box-shadow: 0 8px 32px rgba(17, 119, 191, 0.18), 0 1.5px 8px rgba(0,0,0,0.08);
+}
+.product-card-hover:hover {
+  box-shadow: 0 8px 32px rgba(17, 119, 191, 0.22), 0 1.5px 8px rgba(0,0,0,0.12);
+  transform: translateY(-4px) scale(1.02);
+}
+.product-image-fit {
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
 }
 </style>

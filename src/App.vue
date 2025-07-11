@@ -1,8 +1,8 @@
 <template>
   <div id="app">
-    <HeaderNavbar v-if="!isAdminRoute && !isSellerRoute" />
+    <HeaderNavbar v-if="!isAdminRoute && !isSellerRoute" @global-search="onGlobalSearch" />
     <keep-alive>
-      <router-view />
+      <router-view :search-query="searchQuery" />
     </keep-alive>
     <AppFooter v-if="!isAdminRoute && !isSellerRoute" />
   </div>
@@ -18,6 +18,11 @@ export default {
     HeaderNavbar,
     AppFooter,
   },
+  data() {
+    return {
+      searchQuery: '',
+    };
+  },
   computed: {
     isAdminRoute() {
       return this.$route.path.startsWith('/admin');
@@ -25,6 +30,11 @@ export default {
     isSellerRoute() {
       return this.$route.path.startsWith('/seller');
     }
-  }
+  },
+  methods: {
+    onGlobalSearch(query) {
+      this.searchQuery = query;
+    },
+  },
 };
 </script>

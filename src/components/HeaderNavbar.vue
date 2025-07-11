@@ -7,7 +7,7 @@
         <span class="fw-bold text-white fs-4">Mintiss</span>
         <!-- Global Search Center -->
         <form class="d-flex flex-grow-1 justify-content-center mx-4" style="max-width: 400px;">
-          <input class="form-control w-100" type="search" placeholder="Global Search" aria-label="Search" disabled />
+          <input class="form-control w-100" type="search" placeholder="Global Search" aria-label="Search" v-model="searchQuery" />
         </form>
         <!-- Wallet + Profile or Auth Button Right -->
         <div class="d-flex align-items-center gap-4">
@@ -32,7 +32,7 @@
         <span class="fw-bold text-white fs-3">Mintiss</span>
         <!-- Global Search Centered -->
         <form class="d-flex w-100 justify-content-center mb-1" style="max-width: 350px;">
-          <input class="form-control w-100" type="search" placeholder="Global Search" aria-label="Search" disabled />
+          <input class="form-control w-100" type="search" placeholder="Global Search" aria-label="Search" v-model="searchQuery" />
         </form>
         <!-- Wallet + Profile or Auth Button in one row -->
         <div class="d-flex w-100 align-items-center justify-content-center gap-3 pb-1">
@@ -65,6 +65,7 @@ export default {
     return {
       userBalance: null,
       mintissValue: 0,
+      searchQuery: '',
     };
   },
   computed: {
@@ -87,6 +88,14 @@ export default {
           this.userBalance = null;
           this.mintissValue = 0;
         }
+      },
+    },
+    searchQuery: {
+      handler: function(newVal) {
+        clearTimeout(this._searchDebounce);
+        this._searchDebounce = setTimeout(() => {
+          this.$emit('global-search', newVal.trim());
+        }, 300);
       },
     },
   },
@@ -125,6 +134,9 @@ export default {
         console.error("Logout error:", error);
         toastService.error("Failed to logout");
       }
+    },
+    onSearch() {
+      this.$emit('global-search', this.searchQuery.trim());
     },
   },
 };
