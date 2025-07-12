@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar bg-primary shadow-sm sticky-top w-100 curved-navbar">
+  <nav class="navbar shadow-sm sticky-top w-100 curved-navbar" style="background-color: #1177bf !important;">
     <div class="container-fluid px-2 px-sm-4">
       <!-- Desktop Layout -->
       <div class="d-none d-md-flex align-items-center justify-content-between w-100" style="min-height: 64px;">

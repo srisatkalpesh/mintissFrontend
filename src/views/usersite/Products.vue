@@ -8,7 +8,7 @@
             <div class="mb-2 d-flex align-items-center justify-content-center rounded-circle" style="background: linear-gradient(135deg, #1177bf 60%, #ffd700 100%); width: 56px; height: 56px;">
               <i :class="card.icon + ' text-white'" style="font-size: 2rem;"></i>
             </div>
-            <h6 class="card-title fw-bold mt-2 mb-1" style="font-size: 1.15rem;">{{ card.title }} <span v-if="card.span" class="text-primary">{{ card.span }}</span></h6>
+            <h6 class="card-title fw-bold mt-2 mb-1" style="font-size: 1.15rem; color: #1177bf;">{{ card.title }} <span v-if="card.span" style="color: #1177bf;">{{ card.span }}</span></h6>
             <div v-if="card.value" class="fw-bold text-success mt-1" style="font-size: 1.1rem;">{{ card.value }}</div>
           </div>
         </div>
@@ -53,7 +53,7 @@
           <div v-for="(store, idx) in stores" :key="store.name" class="card mb-4 shadow-sm border-0">
             <div class="card-body">
               <div class="d-flex flex-column mb-2">
-                <span class="fs-5 fw-bold text-primary">{{ store.name }}</span>
+                <span class="fs-5 fw-bold" style="color: #1177bf;">{{ store.name }}</span>
               </div>
               <div class="mb-2 text-secondary">{{ store.description }}</div>
               <div class="products-carousel-wrapper">
@@ -67,14 +67,14 @@
                           class="img-fluid product-image-fit" />
                       </div>
                       <div class="card-body d-flex flex-column">
-                        <div class="fw-bold text-primary mb-1">{{ product.name }}</div>
+                        <div class="fw-bold mb-1" style="color: #1177bf;">{{ product.name }}</div>
                         <div class="mb-2">
                           <span class="fw-bold text-success">₹{{ product.price }}</span>
                           <span v-if="product.canceled_price" class="text-decoration-line-through text-danger ms-2">₹{{ product.canceled_price }}</span>
                         </div>
                         <div class="d-flex align-items-center mt-auto gap-2">
                           <div class="flex-grow-1 text-secondary small text-truncate" style="max-width: 120px;">{{ product.description }}</div>
-                          <button class="btn btn-sm btn-primary ms-auto px-3" tabindex="-1">{{ product.cta_label || 'Shop now' }}</button>
+                          <button class="btn btn-sm ms-auto px-3" style="background-color: #1177bf; border-color: #1177bf; color: #fff;" tabindex="-1">{{ product.cta_label || 'Shop now' }}</button>
                         </div>
                       </div>
                     </div>

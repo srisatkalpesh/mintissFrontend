@@ -18,10 +18,7 @@
         <i class="bi bi-envelope-fill text-primary me-2"></i>
         <a href="mailto:support@mintiss.com" class="footer-link text-primary">support@mintiss.com</a>
       </p>
-      <p class="mb-0">
-        <i class="bi bi-telephone-fill text-primary me-2"></i>
-        <a href="tel:+91 9825714909" class="footer-link text-primary">+91 9825714909</a>
-      </p>
+     
     </div>
 
  
