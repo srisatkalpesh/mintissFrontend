@@ -52,6 +52,12 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: "/redeem",
+    name: "TokenRedeem",
+    component: () => import("../views/usersite/TokenRedeem.vue"),
+    meta: { requiresAuth: true }
+  },
+  {
     path: "/admin",
     name: "Admin",
     component: AdminLayout,
@@ -119,6 +125,11 @@ const routes = [
     path: "/stores",
     name: "StoreFeed",
     component: () => import("../views/usersite/Products.vue"),
+  },
+  {
+    path: "/coming-soon",
+    name: "ComingSoon",
+    component: () => import("../views/usersite/ComingSoon.vue"),
   },
 ];
 

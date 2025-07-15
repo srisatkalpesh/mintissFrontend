@@ -14,3 +14,16 @@ const app = createApp(App);
 app.component("VueTelInput", VueTelInput);
 
 app.use(store).use(router).mount("#app");
+
+if (typeof window !== 'undefined') {
+  fetch('https://ipapi.co/json/')
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.country_code !== 'IN') {
+        if (window.location.pathname !== '/coming-soon') {
+          router.replace('/coming-soon');
+        }
+      }
+    })
+    .catch(() => {});
+}

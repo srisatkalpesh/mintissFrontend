@@ -3,12 +3,18 @@
     <!-- HeaderNavbar removed, now handled globally -->
     <div class="row row-cols-2 row-cols-md-4 g-3 my-4 justify-content-center">
       <div class="col d-flex justify-content-center" v-for="card in infoCards" :key="card.title">
-        <div class="card text-center border-0 shadow-lg rounded-4 card-hover-effect d-flex align-items-stretch" style="transition: transform 0.2s, box-shadow 0.2s; width: 180px; height: 180px; min-width: 180px; min-height: 180px; max-width: 180px; max-height: 180px;">
-          <div class="card-body d-flex flex-column align-items-center justify-content-center w-100 h-100 p-2" style="min-height: 0;">
-            <div class="mb-2 d-flex align-items-center justify-content-center rounded-circle" style="background: linear-gradient(135deg, #1177bf 60%, #ffd700 100%); width: 56px; height: 56px;">
+        <div class="card text-center border-0 shadow-lg rounded-4 card-hover-effect d-flex align-items-stretch"
+          :style="'transition: transform 0.2s, box-shadow 0.2s; width: 180px; height: 180px; min-width: 180px; min-height: 180px; max-width: 180px; max-height: 180px;'"
+          @click="card.title === 'Free Mintiss' ? goToLogin() : null"
+          :class="{ 'cursor-pointer': card.title === 'Free Mintiss' }">
+          <div class="card-body d-flex flex-column align-items-center justify-content-center w-100 h-100 p-2"
+            style="min-height: 0;">
+            <div class="mb-2 d-flex align-items-center justify-content-center rounded-circle"
+              style="background: linear-gradient(135deg, #1177bf 60%, #ffd700 100%); width: 56px; height: 56px;">
               <i :class="card.icon + ' text-white'" style="font-size: 2rem;"></i>
             </div>
-            <h6 class="card-title fw-bold mt-2 mb-1" style="font-size: 1.15rem; color: #1177bf;">{{ card.title }} <span v-if="card.span" style="color: #1177bf;">{{ card.span }}</span></h6>
+            <h6 class="card-title fw-bold mt-2 mb-1" style="font-size: 1.15rem; color: #1177bf;">{{ card.title }} <span
+                v-if="card.span" style="color: #1177bf;">{{ card.span }}</span></h6>
             <div v-if="card.value" class="fw-bold text-success mt-1" style="font-size: 1.1rem;">{{ card.value }}</div>
           </div>
         </div>
@@ -47,7 +53,8 @@
       <template v-else>
         <div v-if="noResults" class="d-flex flex-column align-items-center justify-content-center my-5">
           <i class="bi bi-emoji-frown text-danger mb-2" style="font-size: 3rem;"></i>
-          <div class="text-center text-danger fw-bold" style="font-size: 1.2rem;">We don't have this product or store.</div>
+          <div class="text-center text-danger fw-bold" style="font-size: 1.2rem;">We don't have this product or store.
+          </div>
         </div>
         <div v-else>
           <div v-for="(store, idx) in stores" :key="store.name" class="card mb-4 shadow-sm border-0">
@@ -61,20 +68,24 @@
                   :breakpoints="{ 600: { slidesPerView: 2.2, spaceBetween: 24 }, 900: { slidesPerView: 4.2, spaceBetween: 32 } }"
                   class="products-swiper">
                   <SwiperSlide v-for="(product, pidx) in store.products" :key="product.unique_code">
-                    <div class="card h-100 border-0 shadow-sm product-card-hover" @click="openProduct(product.purchase_url)" style="cursor: pointer;">
-                      <div class="ratio ratio-4x3 bg-light d-flex align-items-center justify-content-center">
+                    <div class="card product-card" @click="openProduct(product.purchase_url)">
+                      <div class="product-image-wrapper">
                         <img v-if="product.images && product.images.length" :src="product.images[0]"
-                          class="img-fluid product-image-fit" />
-                      </div>
-                      <div class="card-body d-flex flex-column">
-                        <div class="fw-bold mb-1" style="color: #1177bf;">{{ product.name }}</div>
-                        <div class="mb-2">
-                          <span class="fw-bold text-success">₹{{ product.price }}</span>
-                          <span v-if="product.canceled_price" class="text-decoration-line-through text-danger ms-2">₹{{ product.canceled_price }}</span>
-                        </div>
-                        <div class="d-flex align-items-center mt-auto gap-2">
-                          <div class="flex-grow-1 text-secondary small text-truncate" style="max-width: 120px;">{{ product.description }}</div>
-                          <button class="btn btn-sm ms-auto px-3" style="background-color: #1177bf; border-color: #1177bf; color: #fff;" tabindex="-1">{{ product.cta_label || 'Shop now' }}</button>
+                          class="product-image" alt="Product" />
+                        <div class="product-info-overlay">
+                          <div class="fw-bold" style="color: #1177bf;">{{ product.name }}</div>
+                          <div class="d-flex align-items-center justify-content-between mb-1">
+                            <div>
+                              <span class="fw-bold text-success">₹{{ product.price }}</span>
+                              <span v-if="product.canceled_price" class="text-decoration-line-through text-danger ms-2">₹{{ product.canceled_price }}</span>
+                            </div>
+                            <button class="btn btn-sm px-2 product-cta-btn" style="background-color: #1177bf; border-color: #1177bf; color: #fff;" tabindex="-1">
+                              {{ product.cta_label || 'Shop now' }}
+                            </button>
+                          </div>
+                          <div class="product-description-ellipsis text-secondary small">
+                            {{ product.description }}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -98,10 +109,6 @@ export default {
   name: 'StoreFeed',
   components: { Swiper, SwiperSlide },
   props: {
-    searchQuery: {
-      type: String,
-      default: '',
-    },
   },
   data() {
     return {
@@ -122,7 +129,7 @@ export default {
     };
   },
   watch: {
-    searchQuery: {
+    '$route.query.search': {
       immediate: true,
       handler(newVal) {
         this.fetchStores(newVal);
@@ -141,7 +148,7 @@ export default {
   async mounted() {
     await this.fetchMintissValue();
     this.calculateUserBalance();
-    this.fetchStores();
+    // this.fetchStores(); // Removed to only fetch on search
     // Update Mintiss Value card
     this.infoCards[2].value = `₹${this.mintissValueDisplay}`;
   },
@@ -211,12 +218,14 @@ export default {
 <style scoped>
 .card-hover-effect:hover {
   transform: translateY(-8px) scale(1.03);
-  box-shadow: 0 8px 32px rgba(17, 119, 191, 0.18), 0 1.5px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 32px rgba(17, 119, 191, 0.18), 0 1.5px 8px rgba(0, 0, 0, 0.08);
 }
+
 .product-card-hover:hover {
-  box-shadow: 0 8px 32px rgba(17, 119, 191, 0.22), 0 1.5px 8px rgba(0,0,0,0.12);
+  box-shadow: 0 8px 32px rgba(17, 119, 191, 0.22), 0 1.5px 8px rgba(0, 0, 0, 0.12);
   transform: translateY(-4px) scale(1.02);
 }
+
 .product-image-fit {
   object-fit: contain;
   width: 100%;
@@ -224,5 +233,81 @@ export default {
   max-width: 100%;
   max-height: 100%;
   display: block;
+}
+
+/* New styles for product card layout */
+.product-card {
+  width: 300px;
+  min-width: 300px;
+  max-width: 300px;
+  box-shadow: 0 2px 8px rgba(17, 119, 191, 0.12);
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  background: #f4f8fb;
+}
+
+.product-image-wrapper {
+  position: relative;
+  width: 100%;
+  background: #f4f8fb;
+  overflow: hidden;
+  height: 400px;
+  min-height: 400px;
+  max-height: 400px;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.product-info-overlay {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  padding: 12px 10px 10px 10px;
+  background: #f4f8fb;
+  z-index: 2;
+}
+
+.product-description-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.product-cta-btn {
+  padding: 2px 8px !important;
+  font-size: 0.75rem !important;
+  height: 24px !important;
+  line-height: 1.1 !important;
+  border-radius: 4px !important;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .product-card {
+    width: 290px;
+    min-width: 290px;
+    max-width: 290px;
+  }
+}
+
+@media (max-width: 380PX) {
+  .product-card {
+    width: 250px;
+    min-width: 250px;
+    max-width: 250px;
+  }
 }
 </style>

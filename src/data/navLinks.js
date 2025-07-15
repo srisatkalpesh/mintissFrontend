@@ -26,6 +26,7 @@ export function getRoutes() {
       routes = [
         { name: "Home", path: "/" },
         { name: 'Stores', path: '/stores' },
+        // { name: 'Redeem Tokens', path: '/redeem' },
       ];
     }
   } else {

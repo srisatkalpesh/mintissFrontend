@@ -6,16 +6,16 @@
         <!-- Logo Left -->
         <span class="fw-bold text-white fs-4">Mintiss</span>
         <!-- Global Search Center -->
-        <form class="d-flex flex-grow-1 justify-content-center mx-4" style="max-width: 400px;">
-          <input class="form-control w-100" type="search" placeholder="Global Search" aria-label="Search" v-model="searchQuery" />
+        <form class="d-flex flex-grow-1 justify-content-center mx-4" style="max-width: 400px;" @submit.prevent="onSearch">
+          <input class="form-control w-100" type="search" placeholder="Global Search" aria-label="Search" v-model="searchQuery" @keyup.enter="onSearch" />
         </form>
         <!-- Wallet + Profile or Auth Button Right -->
         <div class="d-flex align-items-center gap-4">
           <template v-if="isLoggedIn">
-            <div class="d-flex align-items-center">
+            <!-- <router-link to="/redeem" class="d-flex align-items-center text-decoration-none wallet-link"> -->
               <i class="bi bi-wallet2 text-white me-2 fs-4"></i>
               <span class="text-white fw-bold">₹{{ userBalance || '0.00000000' }}</span>
-            </div>
+            <!-- </router-link> -->
             <router-link to="/profile" class="d-flex align-items-center text-decoration-none">
               <i class="bi bi-person-circle text-white fs-3 me-2"></i>
               <span class="text-white fw-semibold">{{ userName }}</span>
@@ -31,16 +31,16 @@
         <!-- Logo Top Center -->
         <span class="fw-bold text-white fs-3">Mintiss</span>
         <!-- Global Search Centered -->
-        <form class="d-flex w-100 justify-content-center mb-1" style="max-width: 350px;">
-          <input class="form-control w-100" type="search" placeholder="Global Search" aria-label="Search" v-model="searchQuery" />
+        <form class="d-flex w-100 justify-content-center mb-1" style="max-width: 350px;" @submit.prevent="onSearch">
+          <input class="form-control w-100" type="search" placeholder="Global Search" aria-label="Search" v-model="searchQuery" @keyup.enter="onSearch" />
         </form>
         <!-- Wallet + Profile or Auth Button in one row -->
         <div class="d-flex w-100 align-items-center justify-content-center gap-3 pb-1">
           <template v-if="isLoggedIn">
-            <div class="d-flex align-items-center">
+            <!-- <router-link to="/redeem" class="d-flex align-items-center text-decoration-none wallet-link"> -->
               <i class="bi bi-wallet2 text-white me-1 fs-5"></i>
               <span class="text-white fw-bold small">₹{{ userBalance || '0.00000000' }}</span>
-            </div>
+            <!-- </router-link> -->
             <router-link to="/profile" class="d-flex align-items-center text-decoration-none">
               <i class="bi bi-person-circle text-white fs-4 me-1"></i>
               <span class="text-white fw-semibold small">{{ userName }}</span>
@@ -58,6 +58,7 @@
 <script>
 import axios from "@/axios";
 import toastService from "@/services/toastService";
+import eventBus from "@/eventBus";
 
 export default {
   name: "HeaderNavbar",
@@ -90,19 +91,21 @@ export default {
         }
       },
     },
-    searchQuery: {
-      handler: function(newVal) {
-        clearTimeout(this._searchDebounce);
-        this._searchDebounce = setTimeout(() => {
-          this.$emit('global-search', newVal.trim());
-        }, 300);
-      },
-    },
   },
   async mounted() {
     if (this.isLoggedIn) {
       await this.fetchMintissValue();
       this.calculateUserBalance();
+    }
+    // Listen for balance updates from other components
+    this._balanceUpdatedHandler = () => {
+      this.calculateUserBalance();
+    };
+    eventBus.on('balance-updated', this._balanceUpdatedHandler);
+  },
+  beforeUnmount() {
+    if (this._balanceUpdatedHandler) {
+      eventBus.off('balance-updated', this._balanceUpdatedHandler);
     }
   },
   methods: {
@@ -147,6 +150,17 @@ export default {
   border-bottom-left-radius: 2rem;
   border-bottom-right-radius: 2rem;
   box-shadow: 0 4px 24px rgba(17, 119, 191, 0.1);
+}
+
+.wallet-link {
+  transition: all 0.3s ease;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+}
+
+.wallet-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
 }
 </style>
 
