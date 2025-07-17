@@ -1,12 +1,12 @@
 <template>
   <div class="mintiss-home">
     <!-- Hero Section -->
-    <section class="welcome-section">
+    <!-- <section class="welcome-section">
       <div class="welcome-content">
         <h1 class="main-title">Welcome to Mintiss</h1>
         <p class="subtitle">Experience the future of Mintiss — rewards that grow every day, with every purchase.</p>
       </div>
-    </section>
+    </section> -->
 
     <!-- Mintiss Value Section -->
     <section class="mintiss-value-section">
@@ -33,7 +33,7 @@
     </section>
 
     <!-- Gallery/Feature Section -->
-    <section class="gallery-section">
+    <!-- <section class="gallery-section">
       <div class="gallery-row">
         <div class="gallery-img-wrapper">
           <img :src="mintiss1" alt="Shopping Together" class="gallery-img" />
@@ -44,10 +44,10 @@
           <div class="gallery-caption">Share and connect with Mintiss</div>
         </div>
       </div>
-    </section>
+    </section> -->
 
     <!-- How Mintiss Works Section -->
-    <section class="how-works-section">
+    <!-- <section class="how-works-section">
       <h2>How Mintiss Works</h2>
       <div class="how-steps">
         <div class="how-step">
@@ -71,10 +71,10 @@
           <p>Use your rewards for discounts, gifts, or cash back.</p>
         </div>
       </div>
-    </section>
+    </section> -->
 
     <!-- Benefits Section -->
-    <section class="benefits-section">
+    <!-- <section class="benefits-section">
       <h2>Why Choose Mintiss?</h2>
       <div class="benefits-grid">
         <div class="benefit">
@@ -88,7 +88,7 @@
           <p>We're here for you, anytime you need help.</p>
         </div>
       </div>
-    </section>
+    </section> -->
 
     <!-- Testimonials Section -->
     <!--
@@ -112,10 +112,10 @@
     -->
 
     <!-- Footer Call-to-Action -->
-    <section class="footer-cta-section">
+    <!-- <section class="footer-cta-section">
       <h2>Ready to start earning with Mintiss?</h2>
       <button class="mintiss-btn primary" @click="goToSellerSignup">Join Now</button>
-    </section>
+    </section> -->
   </div>
 </template>
 
@@ -163,7 +163,12 @@ export default {
           tooltip: { enabled: true },
         },
         yaxis: {
-          labels: { style: { colors: '#fff', fontSize: '14px', fontWeight: 600 } },
+          labels: {
+            style: { colors: '#fff', fontSize: '14px', fontWeight: 600 },
+            formatter: function (val) {
+              return Math.round(val); // Show only integer values
+            }
+          },
           axisBorder: { show: false },
           axisTicks: { show: false },
         },

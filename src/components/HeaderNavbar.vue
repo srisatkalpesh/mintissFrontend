@@ -4,7 +4,11 @@
       <!-- Desktop Layout -->
       <div class="d-none d-md-flex align-items-center justify-content-between w-100" style="min-height: 64px;">
         <!-- Logo Left -->
-        <span class="fw-bold text-white fs-4">Mintiss</span>
+        <span
+          class="fw-bold text-white fs-4"
+          style="cursor: pointer;"
+          @click="$router.push('/')"
+        >Mintiss</span>
         <!-- Global Search Center -->
         <form class="d-flex flex-grow-1 justify-content-center mx-4" style="max-width: 400px;" @submit.prevent="onSearch">
           <input class="form-control w-100" type="search" placeholder="Global Search" aria-label="Search" v-model="searchQuery" @keyup.enter="onSearch" />
@@ -29,7 +33,11 @@
       <!-- Mobile Layout -->
       <div class="d-flex d-md-none flex-column align-items-center w-100">
         <!-- Logo Top Center -->
-        <span class="fw-bold text-white fs-3">Mintiss</span>
+        <span
+          class="fw-bold text-white fs-3"
+          style="cursor: pointer;"
+          @click="$router.push('/')"
+        >Mintiss</span>
         <!-- Global Search Centered -->
         <form class="d-flex w-100 justify-content-center mb-1" style="max-width: 350px;" @submit.prevent="onSearch">
           <input class="form-control w-100" type="search" placeholder="Global Search" aria-label="Search" v-model="searchQuery" @keyup.enter="onSearch" />

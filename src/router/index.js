@@ -1,11 +1,17 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HomeView from '../views/HomeView.vue'
+import HomeView from '../views/HomeView.vue' // Remove this line
 import AdminLayout from '../views/admin/AdminLayout.vue'
 import SellerLayout from '../views/sellersite/SellerLayout.vue'
 
 const routes = [
   {
     path: "/",
+    name: "StoreFeed",
+    component: () => import("../views/usersite/Products.vue"),
+  },
+  // Remove or comment out the old home route if present
+  {
+    path: "/mintiss",
     name: "home",
     component: HomeView,
   },
@@ -14,7 +20,11 @@ const routes = [
     name: "about",
     component: () => import("../views/AboutView.vue"),
   },
-
+  {
+    path: "/about-us",
+    name: "AboutUs",
+    component: () => import("../views/AboutUs.vue"),
+  },
   {
     path: "/cart",
     name: "Cart",
@@ -24,6 +34,11 @@ const routes = [
     path: "/contact",
     name: "Contact",
     component: () => import("../views/usersite/UserContact.vue"),
+  },
+  {
+    path: "/contact-us",
+    name: "ContactUs",
+    component: () => import("../views/ContactUs.vue"),
   },
   {
     path: "/login",
@@ -123,13 +138,23 @@ const routes = [
   },
   {
     path: "/stores",
-    name: "StoreFeed",
+    name: "StoreFeedAlias",
     component: () => import("../views/usersite/Products.vue"),
   },
   {
     path: "/coming-soon",
     name: "ComingSoon",
     component: () => import("../views/usersite/ComingSoon.vue"),
+  },
+  {
+    path: "/terms",
+    name: "TermsAndConditions",
+    component: () => import("../views/TermsAndConditions.vue"),
+  },
+  {
+    path: "/privacy",
+    name: "PrivacyPolicy",
+    component: () => import("../views/PrivacyPolicy.vue"),
   },
 ];
 

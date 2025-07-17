@@ -3,10 +3,22 @@
     <!-- HeaderNavbar removed, now handled globally -->
     <div class="row row-cols-2 row-cols-md-4 g-3 my-4 justify-content-center">
       <div class="col d-flex justify-content-center" v-for="card in infoCards" :key="card.title">
-        <div class="card text-center border-0 shadow-lg rounded-4 card-hover-effect d-flex align-items-stretch"
+        <div
+          class="card text-center border-0 shadow-lg rounded-4 card-hover-effect d-flex align-items-stretch"
           :style="'transition: transform 0.2s, box-shadow 0.2s; width: 180px; height: 180px; min-width: 180px; min-height: 180px; max-width: 180px; max-height: 180px;'"
-          @click="card.title === 'Free Mintiss' ? goToLogin() : null"
-          :class="{ 'cursor-pointer': card.title === 'Free Mintiss' }">
+          @click="
+            card.title === 'Free Mintiss'
+              ? goToLogin()
+              : card.title === 'Today’s Mintiss Value'
+              ? goToMintiss()
+              : null
+          "
+          :class="{
+            'cursor-pointer':
+              card.title === 'Free Mintiss' ||
+              card.title === 'Today’s Mintiss Value'
+          }"
+        >
           <div class="card-body d-flex flex-column align-items-center justify-content-center w-100 h-100 p-2"
             style="min-height: 0;">
             <div class="mb-2 d-flex align-items-center justify-content-center rounded-circle"
@@ -72,20 +84,22 @@
                       <div class="product-image-wrapper">
                         <img v-if="product.images && product.images.length" :src="product.images[0]"
                           class="product-image" alt="Product" />
-                        <div class="product-info-overlay">
-                          <div class="fw-bold" style="color: #1177bf;">{{ product.name }}</div>
-                          <div class="d-flex align-items-center justify-content-between mb-1">
-                            <div>
-                              <span class="fw-bold text-success">₹{{ product.price }}</span>
-                              <span v-if="product.canceled_price" class="text-decoration-line-through text-danger ms-2">₹{{ product.canceled_price }}</span>
-                            </div>
-                            <button class="btn btn-sm px-2 product-cta-btn" style="background-color: #1177bf; border-color: #1177bf; color: #fff;" tabindex="-1">
-                              {{ product.cta_label || 'Shop now' }}
-                            </button>
+                      </div>
+                      <div class="product-info-overlay">
+                        <div class="fw-bold" style="color: #1177bf;">{{ product.name }}</div>
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                          <div>
+                            <span class="fw-bold text-success">₹{{ product.price }}</span>
+                            <span v-if="product.canceled_price"
+                              class="text-decoration-line-through text-danger ms-2">₹{{ product.canceled_price }}</span>
                           </div>
-                          <div class="product-description-ellipsis text-secondary small">
-                            {{ product.description }}
-                          </div>
+                          <button class="btn btn-sm px-2 product-cta-btn"
+                            style="background-color: #1177bf; border-color: #1177bf; color: #fff;" tabindex="-1">
+                            {{ product.cta_label || 'Shop now' }}
+                          </button>
+                        </div>
+                        <div class="product-description-ellipsis text-secondary small">
+                          {{ product.description }}
                         </div>
                       </div>
                     </div>
@@ -197,6 +211,9 @@ export default {
     goToSignup() {
       this.$router.push('/signup');
     },
+    goToMintiss() {
+      this.$router.push('/mintiss');
+    },
     setCarouselRef(el, idx) {
       if (el) this.carouselRefs[idx] = el;
     },
@@ -237,9 +254,9 @@ export default {
 
 /* New styles for product card layout */
 .product-card {
-  width: 300px;
-  min-width: 300px;
-  max-width: 300px;
+  width: 320px;
+  min-width: 320px;
+  max-width: 320px;
   box-shadow: 0 2px 8px rgba(17, 119, 191, 0.12);
   cursor: pointer;
   overflow: hidden;
@@ -255,23 +272,30 @@ export default {
   height: 400px;
   min-height: 400px;
   max-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .product-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  /* Show the whole image */
+  object-position: center;
   display: block;
+  background: #e9ecef;
+  /* fallback background */
 }
 
 .product-info-overlay {
-  position: absolute;
-  left: 0;
-  bottom: 0;
+  /* Remove position and z-index for normal flow */
+  position: static;
+  left: unset;
+  bottom: unset;
   width: 100%;
   padding: 12px 10px 10px 10px;
   background: #f4f8fb;
-  z-index: 2;
 }
 
 .product-description-ellipsis {
@@ -295,19 +319,69 @@ export default {
   cursor: pointer;
 }
 
-@media (max-width: 600px) {
+/* Responsive product card widths */
+@media (max-width: 1200px) {
   .product-card {
-    width: 290px;
-    min-width: 290px;
-    max-width: 290px;
+    width: 280px;
+    min-width: 280px;
+    max-width: 280px;
+  }
+
+  .product-image-wrapper {
+    height: 340px;
+    min-height: 340px;
+    max-height: 340px;
   }
 }
 
-@media (max-width: 380PX) {
+@media (max-width: 900px) {
+  .card-body {
+    padding: 12px 6px !important;
+  }
+}
+
+/* @media (max-width: 600px) {
   .product-card {
-    width: 250px;
-    min-width: 250px;
-    max-width: 250px;
+    width: 160px;
+    min-width: 160px;
+    max-width: 160px;
+  }
+  .product-image-wrapper {
+    height: 120px;
+    min-height: 120px;
+    max-height: 120px;
+  }
+  .card-body {
+    padding: 12px 6px !important;
+  }
+} */
+
+/* @media (max-width: 380px) {
+  .product-card {
+    width: 120px;
+    min-width: 120px;
+    max-width: 120px;
+  }
+  .product-image-wrapper {
+    height: 80px;
+    min-height: 80px;
+    max-height: 80px;
+  }
+} */
+
+/* Reduce padding under the slider for large screens */
+.products-carousel-wrapper {
+  padding-bottom: 16px;
+}
+
+@media (min-width: 1400px) {
+  .products-carousel-wrapper {
+    padding-bottom: 4px !important;
+  }
+
+  .card-body {
+    padding-bottom: 12px !important;
+    padding-top: 18px !important;
   }
 }
 </style>
