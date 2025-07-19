@@ -26,22 +26,26 @@
     <h5 class="mt-4 mb-2" style="color: #1177bf;">3. Sharing Your Information</h5>
     <p>
       We do not sell your personal information. We may share data with:
-      <ul>
-        <li>Trusted third-party service providers (payment gateways, delivery partners, analytics tools, etc.)</li>
-        <li>Legal authorities, if required by law</li>
-        <li>Affiliates or partners with whom you interact through Mintiss</li>
-      </ul>
+    </p>
+    <ul>
+      <li>Trusted third-party service providers (payment gateways, delivery partners, analytics tools, etc.)</li>
+      <li>Legal authorities, if required by law</li>
+      <li>Affiliates or partners with whom you interact through Mintiss</li>
+    </ul>
+    <p>
       All partners are required to protect your data and use it only as necessary.
     </p>
 
     <h5 class="mt-4 mb-2" style="color: #1177bf;">4. Cookies & Tracking Technologies</h5>
     <p>
       We use cookies to:
-      <ul>
-        <li>Remember your preferences</li>
-        <li>Analyze site performance</li>
-        <li>Deliver personalized content and ads</li>
-      </ul>
+    </p>
+    <ul>
+      <li>Remember your preferences</li>
+      <li>Analyze site performance</li>
+      <li>Deliver personalized content and ads</li>
+    </ul>
+    <p>
       You can control cookies via your browser settings. Disabling cookies may affect your experience on our website.
     </p>
 
@@ -53,11 +57,13 @@
     <h5 class="mt-4 mb-2" style="color: #1177bf;">6. Your Rights</h5>
     <p>
       Depending on your location, you may have rights to:
-      <ul>
-        <li>Access, update, or delete your personal information</li>
-        <li>Object to processing</li>
-        <li>Withdraw consent for marketing communications</li>
-      </ul>
+    </p>
+    <ul>
+      <li>Access, update, or delete your personal information</li>
+      <li>Object to processing</li>
+      <li>Withdraw consent for marketing communications</li>
+    </ul>
+    <p>
       To make a request, contact us at <a href="mailto:support@mintiss.com">support@mintiss.com</a>.
     </p>
 
@@ -84,10 +90,10 @@
     <h5 class="mt-4 mb-2" style="color: #1177bf;">11. Contact Us</h5>
     <p>
       If you have any questions or concerns about this Privacy Policy, please contact us:
-      <ul>
-        <li>Email: <a href="mailto:support@mintiss.com">support@mintiss.com</a></li>
-        <li>Website: <a href="https://www.mintiss.com" target="_blank">www.mintiss.com</a></li>
-      </ul>
     </p>
+    <ul>
+      <li>Email: <a href="mailto:support@mintiss.com">support@mintiss.com</a></li>
+      <li>Website: <a href="https://www.mintiss.com" target="_blank">www.mintiss.com</a></li>
+    </ul>
   </div>
 </template>

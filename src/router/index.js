@@ -88,6 +88,11 @@ const routes = [
         component: () => import("../views/admin/Users.vue")
       },
       {
+        path: "sellers", // <-- Add this route
+        name: "AdminSellers",
+        component: () => import("../views/admin/Sellers.vue")
+      },
+      {
         path: "mintiss-values",
         name: "AdminMintissValues",
         component: () => import("../views/admin/MintissValues.vue")

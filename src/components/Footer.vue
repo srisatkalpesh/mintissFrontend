@@ -5,12 +5,13 @@
         <!-- Quick Links - CENTER -->
         <div class="col-md-4 order-2 order-md-2 d-flex flex-column align-items-center">
           <h5 class="fw-semibold mb-3 text-center">Quick Links</h5>
-          <ul class="list-unstyled text-center">
-            <router-link to="/about-us" class="mx-2">About Us</router-link> |
-            <router-link to="/contact-us" class="mx-2">Contact Us</router-link> |
-            <router-link to="/terms" class="mx-2">Terms & Conditions</router-link> |
+          <!-- <ul class="list-unstyled text-center"> -->
+            <router-link to="/about-us" class="mx-2">About Us</router-link>
+            <router-link to="/contact-us" class="mx-2">Contact Us</router-link>
+            <router-link to="/terms" class="mx-2">Terms & Conditions</router-link>
             <router-link to="/privacy" class="mx-2">Privacy Policy</router-link>
-          </ul>
+            <router-link to="/seller/signup" class="mx-2">Become A Seller</router-link>
+          <!-- </ul> -->
         </div>
         <!-- Support -->
         <div class="col-md-4 order-1 order-md-1 text-md-start text-center">

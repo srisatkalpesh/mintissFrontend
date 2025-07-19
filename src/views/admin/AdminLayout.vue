@@ -21,6 +21,12 @@
                     </router-link>
                 </li>
                 <li class="nav-item">
+                    <router-link to="/admin/sellers" class="nav-link text-white">
+                        <i class="bi bi-shop me-2"></i>
+                        Sellers
+                    </router-link>
+                </li>
+                <li class="nav-item">
                     <router-link to="/admin/mintiss-values" class="nav-link text-white">
                         <i class="bi bi-currency-dollar me-2"></i>
                         Mintiss Values
@@ -151,4 +157,4 @@ export default {
     margin-top: auto;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
-</style> 
+</style>

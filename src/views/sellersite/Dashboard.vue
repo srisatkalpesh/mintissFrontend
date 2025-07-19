@@ -6,8 +6,8 @@
                 <p>Welcome to your seller dashboard!</p>
             </div>
         </div>
-        
-        <div class="row">
+
+        <!-- <div class="row">
             <div class="col-md-3 mb-4">
                 <div class="card bg-primary text-white">
                     <div class="card-body">
@@ -43,7 +43,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 </template>
 
@@ -54,4 +54,4 @@ export default {
         console.log('SellerDashboard component mounted');
     }
 }
-</script> 
+</script>

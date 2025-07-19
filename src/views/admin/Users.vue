@@ -47,9 +47,10 @@
                 id="points" 
                 type="number" 
                 v-model="mintissForm.points" 
-                min="0.01" 
-                step="0.01" 
+                min="0.000000001" 
+                step="0.000000001" 
                 required
+                placeholder="e.g. 1.123456789"
               />
             </div>
             
@@ -500,4 +501,4 @@ export default {
     gap: 1rem;
   }
 }
-</style> 
+</style>

@@ -86,12 +86,29 @@
                           class="product-image" alt="Product" />
                       </div>
                       <div class="product-info-overlay">
-                        <div class="fw-bold" style="color: #1177bf;">{{ product.name }}</div>
+                        <!-- Product name and CTA label (button) if no price/canceled_price -->
                         <div class="d-flex align-items-center justify-content-between mb-1">
+                          <div class="fw-bold" style="color: #1177bf;">
+                            {{ product.name }}
+                          </div>
+                          <button
+                            v-if="!product.price && !product.canceled_price && product.cta_label"
+                            class="btn btn-sm px-2 product-cta-btn"
+                            style="background-color: #1177bf; border-color: #1177bf; color: #fff;" tabindex="-1">
+                            {{ product.cta_label }}
+                          </button>
+                        </div>
+                        <!-- Price/canceled_price and CTA button only if price/canceled_price exists -->
+                        <div class="d-flex align-items-center justify-content-between mb-1" v-if="product.price || product.canceled_price">
                           <div>
-                            <span class="fw-bold text-success">₹{{ product.price }}</span>
-                            <span v-if="product.canceled_price"
-                              class="text-decoration-line-through text-danger ms-2">₹{{ product.canceled_price }}</span>
+                            <span v-if="product.price !== null && product.price !== undefined && product.price !== ''"
+                                  class="fw-bold text-success">
+                              ₹{{ product.price }}
+                            </span>
+                            <span v-if="product.canceled_price !== null && product.canceled_price !== undefined && product.canceled_price !== ''"
+                                  class="text-decoration-line-through text-danger ms-2">
+                              ₹{{ product.canceled_price }}
+                            </span>
                           </div>
                           <button class="btn btn-sm px-2 product-cta-btn"
                             style="background-color: #1177bf; border-color: #1177bf; color: #fff;" tabindex="-1">
