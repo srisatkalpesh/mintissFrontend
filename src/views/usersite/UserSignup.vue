@@ -200,4 +200,26 @@ export default {
 </script>
 
 <style scoped>
+.bg-primary {
+  background: linear-gradient(135deg, #1177bf 0%, #0d6efd 100%) !important;
+}
+.text-primary {
+  color: #1177bf !important;
+}
+.btn-primary {
+  background-color: #1177bf !important;
+  border-color: #1177bf !important;
+}
+.btn-primary:hover {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+}
+.btn-outline-primary {
+  color: #1177bf !important;
+  border-color: #1177bf !important;
+}
+.btn-outline-primary:hover {
+  background-color: #1177bf !important;
+  border-color: #1177bf !important;
+}
 </style>

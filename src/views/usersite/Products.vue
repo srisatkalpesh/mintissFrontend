@@ -74,7 +74,9 @@
               <div class="d-flex flex-column mb-2">
                 <span class="fs-5 fw-bold" style="color: #1177bf;">{{ store.name }}</span>
               </div>
-              <div class="mb-2 text-secondary">{{ store.description }}</div>
+              <div class="mb-2 text-secondary store-description-ellipsis">
+                {{ store.description }}
+              </div>
               <div class="products-carousel-wrapper">
                 <Swiper :slides-per-view="1.2" :space-between="20"
                   :breakpoints="{ 600: { slidesPerView: 2.2, spaceBetween: 24 }, 900: { slidesPerView: 4.2, spaceBetween: 32 } }"
@@ -88,7 +90,7 @@
                       <div class="product-info-overlay">
                         <!-- Product name and CTA label (button) if no price/canceled_price -->
                         <div class="d-flex align-items-center justify-content-between mb-1">
-                          <div class="fw-bold" style="color: #1177bf;">
+                          <div class="fw-bold product-name-ellipsis" style="color: #1177bf;">
                             {{ product.name }}
                           </div>
                           <button
@@ -320,6 +322,26 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   display: block;
+}
+
+.product-name-ellipsis {
+  max-width: 75%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Store description ellipsis after 2 lines */
+.store-description-ellipsis {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 2.8em;
+  line-height: 1.4em;
 }
 
 .product-cta-btn {

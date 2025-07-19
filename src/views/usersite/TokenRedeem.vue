@@ -427,31 +427,31 @@ export default {
 <style scoped>
 /* Custom theme color override for Bootstrap */
 .bg-primary {
-  background: linear-gradient(135deg, #1137bf 0%, #0d2b8a 100%) !important;
+  background: linear-gradient(135deg, #1177bf 0%, #0d6efd 100%) !important;
 }
 
 .text-primary {
-  color: #1137bf !important;
+  color: #1177bf !important;
 }
 
 .btn-primary {
-  background-color: #1137bf !important;
-  border-color: #1137bf !important;
+  background-color: #1177bf !important;
+  border-color: #1177bf !important;
 }
 
 .btn-primary:hover {
-  background-color: #0d2b8a !important;
-  border-color: #0d2b8a !important;
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
 }
 
 .btn-outline-primary {
-  color: #1137bf !important;
-  border-color: #1137bf !important;
+  color: #1177bf !important;
+  border-color: #1177bf !important;
 }
 
 .btn-outline-primary:hover {
-  background-color: #1137bf !important;
-  border-color: #1137bf !important;
+  background-color: #1177bf !important;
+  border-color: #1177bf !important;
 }
 
 /* Custom cursor for clickable cards */
