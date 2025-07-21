@@ -19,7 +19,7 @@ if (typeof window !== 'undefined') {
   fetch('https://ipapi.co/json/')
     .then(res => res.json())
     .then(data => {
-      if (data && data.country_code !== 'IN') {
+      if (data && data.country_code !== 'IN' && data.country_code !== 'ZA') {
         if (window.location.pathname !== '/coming-soon') {
           router.replace('/coming-soon');
         }
