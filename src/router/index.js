@@ -2,12 +2,23 @@ import { createRouter, createWebHistory } from "vue-router";
 import HomeView from '../views/HomeView.vue' // Remove this line
 import AdminLayout from '../views/admin/AdminLayout.vue'
 import SellerLayout from '../views/sellersite/SellerLayout.vue'
+import CheckoutPage from '@/views/usersite/CheckoutPage.vue';
 
 const routes = [
   {
     path: "/",
     name: "StoreFeed",
     component: () => import("../views/usersite/Products.vue"),
+  },
+  {
+    path: '/checkout',
+    name: 'checkout',
+    component: CheckoutPage,
+  },
+  {
+    path: '/order-complete',
+    name: 'OrderComplete',
+    component: () => import("../views/usersite/OrderComplete.vue"),
   },
   // Remove or comment out the old home route if present
   {

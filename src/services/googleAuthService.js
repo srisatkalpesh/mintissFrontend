@@ -9,7 +9,18 @@ class GoogleAuthService {
     // Redirect to Google OAuth (this will redirect to your Laravel backend)
     redirectToGoogle() {
         const baseURL = process.env.VUE_APP_API_BASE_URL;
-        window.location.href = `${baseURL}/auth/google`;
+        
+        // Get referral code from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const referralCode = urlParams.get('ref');
+        
+        // Add referral code to the redirect URL if present
+        let redirectUrl = `${baseURL}/auth/google`;
+        if (referralCode) {
+            redirectUrl += `?ref=${encodeURIComponent(referralCode)}`;
+        }
+        
+        window.location.href = redirectUrl;
     }
 
     // Handle callback from Laravel backend after Google OAuth
@@ -17,6 +28,7 @@ class GoogleAuthService {
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
         const error = urlParams.get('error');
+        const referralCode = urlParams.get('ref');
 
         if (error) {
             throw new Error(`Google authentication error: ${error}`);
@@ -26,9 +38,17 @@ class GoogleAuthService {
             try {
                 const baseURL = process.env.VUE_APP_API_BASE_URL;
                 console.log("code", baseURL);
-                const response = await axios.post(`${baseURL}/auth/google/callback`, {
+                
+                const callbackData = {
                     code: code
-                });
+                };
+
+                // Add referral code if present
+                if (referralCode) {
+                    callbackData.referral_code = referralCode;
+                }
+
+                const response = await axios.post(`${baseURL}/auth/google/callback`, callbackData);
 
                 const { user, token } = response.data;
 
@@ -108,12 +128,23 @@ class GoogleAuthService {
             // Get user info from Google
             const userInfo = await this.getGoogleUserInfo(response.access_token);
             
+            // Get referral code from URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const referralCode = urlParams.get('ref');
+            
             // Send to your Laravel backend
             const baseURL = process.env.VUE_APP_API_BASE_URL;
-            const backendResponse = await axios.post(`${baseURL}/auth/google/callback`, {
+            const callbackData = {
                 access_token: response.access_token,
                 user_info: userInfo
-            });
+            };
+
+            // Add referral code if present
+            if (referralCode) {
+                callbackData.referral_code = referralCode;
+            }
+
+            const backendResponse = await axios.post(`${baseURL}/auth/google/callback`, callbackData);
 
             const { user, token } = backendResponse.data;
 

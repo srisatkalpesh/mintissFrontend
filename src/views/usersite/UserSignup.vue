@@ -96,8 +96,15 @@ export default {
       confirmPassword: '',
       errors: {},
       loading: false,
-      googleLoading: false
+      googleLoading: false,
+      referralCode: ''
     };
+  },
+  mounted() {
+    // Get referral code from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    this.referralCode = urlParams.get('ref') || '';
+    console.log('Referral code from URL:', this.referralCode);
   },
   watch: {
     phone: {
@@ -132,13 +139,20 @@ export default {
         const cleanPhone = this.phone.replace(/\s/g, '');
         
         const baseURL = process.env.VUE_APP_API_BASE_URL;
-        const response = await axios.post(`${baseURL}/signup`, {
+        const signupData = {
           name: this.name,
           email: this.email,
           phone: cleanPhone,
           password: this.password,
           password_confirmation: this.confirmPassword
-        });
+        };
+
+        // Add referral code if present
+        if (this.referralCode) {
+          signupData.referral_code = this.referralCode;
+        }
+
+        const response = await axios.post(`${baseURL}/signup`, signupData);
 
         const { user, token } = response.data;
 

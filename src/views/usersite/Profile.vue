@@ -1,8 +1,9 @@
 <template>
   <div class="container py-5">
     <div class="row justify-content-center">
-      <div class="col-md-8">
-        <div class="card shadow-lg border-0 rounded-4">
+      <div class="col-lg-10">
+        <!-- Profile Information Card -->
+        <div class="card shadow-lg border-0 rounded-4 mb-4">
           <div class="card-header bg-primary text-white rounded-top-4 p-4 d-flex align-items-center justify-content-between">
             <h2 class="mb-0 fs-3">Profile Information</h2>
             <button v-if="!editMode" class="btn btn-light btn-sm fw-bold" @click="editMode = true">
@@ -94,6 +95,105 @@
             </div>
           </div>
         </div>
+
+        <!-- Referral System Card -->
+        <div class="card shadow-lg border-0 rounded-4">
+          <div class="card-body p-4">
+            <!-- Referral Code Section -->
+            <div class="row mb-4">
+              <div class="col-lg-8">
+                <div class="card border-0 bg-light">
+                  <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3">
+                      <i class="bi bi-share me-2 text-primary"></i>
+                      Your Referral Code
+                    </h5>
+                    <div class="input-group mb-3">
+                      <input 
+                        type="text" 
+                        class="form-control form-control-lg fw-bold text-center" 
+                        :value="referralCode" 
+                        readonly
+                        id="referralCodeInput"
+                      >
+                      <button 
+                        class="btn btn-primary btn-lg" 
+                        type="button"
+                        @click="copyReferralCode"
+                        :class="{ 'btn-success': copySuccess }"
+                      >
+                        <i :class="copySuccess ? 'bi bi-check-lg' : 'bi bi-clipboard'" class="me-2"></i>
+                        {{ copySuccess ? 'Copied!' : 'Copy' }}
+                      </button>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                      <button 
+                        class="btn btn-outline-primary btn-sm"
+                        @click="shareOnWhatsApp"
+                      >
+                        <i class="bi bi-whatsapp me-1"></i> WhatsApp
+                      </button>
+                      <button 
+                        class="btn btn-outline-primary btn-sm"
+                        @click="shareOnTelegram"
+                      >
+                        <i class="bi bi-telegram me-1"></i> Telegram
+                      </button>
+                      <button 
+                        class="btn btn-outline-primary btn-sm"
+                        @click="shareOnEmail"
+                      >
+                        <i class="bi bi-envelope me-1"></i> Email
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- How It Works -->
+            <div class="mt-4">
+              <h5 class="fw-bold mb-3">
+                <i class="bi bi-question-circle me-2 text-primary"></i>
+                How It Works
+              </h5>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <div class="card border-0 bg-light h-100">
+                    <div class="card-body text-center p-3">
+                      <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                        <span class="fw-bold">1</span>
+                      </div>
+                      <h6 class="fw-bold">Share Your Code</h6>
+                      <p class="small text-muted mb-0">Share your unique referral code with friends and family</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card border-0 bg-light h-100">
+                    <div class="card-body text-center p-3">
+                      <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                        <span class="fw-bold">2</span>
+                      </div>
+                      <h6 class="fw-bold">They Join</h6>
+                      <p class="small text-muted mb-0">Your friends sign up using your referral code</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card border-0 bg-light h-100">
+                    <div class="card-body text-center p-3">
+                      <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                        <span class="fw-bold">3</span>
+                      </div>
+                      <h6 class="fw-bold">Earn Rewards</h6>
+                      <p class="small text-muted mb-0">Both you and your friend get rewards when they make their first purchase</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -102,6 +202,7 @@
 <script>
 import axios from '@/axios';
 import toastService from '@/services/toastService';
+import referralService from '@/services/referralService';
 
 export default {
   name: 'Profile',
@@ -110,8 +211,22 @@ export default {
       user: JSON.parse(localStorage.getItem('user')) || {},
       editMode: false,
       editUser: {},
-      loading: false
+      loading: false,
+      referralCode: '',
+      copySuccess: false,
+      referralStats: {
+        totalReferrals: 0,
+        activeReferrals: 0,
+        pendingReferrals: 0,
+        thisMonth: 0,
+        totalEarnings: 0
+      },
+      referralHistory: []
     }
+  },
+  async mounted() {
+    this.editUser = { ...this.user };
+    await this.fetchReferralData();
   },
   methods: {
     async handleLogout() {
@@ -137,7 +252,6 @@ export default {
     async saveProfile() {
       this.loading = true;
       try {
-        // Only send editable fields
         const payload = {
           name: this.editUser.name,
           email: this.editUser.email,
@@ -153,10 +267,111 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    async fetchReferralData() {
+      try {
+        // Fetch referral code
+        const codeResponse = await referralService.getReferralCode();
+        
+        // Check if the response has referral_code (with underscore) or referralCode (camelCase)
+        this.referralCode = codeResponse.referral_code || codeResponse.referralCode || referralService.generateReferralCode();
+        
+        // Fetch referral statistics
+        // const statsResponse = await referralService.getReferralStats();
+        // this.referralStats = statsResponse || this.referralStats;
+        
+        // Fetch referral history
+        // const historyResponse = await referralService.getReferralHistory();
+        // this.referralHistory = historyResponse || [];
+      } catch (error) {
+        console.error('Error fetching referral data:', error);
+        // Fallback to demo data
+        const demoData = referralService.getDemoReferralData();
+        this.referralCode = demoData.referralCode;
+        this.referralStats = demoData.stats;
+        this.referralHistory = demoData.history;
+      }
+    },
+    async copyReferralCode() {
+      try {
+        await referralService.copyToClipboard(this.referralCode);
+        this.copySuccess = true;
+        setTimeout(() => {
+          this.copySuccess = false;
+        }, 2000);
+      } catch (error) {
+        console.error('Error copying referral code:', error);
+        toastService.error('Failed to copy referral code');
+      }
+    },
+    shareOnWhatsApp() {
+      referralService.shareOnWhatsApp(this.referralCode);
+    },
+    shareOnTelegram() {
+      referralService.shareOnTelegram(this.referralCode);
+    },
+    shareOnEmail() {
+      referralService.shareOnEmail(this.referralCode);
+    },
+    formatDate(dateString) {
+      return referralService.formatDate(dateString);
     }
-  },
-  mounted() {
-    this.editUser = { ...this.user };
   }
 }
-</script> 
+</script>
+
+<style scoped>
+.bg-gradient {
+  background: linear-gradient(135deg, #1177bf 0%, #0056b3 100%);
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table th {
+  border-top: none;
+  font-weight: 600;
+  color: #6c757d;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.5em 0.75em;
+}
+
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+.btn {
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .card-body {
+    padding: 1rem !important;
+  }
+  
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+}
+</style> 

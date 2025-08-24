@@ -82,7 +82,7 @@
                   :breakpoints="{ 600: { slidesPerView: 2.2, spaceBetween: 24 }, 900: { slidesPerView: 4.2, spaceBetween: 32 } }"
                   class="products-swiper">
                   <SwiperSlide v-for="(product, pidx) in store.products" :key="product.unique_code">
-                    <div class="card product-card" @click="openProduct(product.purchase_url)">
+                    <div class="card product-card" @click="openProduct(product)">
                       <div class="product-image-wrapper">
                         <img v-if="product.images && product.images.length" :src="product.images[0]"
                           class="product-image" alt="Product" />
@@ -221,9 +221,18 @@ export default {
         this.userBalance = (parseFloat(user.mintiss) * this.mintissValue).toFixed(8);
       }
     },
-    openProduct(url) {
-      window.open(url, '_blank');
-    },
+    openProduct(product) {
+    if (product.store_id === 4) {
+      this.$router.push({
+        name: 'checkout',
+        query: {
+          product: JSON.stringify(product), 
+        },
+      });
+    } else {
+      window.open(product.purchase_url, '_blank');
+    }
+  },
     goToLogin() {
       this.$router.push('/login');
     },

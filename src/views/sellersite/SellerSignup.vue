@@ -134,8 +134,15 @@ export default {
       store_zip_code: '',
       errors: {},
       loading: false,
-      googleLoading: false
+      googleLoading: false,
+      referralCode: ''
     };
+  },
+  mounted() {
+    // Get referral code from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    this.referralCode = urlParams.get('ref') || '';
+    console.log('Referral code from URL:', this.referralCode);
   },
   watch: {
     phone: {
@@ -182,7 +189,7 @@ export default {
       try {
         const cleanPhone = this.phone.replace(/\s/g, '');
         const baseURL = process.env.VUE_APP_API_BASE_URL;
-        const response = await axios.post(`${baseURL}/seller/signup`, {
+        const signupData = {
           name: this.name,
           email: this.email,
           phone: cleanPhone,
@@ -195,7 +202,14 @@ export default {
           store_city: this.store_city,
           store_state: this.store_state,
           store_zip_code: this.store_zip_code
-        });
+        };
+
+        // Add referral code if present
+        if (this.referralCode) {
+          signupData.referral_code = this.referralCode;
+        }
+
+        const response = await axios.post(`${baseURL}/seller/signup`, signupData);
 
         const { user, token } = response.data;
         localStorage.setItem('user', JSON.stringify(user));
