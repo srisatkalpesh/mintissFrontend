@@ -204,7 +204,7 @@ export default {
   border-bottom-left-radius: 2rem;
   border-bottom-right-radius: 2rem;
   box-shadow: 0 4px 24px rgba(17, 119, 191, 0.1);
-}
+}   
 
 .wallet-link {
   transition: all 0.3s ease;

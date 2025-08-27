@@ -112,6 +112,11 @@ const routes = [
         path: "signup-bonus",
         name: "AdminSignupBonus",
         component: () => import("../views/admin/SignupBonus.vue")
+      },
+      {
+        path: "signup-Referral",
+        name: "AdminSignupReferral",
+        component: () => import("../views/admin/SignupReferral.vue")
       }
     ]
   },

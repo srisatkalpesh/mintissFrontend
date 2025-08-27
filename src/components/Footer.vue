@@ -22,9 +22,6 @@
           </p>
 
         </div>
-
-
-
         <!-- Copyright -->
         <div class="col-md-4 order-3 order-md-3 text-md-end text-center">
           <p class="mb-1">&copy; 2025 <strong>Mintiss</strong>. All rights reserved.</p>

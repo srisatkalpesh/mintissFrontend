@@ -11,6 +11,7 @@ export function getRoutes() {
         { name: "Users", path: "/admin/users" },
         { name: "Mintiss Values", path: "/admin/mintiss-values" },
         { name: "Signup Bonus", path: "/admin/signup-bonus" },
+        { name: "Signup Referral", path: "/admin/signup-Referral" },
       ];
     } else if (userObj.role === "Seller" || userObj.role === "seller") {
       // Seller-specific routes (these will be handled by SellerLayout)

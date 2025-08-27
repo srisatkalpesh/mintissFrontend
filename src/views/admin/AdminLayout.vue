@@ -38,6 +38,12 @@
                         Signup Bonus
                     </router-link>
                 </li>
+                <li class="nav-item">
+                    <router-link to="/admin/signup-Referral" class="nav-link text-white">
+                        <i class="bi bi-person-plus me-2"></i>
+                        Signup Bonus
+                    </router-link>
+                </li>
                 <li class="nav-item mt-auto">
                     <a href="#" class="nav-link text-white" @click.prevent="handleLogout">
                         <i class="bi bi-box-arrow-right me-2"></i>
