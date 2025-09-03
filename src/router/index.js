@@ -84,6 +84,12 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: "/Referral",
+    name: "Referral",
+    component: () => import("../views/usersite/Referral.vue"),
+    meta: { requiresAuth: true }
+  },
+  {
     path: "/admin",
     name: "Admin",
     component: AdminLayout,
@@ -107,6 +113,22 @@ const routes = [
         path: "mintiss-values",
         name: "AdminMintissValues",
         component: () => import("../views/admin/MintissValues.vue")
+      },
+      {
+        path: "categories",
+        name: "AdminCategories",
+        component: () => import("../views/admin/categories/Categories.vue")
+      },
+      {
+        path: "categories/create",
+        name: "AdminCategoryCreate",
+        component: () => import("../views/admin/categories/CategoryCreate.vue")
+      },
+      {
+        path: "categories/:id/edit",
+        name: "AdminCategoryEdit",
+        component: () => import("../views/admin/categories/CategoryEdit.vue"),
+        props: true
       },
       {
         path: "signup-bonus",
@@ -154,7 +176,8 @@ const routes = [
         path: "products/:id/edit",
         name: "SellerEditProduct",
         component: () => import("../views/sellersite/EditProduct.vue")
-      }
+      },
+
     ]
   },
   {

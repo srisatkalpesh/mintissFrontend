@@ -2,13 +2,11 @@
   <nav class="navbar shadow-sm sticky-top w-100 curved-navbar" style="background-color: #1177bf !important;">
     <div class="container-fluid px-2 px-sm-4">
       <div class="d-none d-md-flex align-items-center justify-content-between w-100" style="min-height: 64px;">
-        <span
-          class="fw-bold text-white fs-4"
-          style="cursor: pointer;"
-          @click="$router.push('/')"
-        >Mintiss</span>
-        <form class="d-flex flex-grow-1 justify-content-center mx-4" style="max-width: 400px;" @submit.prevent="onSearch">
-          <input class="form-control w-100" type="search" placeholder="Global Search" aria-label="Search" v-model="searchQuery" @keyup.enter="onSearch" />
+        <span class="fw-bold text-white fs-4" style="cursor: pointer;" @click="$router.push('/')">Mintiss</span>
+        <form class="d-flex flex-grow-1 justify-content-center mx-4" style="max-width: 400px;"
+          @submit.prevent="onSearch">
+          <input class="form-control w-100" type="search" placeholder="Global Search" aria-label="Search"
+            v-model="searchQuery" @keyup.enter="onSearch" />
         </form>
         <div class="d-flex align-items-center gap-4">
           <template v-if="isLoggedIn">
@@ -22,32 +20,31 @@
             </router-link>
           </template>
           <template v-else>
-            <router-link to="/login" class="btn btn-warning fw-bold px-4 py-2 rounded-pill shadow-sm">Login / Sign Up</router-link>
+            <router-link to="/login" class="btn btn-warning fw-bold px-4 py-2 rounded-pill shadow-sm">Login / Sign
+              Up</router-link>
           </template>
         </div>
       </div>
       <div class="d-flex d-md-none flex-column align-items-center w-100">
-        <span
-          class="fw-bold text-white fs-3"
-          style="cursor: pointer;"
-          @click="$router.push('/')"
-        >Mintiss</span>
+        <span class="fw-bold text-white fs-3" style="cursor: pointer;" @click="$router.push('/')">Mintiss</span>
         <form class="d-flex w-100 justify-content-center mb-1" style="max-width: 350px;" @submit.prevent="onSearch">
-          <input class="form-control w-100" type="search" placeholder="Global Search" aria-label="Search" v-model="searchQuery" @keyup.enter="onSearch" />
+          <input class="form-control w-100" type="search" placeholder="Global Search" aria-label="Search"
+            v-model="searchQuery" @keyup.enter="onSearch" />
         </form>
         <div class="d-flex w-100 align-items-center justify-content-center gap-3 pb-1">
           <template v-if="isLoggedIn">
-            <router-link to="/redeem" class="d-flex align-items-center text-decoration-none wallet-link">
-              <i class="bi bi-wallet2 text-white me-1 fs-5"></i>
-              <span class="text-white fw-bold small">₹{{ userBalance || '0.00000000' }}</span>
-            </router-link>
+            <!-- <router-link to="/redeem" class="d-flex align-items-center text-decoration-none wallet-link"> -->
+            <i class="bi bi-wallet2 text-white me-1 fs-5"></i>
+            <span class="text-white fw-bold small">₹{{ userBalance || '0.00000000' }}</span>
+            <!-- </router-link> -->
             <router-link to="/profile" class="d-flex align-items-center text-decoration-none">
               <i class="bi bi-person-circle text-white fs-4 me-1"></i>
               <span class="text-white fw-semibold small">{{ userName }}</span>
             </router-link>
           </template>
           <template v-else>
-            <router-link to="/login" class="btn btn-warning fw-bold w-100 rounded-pill shadow-sm py-2">Login / Sign Up</router-link>
+            <router-link to="/login" class="btn btn-warning fw-bold w-100 rounded-pill shadow-sm py-2">Login / Sign
+              Up</router-link>
           </template>
         </div>
       </div>
@@ -204,7 +201,7 @@ export default {
   border-bottom-left-radius: 2rem;
   border-bottom-right-radius: 2rem;
   box-shadow: 0 4px 24px rgba(17, 119, 191, 0.1);
-}   
+}
 
 .wallet-link {
   transition: all 0.3s ease;

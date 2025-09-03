@@ -3,23 +3,24 @@
     <!-- HeaderNavbar removed, now handled globally -->
     <div class="row row-cols-2 row-cols-md-4 g-3 my-4 justify-content-center">
       <div class="col d-flex justify-content-center" v-for="card in infoCards" :key="card.title">
-        <div
-          class="card text-center border-0 shadow-lg rounded-4 card-hover-effect d-flex align-items-stretch"
+        <div class="card text-center border-0 shadow-lg rounded-4 card-hover-effect d-flex align-items-stretch"
           :style="'transition: transform 0.2s, box-shadow 0.2s; width: 180px; height: 180px; min-width: 180px; min-height: 180px; max-width: 180px; max-height: 180px;'"
           @click="
             card.title === 'Free Mintiss'
               ? goToLogin()
               : card.title === 'Today’s Mintiss Value'
-              ? goToMintiss()
-              : null
-          "
-          :class="{
-            'cursor-pointer':
-              card.title === 'Free Mintiss' ||
-              card.title === 'Today’s Mintiss Value'
-          }"
-        >
-          <div class="card-body d-flex flex-column align-items-center justify-content-center w-100 h-100 p-2"
+                ? goToMintiss()
+                : card.title === 'Refer & Earn'
+                  ? goToReferral()
+                  : null
+            " :class="{
+              'cursor-pointer':
+                card.title === 'Free Mintiss' ||
+                card.title === 'Today’s Mintiss Value' ||
+                card.title === 'Refer & Earn'
+            }">
+
+          <div class=" card-body d-flex flex-column align-items-center justify-content-center w-100 h-100 p-2"
             style="min-height: 0;">
             <div class="mb-2 d-flex align-items-center justify-content-center rounded-circle"
               style="background: linear-gradient(135deg, #1177bf 60%, #ffd700 100%); width: 56px; height: 56px;">
@@ -33,103 +34,23 @@
       </div>
     </div>
 
-    <div class="feed-content">
-      <div v-if="loading" class="row g-3">
-        <div v-for="n in 2" :key="n" class="col-12 mb-4">
-          <div class="card shadow-sm">
-            <div class="card-body">
-              <div class="placeholder-glow mb-2">
-                <span class="placeholder col-6"></span>
-                <span class="placeholder col-4"></span>
-                <span class="placeholder col-4"></span>
-              </div>
-              <div class="placeholder-glow mb-3">
-                <span class="placeholder col-8"></span>
-              </div>
-              <div class="row g-2">
-                <div v-for="m in 3" :key="m" class="col">
-                  <div class="card h-100">
-                    <div class="ratio ratio-4x3 bg-secondary bg-opacity-10 mb-2"></div>
-                    <div class="card-body p-2">
-                      <span class="placeholder col-8 mb-2"></span>
-                      <span class="placeholder col-4 mb-2"></span>
-                      <span class="placeholder col-6"></span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+  <div class="w-100 my-4 overflow-auto">
+    <div class="d-flex flex-row flex-nowrap w-100 gx-3">
+      <div
+        v-for="cat in categories.slice(0, 10)"
+        :key="cat.id"
+        class="d-flex flex-column align-items-center flex-fill mx-2"
+      >
+        <img
+          :src="cat.image"
+          alt="Category Image"
+          class="rounded-circle border shadow"
+          style="width: 80px; height: 80px; object-fit: cover;"
+        />
+  <div class="mt-3 text-center fw-semibold">{{ cat.name }}</div>
       </div>
-      <template v-else>
-        <div v-if="noResults" class="d-flex flex-column align-items-center justify-content-center my-5">
-          <i class="bi bi-emoji-frown text-danger mb-2" style="font-size: 3rem;"></i>
-          <div class="text-center text-danger fw-bold" style="font-size: 1.2rem;">We don't have this product or store.
-          </div>
-        </div>
-        <div v-else>
-          <div v-for="(store, idx) in stores" :key="store.name" class="card mb-4 shadow-sm border-0">
-            <div class="card-body">
-              <div class="d-flex flex-column mb-2">
-                <span class="fs-5 fw-bold" style="color: #1177bf;">{{ store.name }}</span>
-              </div>
-              <div class="mb-2 text-secondary store-description-ellipsis">
-                {{ store.description }}
-              </div>
-              <div class="products-carousel-wrapper">
-                <Swiper :slides-per-view="1.2" :space-between="20"
-                  :breakpoints="{ 600: { slidesPerView: 2.2, spaceBetween: 24 }, 900: { slidesPerView: 4.2, spaceBetween: 32 } }"
-                  class="products-swiper">
-                  <SwiperSlide v-for="(product, pidx) in store.products" :key="product.unique_code">
-                    <div class="card product-card" @click="openProduct(product)">
-                      <div class="product-image-wrapper">
-                        <img v-if="product.images && product.images.length" :src="product.images[0]"
-                          class="product-image" alt="Product" />
-                      </div>
-                      <div class="product-info-overlay">
-                        <!-- Product name and CTA label (button) if no price/canceled_price -->
-                        <div class="d-flex align-items-center justify-content-between mb-1">
-                          <div class="fw-bold product-name-ellipsis" style="color: #1177bf;">
-                            {{ product.name }}
-                          </div>
-                          <button
-                            v-if="!product.price && !product.canceled_price && product.cta_label"
-                            class="btn btn-sm px-2 product-cta-btn"
-                            style="background-color: #1177bf; border-color: #1177bf; color: #fff;" tabindex="-1">
-                            {{ product.cta_label }}
-                          </button>
-                        </div>
-                        <!-- Price/canceled_price and CTA button only if price/canceled_price exists -->
-                        <div class="d-flex align-items-center justify-content-between mb-1" v-if="product.price || product.canceled_price">
-                          <div>
-                            <span v-if="product.price !== null && product.price !== undefined && product.price !== ''"
-                                  class="fw-bold text-success">
-                              ₹{{ product.price }}
-                            </span>
-                            <span v-if="product.canceled_price !== null && product.canceled_price !== undefined && product.canceled_price !== ''"
-                                  class="text-decoration-line-through text-danger ms-2">
-                              ₹{{ product.canceled_price }}
-                            </span>
-                          </div>
-                          <button class="btn btn-sm px-2 product-cta-btn"
-                            style="background-color: #1177bf; border-color: #1177bf; color: #fff;" tabindex="-1">
-                            {{ product.cta_label || 'Shop now' }}
-                          </button>
-                        </div>
-                        <div class="product-description-ellipsis text-secondary small">
-                          {{ product.description }}
-                        </div>
-                      </div>
-                    </div>
-                  </SwiperSlide>
-                </Swiper>
-              </div>
-            </div>
-          </div>
-        </div>
-      </template>
     </div>
+  </div>
   </div>
 </template>
 
@@ -154,11 +75,12 @@ export default {
       hoveredStore: null,
       carouselRefs: [],
       infoCards: [
-        { icon: 'bi bi-cash-coin', title: 'Make', span: '100%', value: 'Cash Back' },
+        { icon: 'bi bi-cash-coin', title: 'Refer & Earn', span: 'Invite friends', value: 'Earn rewards' },
         { icon: 'bi bi-gift', title: 'Free Mintiss', span: 'Sign up now' },
         { icon: 'bi bi-graph-up-arrow', title: 'Today’s Mintiss Value', value: `₹${this.mintissValueDisplay}` },
         { icon: 'bi bi-trophy', title: 'Reward Redemption', span: 'Starting Soon' },
       ],
+      categories: []
     };
   },
   watch: {
@@ -184,6 +106,7 @@ export default {
     // this.fetchStores(); // Removed to only fetch on search
     // Update Mintiss Value card
     this.infoCards[2].value = `₹${this.mintissValueDisplay}`;
+    this.fetchCategories();
   },
   methods: {
     async fetchStores(query = null) {
@@ -222,17 +145,17 @@ export default {
       }
     },
     openProduct(product) {
-    if (product.store_id === 4) {
-      this.$router.push({
-        name: 'checkout',
-        query: {
-          product: JSON.stringify(product), 
-        },
-      });
-    } else {
-      window.open(product.purchase_url, '_blank');
-    }
-  },
+      if (product.store_id === 4) {
+        this.$router.push({
+          name: 'checkout',
+          query: {
+            product: JSON.stringify(product),
+          },
+        });
+      } else {
+        window.open(product.purchase_url, '_blank');
+      }
+    },
     goToLogin() {
       this.$router.push('/login');
     },
@@ -241,6 +164,9 @@ export default {
     },
     goToMintiss() {
       this.$router.push('/mintiss');
+    },
+    goToReferral() {
+      this.$router.push('/referral')
     },
     setCarouselRef(el, idx) {
       if (el) this.carouselRefs[idx] = el;
@@ -254,6 +180,14 @@ export default {
         } else {
           el.scrollLeft += scrollAmount;
         }
+      }
+    },
+    async fetchCategories() {
+      try {
+        const { data } = await axios.get('/categories');
+        this.categories = data;
+      } catch (error) {
+        // Handle error if needed
       }
     },
   },

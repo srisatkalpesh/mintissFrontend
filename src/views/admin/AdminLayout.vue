@@ -44,6 +44,12 @@
                         Signup Bonus
                     </router-link>
                 </li>
+                <li class="nav-item">
+                    <router-link to="/admin/categories" class="nav-link text-white">
+                        <i class="bi bi-tags me-2"></i>
+                        Categories
+                    </router-link>
+                </li>
                 <li class="nav-item mt-auto">
                     <a href="#" class="nav-link text-white" @click.prevent="handleLogout">
                         <i class="bi bi-box-arrow-right me-2"></i>
