@@ -1,6 +1,6 @@
 <template>
   <div class="container-fluid bg-light min-vh-100 font-monospace">
-    <!-- HeaderNavbar removed, now handled globally -->
+    <!-- ✅ Info Cards -->
     <div class="row row-cols-2 row-cols-md-4 g-3 my-4 justify-content-center">
       <div class="col d-flex justify-content-center" v-for="card in infoCards" :key="card.title">
         <div class="card text-center border-0 shadow-lg rounded-4 card-hover-effect d-flex align-items-stretch"
@@ -19,40 +19,61 @@
                 card.title === 'Today’s Mintiss Value' ||
                 card.title === 'Refer & Earn'
             }">
-
-          <div class=" card-body d-flex flex-column align-items-center justify-content-center w-100 h-100 p-2"
+          <div class="card-body d-flex flex-column align-items-center justify-content-center w-100 h-100 p-2"
             style="min-height: 0;">
             <div class="mb-2 d-flex align-items-center justify-content-center rounded-circle"
               style="background: linear-gradient(135deg, #1177bf 60%, #ffd700 100%); width: 56px; height: 56px;">
               <i :class="card.icon + ' text-white'" style="font-size: 2rem;"></i>
             </div>
-            <h6 class="card-title fw-bold mt-2 mb-1" style="font-size: 1.15rem; color: #1177bf;">{{ card.title }} <span
-                v-if="card.span" style="color: #1177bf;">{{ card.span }}</span></h6>
-            <div v-if="card.value" class="fw-bold text-success mt-1" style="font-size: 1.1rem;">{{ card.value }}</div>
+            <h6 class="card-title fw-bold mt-2 mb-1" style="font-size: 1.15rem; color: #1177bf;">
+              {{ card.title }}
+              <span v-if="card.span" style="color: #1177bf;">{{ card.span }}</span>
+            </h6>
+            <div v-if="card.value" class="fw-bold text-success mt-1" style="font-size: 1.1rem;">
+              {{ card.value }}
+            </div>
           </div>
         </div>
       </div>
     </div>
+    <!-- ✅ Hero Section (Bootstrap only) -->
+    <div class="my-4">
+      <div v-if="heroSections.length > 0" class="w-100">
+        <div v-for="hero in heroSections" :key="hero.id" class="position-relative rounded overflow-hidden shadow">
+          <!-- Image -->
+          <img :src="hero.image_url" :alt="hero.title" class="img-fluid w-100"
+            style="object-fit: cover; max-height: 400px;" />
 
-  <div class="w-100 my-4 overflow-auto">
-    <div class="d-flex flex-row flex-nowrap w-100 gx-3">
-      <div
-        v-for="cat in categories.slice(0, 10)"
-        :key="cat.id"
-        class="d-flex flex-column align-items-center flex-fill mx-2"
-      >
-        <img
-          :src="cat.image"
-          alt="Category Image"
-          class="rounded-circle border shadow"
-          style="width: 80px; height: 80px; object-fit: cover;"
-        />
-  <div class="mt-3 text-center fw-semibold">{{ cat.name }}</div>
+          <!-- Overlay (Title + Subtitle) -->
+          <!-- <div
+            class="position-absolute bottom-0 start-50 translate-middle-x bg-light bg-opacity-75 text-center p-2 rounded w-75 mb-3">
+            <h5 class="fw-bold mb-1">{{ hero.title }}</h5>
+            <p class="mb-0 text-muted">{{ hero.subtitle }}</p>
+          </div> -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ Categories -->
+    <div class="w-100 my-4 overflow-auto">
+      <div class="d-flex flex-row flex-nowrap w-100 gx-3">
+        <div v-for="cat in categories.slice(0, 10)" :key="cat.id"
+          class="d-flex flex-column align-items-center flex-fill mx-2">
+          <img :src="cat.image" alt="Category Image" class="rounded-circle border shadow"
+            style="width: 80px; height: 80px; object-fit: cover;" />
+          <div class="mt-3 text-center fw-semibold">{{ cat.name }}</div>
+        </div>
+      </div>
+    </div>
+    <!-- ✅ Products Carousel -->
+    <div v-if="loading" class="d-flex justify-content-center align-items-center my-5" style="height: 200px;">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
       </div>
     </div>
   </div>
-  </div>
 </template>
+
 
 <script>
 import axios from '@/axios';
@@ -80,7 +101,8 @@ export default {
         { icon: 'bi bi-graph-up-arrow', title: 'Today’s Mintiss Value', value: `₹${this.mintissValueDisplay}` },
         { icon: 'bi bi-trophy', title: 'Reward Redemption', span: 'Starting Soon' },
       ],
-      categories: []
+      categories: [],
+      heroSections: []
     };
   },
   watch: {
@@ -101,6 +123,7 @@ export default {
     },
   },
   async mounted() {
+    this.fetchHeroSections();
     await this.fetchMintissValue();
     this.calculateUserBalance();
     // this.fetchStores(); // Removed to only fetch on search
@@ -109,6 +132,15 @@ export default {
     this.fetchCategories();
   },
   methods: {
+    async fetchHeroSections() {
+      try {
+        const { data } = await axios.get('/public/hero');
+        // If API returns a single object
+        this.heroSections = Array.isArray(data) ? data : [data];
+      } catch (error) {
+        console.error("Error fetching hero sections:", error);
+      }
+    },
     async fetchStores(query = null) {
       this.loading = true;
       this.noResults = false;

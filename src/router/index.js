@@ -105,7 +105,7 @@ const routes = [
         component: () => import("../views/admin/Users.vue")
       },
       {
-        path: "sellers", // <-- Add this route
+        path: "sellers",
         name: "AdminSellers",
         component: () => import("../views/admin/Sellers.vue")
       },
@@ -130,6 +130,23 @@ const routes = [
         component: () => import("../views/admin/categories/CategoryEdit.vue"),
         props: true
       },
+      {
+        path: "hero-sections",
+        name: "AdminHeroSections",
+        component: () => import("../views/admin/hero/HeroSections.vue"),
+      },
+      {
+        path: "hero-sections/create",
+        name: "AdminHeroSectionCreate",
+        component: () => import("../views/admin/hero/HeroSectionCreate.vue"),
+      },
+      {
+        path: "hero-sections/:id/edit",
+        name: "AdminHeroSectionEdit",
+        component: () => import("../views/admin/hero/HeroSectionEdit.vue"),
+        props: true,
+      },
+
       {
         path: "signup-bonus",
         name: "AdminSignupBonus",
