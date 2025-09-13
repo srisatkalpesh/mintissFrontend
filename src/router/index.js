@@ -21,6 +21,16 @@ const routes = [
     component: () => import("../views/usersite/ProductDetail.vue"),
   },
   {
+    path: "/category/:id",
+    name: 'CategoryProducts',
+    component: () => import("../views/usersite/CategoryProducts.vue"),
+  },
+  {
+    path: "/categories",
+    name: 'Categories',
+    component: () => import("../views/usersite/Categories.vue"),
+  },
+  {
     path: '/order-complete',
     name: 'OrderComplete',
     component: () => import("../views/usersite/OrderComplete.vue"),
@@ -177,7 +187,7 @@ const routes = [
       {
         path: "dashboard",
         name: "SellerDashboard",
-        component: () => import("../views/sellersite/Dashboard.vue")
+        component: () => import("../views/seller/SellerDashboard.vue")
       },
       {
         path: "profile",
@@ -199,6 +209,16 @@ const routes = [
         name: "SellerEditProduct",
         component: () => import("../views/sellersite/EditProduct.vue")
       },
+      {
+        path: "orders",
+        name: "SellerOrders",
+        component: () => import("../views/seller/SellerOrders.vue")
+      },
+      {
+        path: "orders/:id",
+        name: "SellerOrderDetails",
+        component: () => import("../views/seller/SellerOrderDetails.vue")
+      }
 
     ]
   },

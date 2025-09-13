@@ -1,7 +1,7 @@
 import axios from 'axios'; // import from axios package directly
 
 const instance = axios.create({
-    baseURL: process.env.VUE_APP_API_BASE_URL,
+    baseURL: process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8000/api',
 });
 
 console.log('Axios instance created with base URL:', instance.defaults.baseURL);

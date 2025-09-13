@@ -1,31 +1,19 @@
 <template>
-  <div class="container-fluid bg-light min-vh-100">
+  <div class="modern-product-detail-page">
     <!-- Loading State -->
-    <div v-if="loading" class="d-flex justify-content-center align-items-center min-vh-100">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
+    <div v-if="loading" class="loading-container">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading product details...</p>
       </div>
     </div>
 
     <!-- Product Detail Content -->
-    <div v-else-if="product" class="container py-4">
-      <!-- Breadcrumb -->
-      <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item">
-            <router-link to="/" class="text-decoration-none">Home</router-link>
-          </li>
-          <li class="breadcrumb-item">
-            <span v-if="product.category">{{ product.category.name }}</span>
-          </li>
-          <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
-        </ol>
-      </nav>
-
+    <div v-else-if="product" class="product-detail-container">
       <!-- Main Product Section -->
-      <div class="row">
+      <div class="product-main-section">
         <!-- Product Images -->
-        <div class="col-lg-6 mb-4">
+        <div class="product-images-section">
           <div class="product-image-container">
             <div v-if="product.images && product.images.length > 0" class="main-image-wrapper">
               <img 
@@ -36,13 +24,13 @@
               />
             </div>
             <div v-else class="no-image-placeholder">
-              <i class="bi bi-image text-muted" style="font-size: 4rem;"></i>
-              <p class="text-muted mt-2">No image available</p>
+              <i class="bi bi-image"></i>
+              <p>No image available</p>
             </div>
             
             <!-- Thumbnail Images -->
-            <div v-if="product.images && product.images.length > 1" class="thumbnail-container mt-3">
-              <div class="d-flex gap-2 overflow-auto">
+            <div v-if="product.images && product.images.length > 1" class="thumbnail-container">
+              <div class="thumbnail-grid">
                 <img 
                   v-for="(image, index) in product.images" 
                   :key="index"
@@ -59,46 +47,46 @@
         </div>
 
         <!-- Product Information -->
-        <div class="col-lg-6">
-          <div class="product-info">
-            <h1 class="product-title mb-3">{{ product.name }}</h1>
+        <div class="product-info-section">
+          <div class="product-info-card">
+            <h1 class="product-title">{{ product.name }}</h1>
             
             <!-- Store Information -->
-            <div v-if="product.store" class="store-info mb-3">
-              <div class="d-flex align-items-center">
-                <i class="bi bi-shop text-primary me-2"></i>
-                <span class="fw-semibold">{{ product.store.name }}</span>
+            <div v-if="product.store" class="store-info">
+              <div class="store-header">
+                <i class="bi bi-shop"></i>
+                <span class="store-name">{{ product.store.name }}</span>
               </div>
-              <div v-if="product.store.address" class="text-muted small">
-                <i class="bi bi-geo-alt me-1"></i>
+              <div v-if="product.store.address" class="store-address">
+                <i class="bi bi-geo-alt"></i>
                 {{ product.store.address }}, {{ product.store.city }}, {{ product.store.state }}
               </div>
             </div>
 
             <!-- Price Section -->
-            <div class="price-section mb-4">
-              <div class="d-flex align-items-center gap-3">
+            <div class="price-section">
+              <div class="price-row">
                 <span class="current-price">₹{{ product.price }}</span>
                 <span v-if="product.canceled_price" class="original-price">₹{{ product.canceled_price }}</span>
                 <span v-if="product.canceled_price" class="discount-badge">
                   {{ Math.round(((product.canceled_price - product.price) / product.canceled_price) * 100) }}% OFF
                 </span>
               </div>
-              <div v-if="product.mintiss" class="mintiss-reward mt-2">
-                <i class="bi bi-gift text-warning me-1"></i>
-                <span class="text-success fw-semibold">Earn {{ calculateMintissPoints(product.mintiss) }} mintiss points on this purchase</span>
-                <div class="mintiss-value-info mt-1">
-                  <small class="text-muted">(Worth ₹{{ product.mintiss }} at current mintiss value)</small>
+              <div v-if="product.mintiss" class="mintiss-reward">
+                <i class="bi bi-gift"></i>
+                <span>Earn {{ calculateMintissPoints(product.mintiss) }} mintiss points on this purchase</span>
+                <div class="mintiss-value">
+                  <small>(Worth ₹{{ product.mintiss }} at current mintiss value)</small>
                 </div>
               </div>
             </div>
 
             <!-- Quantity Selector -->
-            <div class="quantity-section mb-4">
-              <h5 class="mb-3">Quantity</h5>
-              <div class="quantity-controls d-flex align-items-center">
+            <div class="quantity-section">
+              <h5 class="section-label">Quantity</h5>
+              <div class="quantity-controls">
                 <button 
-                  class="btn btn-outline-secondary"
+                  class="quantity-btn"
                   @click="decreaseQuantity"
                   :disabled="quantity <= 1"
                 >
@@ -106,14 +94,13 @@
                 </button>
                 <input 
                   type="number" 
-                  class="form-control text-center mx-2" 
+                  class="quantity-input" 
                   v-model.number="quantity"
                   min="1"
                   max="99"
-                  style="width: 80px;"
                 />
                 <button 
-                  class="btn btn-outline-secondary"
+                  class="quantity-btn"
                   @click="increaseQuantity"
                   :disabled="quantity >= 99"
                 >
@@ -123,61 +110,42 @@
             </div>
 
             <!-- Product Description -->
-            <div class="description-section mb-4">
-              <h5 class="mb-3">Description</h5>
+            <div class="description-section">
+              <h5 class="section-label">Description</h5>
               <p class="product-description">{{ product.description || 'No description available.' }}</p>
             </div>
 
             <!-- Action Buttons -->
             <div class="action-buttons">
-              <div class="d-flex gap-3 flex-wrap">
                 <button 
-                  class="btn btn-primary btn-lg px-4"
+                class="btn btn-primary btn-lg"
                   @click="addToCart"
                   :disabled="isAddingToCart"
                 >
-                  <i class="bi bi-cart-plus me-2"></i>
+                <i class="bi bi-cart-plus me-1"></i>
                   <span v-if="isAddingToCart">Adding...</span>
                   <span v-else>Add to Cart</span>
                 </button>
                 <button 
-                  class="btn btn-success btn-lg px-4"
+                class="btn btn-success btn-lg"
                   @click="buyNow"
                   :disabled="isAddingToCart"
                 >
-                  <i class="bi bi-bag me-2"></i>
+                <i class="bi bi-bag me-1"></i>
                   Buy Now
                 </button>
                 <button 
-                  class="btn btn-outline-secondary btn-lg px-4"
+                class="btn btn-outline-danger btn-lg"
                   @click="toggleWishlist"
                 >
-                  <i :class="isInWishlist ? 'bi bi-heart-fill text-danger' : 'bi bi-heart'"></i>
-                  <span class="ms-2">{{ isInWishlist ? 'Wishlisted' : 'Wishlist' }}</span>
+                <i :class="isInWishlist ? 'bi bi-heart-fill' : 'bi bi-heart'"></i>
+                <span class="ms-1">{{ isInWishlist ? 'Wishlisted' : 'Wishlist' }}</span>
                 </button>
+            </div>
+          </div>
               </div>
             </div>
 
-            <!-- Product Details -->
-            <div class="product-details mt-4">
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="detail-item">
-                    <span class="detail-label">Product Code:</span>
-                    <span class="detail-value">{{ product.unique_code }}</span>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="detail-item">
-                    <span class="detail-label">Category:</span>
-                    <span class="detail-value">{{ product.category ? product.category.name : 'N/A' }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <!-- Related Products Section -->
       <div v-if="relatedProducts && relatedProducts.length > 0" class="mt-5">
@@ -212,12 +180,12 @@
                     <span v-if="relatedProduct.canceled_price" class="original-price-small">₹{{ relatedProduct.canceled_price }}</span>
                   </div>
                   <div v-if="relatedProduct.mintiss" class="mintiss-info">
-                    <small class="text-success">+₹{{ relatedProduct.mintiss }} mintiss</small>
+                    <small style="color: #007aff;">+₹{{ relatedProduct.mintiss }} mintiss</small>
                   </div>
                 </div>
                 <div class="mt-2">
                   <button 
-                    class="btn btn-sm btn-outline-primary w-100"
+                    class="btn btn-sm modern-related-btn w-100"
                     @click.stop="addRelatedToCart(relatedProduct)"
                   >
                     <i class="bi bi-cart-plus me-1"></i>
@@ -263,12 +231,12 @@
                     <span v-if="storeProduct.canceled_price" class="original-price-small">₹{{ storeProduct.canceled_price }}</span>
                   </div>
                   <div v-if="storeProduct.mintiss" class="mintiss-info">
-                    <small class="text-success">+₹{{ storeProduct.mintiss }} mintiss</small>
+                    <small style="color: #007aff;">+₹{{ storeProduct.mintiss }} mintiss</small>
                   </div>
                 </div>
                 <div class="mt-2">
                   <button 
-                    class="btn btn-sm btn-outline-primary w-100"
+                    class="btn btn-sm modern-related-btn w-100"
                     @click.stop="addRelatedToCart(storeProduct)"
                   >
                     <i class="bi bi-cart-plus me-1"></i>
@@ -315,12 +283,12 @@
                       <span v-if="relatedProduct.canceled_price" class="original-price-small">₹{{ relatedProduct.canceled_price }}</span>
                     </div>
                     <div v-if="relatedProduct.mintiss" class="mintiss-info">
-                      <small class="text-success">+{{ calculateMintissPoints(relatedProduct.mintiss) }} mintiss</small>
+                      <small style="color: #007aff;">+{{ calculateMintissPoints(relatedProduct.mintiss) }} mintiss</small>
                     </div>
                   </div>
                   <div class="mt-2">
                     <button 
-                      class="btn btn-sm btn-outline-primary w-100"
+                      class="btn btn-sm modern-related-btn w-100"
                       @click.stop="addRelatedToCart(relatedProduct)"
                     >
                       <i class="bi bi-cart-plus me-1"></i>
@@ -336,11 +304,11 @@
     </div>
 
     <!-- Error State -->
-    <div v-else class="d-flex justify-content-center align-items-center min-vh-100">
-      <div class="text-center">
-        <i class="bi bi-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
-        <h4 class="mt-3">Product not found</h4>
-        <p class="text-muted">The product you're looking for doesn't exist or has been removed.</p>
+    <div v-else class="error-state">
+      <div class="error-content">
+        <i class="bi bi-exclamation-triangle"></i>
+        <h4>Product not found</h4>
+        <p>The product you're looking for doesn't exist or has been removed.</p>
         <router-link to="/" class="btn btn-primary">Back to Home</router-link>
       </div>
     </div>
@@ -632,6 +600,66 @@ export default {
 </script>
 
 <style scoped>
+/* ===== MODERN PRODUCT DETAIL STYLES ===== */
+
+/* Main Page Layout */
+.modern-product-detail-page {
+  background: #fafbfc;
+  min-height: 100vh;
+}
+
+/* Loading State */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.loading-spinner {
+  text-align: center;
+  color: #666;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007aff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Product Detail Container */
+.product-detail-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+/* Main Product Section */
+.product-main-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  margin-bottom: 3rem;
+}
+
+/* Product Images Section */
+.product-images-section {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e8eaed;
+}
+
 .product-image-container {
   position: relative;
 }
@@ -639,25 +667,431 @@ export default {
 .main-image-wrapper {
   width: 100%;
   height: 400px;
-  border: 1px solid #dee2e6;
   border-radius: 8px;
   overflow: hidden;
   background: #f8f9fa;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+  border: 1px solid #e8eaed;
 }
 
 .main-product-image {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.main-product-image:hover {
+  transform: scale(1.05);
+}
+
+.no-image-placeholder {
+  text-align: center;
+  color: #999;
+}
+
+.no-image-placeholder i {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.thumbnail-container {
+  margin-top: 1rem;
+}
+
+.thumbnail-grid {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+}
+
+.thumbnail-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.thumbnail-image:hover,
+.thumbnail-image.active {
+  border-color: #007aff;
+  transform: scale(1.05);
+}
+
+/* Product Info Section */
+.product-info-section {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e8eaed;
+  height: fit-content;
+}
+
+.product-info-card {
+  height: 100%;
+}
+
+.product-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+/* Store Info */
+.store-info {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 3px solid #007aff;
+}
+
+.store-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.store-header i {
+  color: #007aff;
+  font-size: 1.1rem;
+}
+
+.store-name {
+  font-weight: 600;
+  color: #007aff;
+  font-size: 1.1rem;
+}
+
+.store-address {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.store-address i {
+  color: #999;
+}
+
+/* Price Section */
+.price-section {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.price-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.current-price {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #137333;
+  letter-spacing: -0.01em;
+}
+
+.original-price {
+  font-size: 1.1rem;
+  color: #5f6368;
+  text-decoration: line-through;
+  letter-spacing: 0.01em;
+}
+
+.discount-badge {
+  background: #ea4335;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(234, 67, 53, 0.3);
+}
+
+.mintiss-reward {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #007aff;
+  font-weight: 500;
+  font-size: 0.9rem;
+  letter-spacing: 0.01em;
+}
+
+.mintiss-reward i {
+  color: #007aff;
+}
+
+.mintiss-value {
+  margin-top: 0.25rem;
+}
+
+.mintiss-value small {
+  color: #5f6368;
+  font-size: 0.8rem;
+}
+
+/* Quantity Section */
+.quantity-section {
+  margin-bottom: 1.5rem;
+}
+
+.section-label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.01em;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.quantity-btn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #e8eaed;
+  background: white;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #007aff;
+}
+
+.quantity-btn:hover:not(:disabled) {
+  background: #007aff;
+  color: white;
+  border-color: #007aff;
+}
+
+.quantity-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.quantity-input {
+  width: 80px;
+  height: 40px;
+  border: 1px solid #e8eaed;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 500;
+  color: #1a1a1a;
+  font-size: 0.9rem;
+}
+
+.quantity-input:focus {
+  outline: none;
+  border-color: #007aff;
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
+}
+
+/* Description Section */
+.description-section {
+  margin-bottom: 1.5rem;
+}
+
+.product-description {
+  color: #5f6368;
+  line-height: 1.6;
+  margin: 0;
+  font-size: 0.9rem;
+  letter-spacing: 0.01em;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.action-buttons .btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: none;
+  font-size: 0.9rem;
+}
+
+.action-buttons .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.action-buttons .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Product Details Section */
+.product-details-section {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e8eaed;
+  margin-bottom: 2rem;
+}
+
+/* Error State */
+.error-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.error-content {
+  text-align: center;
+  background: white;
+  padding: 3rem 2rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e8eaed;
+  max-width: 400px;
+}
+
+.error-content i {
+  font-size: 4rem;
+  color: #ffc107;
+  margin-bottom: 1rem;
+}
+
+.error-content h4 {
+  color: #1a1a1a;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.error-content p {
+  color: #5f6368;
+  margin-bottom: 2rem;
+  font-size: 0.9rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .product-detail-container {
+    padding: 1rem;
+  }
+  
+  .product-main-section {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .main-image-wrapper {
+    height: 300px;
+  }
+  
+  .product-title {
+    font-size: 1.5rem;
+  }
+  
+  .current-price {
+    font-size: 1.5rem;
+  }
+  
+  .action-buttons {
+    gap: 0.75rem;
+  }
+  
+  .action-buttons .btn {
+    padding: 0.75rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-detail-container {
+    padding: 0.5rem;
+  }
+  
+  .product-images-section,
+  .product-info-section,
+  .product-details-section {
+    padding: 1rem;
+  }
+  
+  .main-image-wrapper {
+    height: 250px;
+  }
+  
+  .product-title {
+    font-size: 1.25rem;
+  }
+  
+  .current-price {
+    font-size: 1.25rem;
+  }
+  
+  .thumbnail-image {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* Product Image Container */
+.modern-product-image-container {
+  position: relative;
+}
+
+.main-image-wrapper {
+  width: 100%;
+  height: 280px;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.main-product-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.main-product-image:hover {
+  transform: scale(1.02);
 }
 
 .no-image-placeholder {
   width: 100%;
-  height: 400px;
-  border: 1px solid #dee2e6;
+  height: 280px;
+  border: 1px solid #f0f0f0;
   border-radius: 8px;
   background: #f8f9fa;
   display: flex;
@@ -671,79 +1105,199 @@ export default {
 }
 
 .thumbnail-image {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   object-fit: cover;
-  border: 2px solid #dee2e6;
-  border-radius: 4px;
+  border: 2px solid #f0f0f0;
+  border-radius: 6px;
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: all 0.3s ease;
 }
 
 .thumbnail-image:hover,
 .thumbnail-image.active {
-  border-color: #0d6efd;
+  border-color: #007aff;
+  transform: scale(1.05);
 }
 
-.product-title {
-  font-size: 2rem;
+/* Product Info Styles */
+.modern-product-info {
+  padding: 0 1rem;
+}
+
+.modern-product-title {
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #212529;
+  color: #333;
+  line-height: 1.2;
 }
 
-.store-info {
-  padding: 12px;
+.modern-store-info {
+  padding: 8px 12px;
+  background: rgba(0, 122, 255, 0.05);
+  border-radius: 6px;
+  border-left: 3px solid #007aff;
+}
+
+/* Price Section */
+.modern-price-section {
+  padding: 0.75rem;
   background: #f8f9fa;
   border-radius: 6px;
-  border-left: 4px solid #0d6efd;
+  border: 1px solid #f0f0f0;
 }
 
-.current-price {
-  font-size: 2rem;
+.modern-current-price {
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #198754;
+  color: #007aff;
 }
 
-.original-price {
-  font-size: 1.2rem;
-  color: #6c757d;
+.modern-original-price {
+  font-size: 1rem;
+  color: #999;
   text-decoration: line-through;
 }
 
-.discount-badge {
+.modern-discount-badge {
   background: #dc3545;
   color: white;
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 0.875rem;
   font-weight: 600;
 }
 
-.mintiss-reward {
-  background: #fff3cd;
-  border: 1px solid #ffeaa7;
-  border-radius: 4px;
+.modern-mintiss-reward {
+  background: rgba(0, 122, 255, 0.1);
+  border: 1px solid rgba(0, 122, 255, 0.2);
+  border-radius: 6px;
   padding: 8px 12px;
 }
 
-.product-description {
-  line-height: 1.6;
-  color: #495057;
+/* Quantity Controls */
+.modern-quantity-section {
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #f0f0f0;
 }
 
-.action-buttons {
+.modern-quantity-controls {
+  max-width: 200px;
+}
+
+.modern-quantity-btn {
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid #007aff;
+  background: white;
+  color: #007aff;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.modern-quantity-btn:hover:not(:disabled) {
+  background: #007aff;
+  color: white;
+}
+
+.modern-quantity-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modern-quantity-input {
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: 600;
+  width: 60px;
+}
+
+/* Description */
+.modern-description-section {
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #f0f0f0;
+}
+
+.modern-product-description {
+  line-height: 1.6;
+  color: #666;
+  margin: 0;
+}
+
+/* Action Buttons */
+.modern-action-buttons {
   margin-bottom: 2rem;
 }
 
-.btn-lg {
-  padding: 12px 24px;
+.modern-primary-btn {
+  background: #007aff;
+  border: 1px solid #007aff;
+  color: white;
+  border-radius: 8px;
   font-weight: 600;
+  transition: all 0.3s ease;
 }
 
+.modern-primary-btn:hover:not(:disabled) {
+  background: #0056cc;
+  border-color: #0056cc;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+}
+
+.modern-success-btn {
+  background: #28a745;
+  border: 1px solid #28a745;
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.modern-success-btn:hover:not(:disabled) {
+  background: #218838;
+  border-color: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.modern-wishlist-btn {
+  background: white;
+  border: 1px solid #007aff;
+  color: #007aff;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.modern-wishlist-btn:hover {
+  background: #007aff;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+}
+
+.btn-lg {
+  padding: 10px 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Product Details */
 .product-details {
   background: #f8f9fa;
-  border-radius: 8px;
-  padding: 20px;
+  border-radius: 6px;
+  padding: 15px;
+  border: 1px solid #f0f0f0;
 }
 
 .detail-item {
@@ -754,22 +1308,27 @@ export default {
 
 .detail-label {
   font-weight: 600;
-  color: #495057;
+  color: #333;
 }
 
 .detail-value {
-  color: #6c757d;
+  color: #666;
 }
 
+/* Related Products */
 .product-card {
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  border: 1px solid #dee2e6;
+  transition: all 0.3s ease;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
 }
 
 .product-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border-color: #e0e0e0;
 }
 
 .product-image-wrapper {
@@ -780,12 +1339,18 @@ export default {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  position: relative;
 }
 
 .product-image {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.05);
 }
 
 .product-name {
@@ -794,11 +1359,13 @@ export default {
   margin-bottom: 8px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.3;
   height: 2.6em;
+  color: #333;
 }
 
 .price-info {
@@ -809,18 +1376,35 @@ export default {
 
 .price {
   font-weight: 700;
-  color: #198754;
+  color: #007aff;
   font-size: 1rem;
 }
 
 .mintiss-info {
   font-size: 0.75rem;
+  color: #007aff;
 }
 
 .original-price-small {
   font-size: 0.8rem;
-  color: #6c757d;
+  color: #999;
   text-decoration: line-through;
+}
+
+.modern-related-btn {
+  background: #007aff;
+  border: 1px solid #007aff;
+  color: white;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.modern-related-btn:hover {
+  background: #0056cc;
+  border-color: #0056cc;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
 }
 
 .quantity-controls {
@@ -841,22 +1425,52 @@ export default {
   border-radius: 4px;
 }
 
+/* ===== MOBILE RESPONSIVE STYLES ===== */
 @media (max-width: 768px) {
-  .product-title {
-    font-size: 1.5rem;
+  .modern-product-title {
+    font-size: 1.3rem;
   }
   
-  .current-price {
-    font-size: 1.5rem;
+  .modern-current-price {
+    font-size: 1.3rem;
   }
   
   .main-image-wrapper {
-    height: 300px;
+    height: 250px;
   }
   
-  .action-buttons .btn {
+  .modern-action-buttons .btn {
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+  }
+  
+  .modern-product-info {
+    padding: 0;
+    margin-top: 0.5rem;
+  }
+  
+  .modern-price-section,
+  .modern-quantity-section,
+  .modern-description-section {
+    padding: 0.5rem;
+  }
+  
+  .modern-quantity-controls {
+    max-width: 120px;
+  }
+  
+  .modern-quantity-btn {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .modern-quantity-input {
+    width: 50px;
+  }
+  
+  .btn-lg {
+    padding: 8px 16px;
+    font-size: 0.85rem;
   }
 }
 
