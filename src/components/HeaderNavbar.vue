@@ -9,6 +9,12 @@
             v-model="searchQuery" @keyup.enter="onSearch" />
         </form>
         <div class="d-flex align-items-center gap-4">
+          <!-- Cart Button -->
+          <router-link to="/cart" class="d-flex align-items-center text-decoration-none cart-link position-relative">
+            <i class="bi bi-cart3 text-white fs-4"></i>
+            <span v-if="cartItemCount > 0" class="cart-badge">{{ cartItemCount }}</span>
+          </router-link>
+          
           <template v-if="isLoggedIn">
             <router-link to="/redeem" class="d-flex align-items-center text-decoration-none wallet-link">
               <i class="bi bi-wallet2 text-white me-2 fs-4"></i>
@@ -32,6 +38,12 @@
             v-model="searchQuery" @keyup.enter="onSearch" />
         </form>
         <div class="d-flex w-100 align-items-center justify-content-center gap-3 pb-1">
+          <!-- Cart Button Mobile -->
+          <router-link to="/cart" class="d-flex align-items-center text-decoration-none cart-link position-relative">
+            <i class="bi bi-cart3 text-white fs-5"></i>
+            <span v-if="cartItemCount > 0" class="cart-badge cart-badge-mobile">{{ cartItemCount }}</span>
+          </router-link>
+          
           <template v-if="isLoggedIn">
             <!-- <router-link to="/redeem" class="d-flex align-items-center text-decoration-none wallet-link"> -->
             <i class="bi bi-wallet2 text-white me-1 fs-5"></i>
@@ -65,6 +77,7 @@ export default {
       mintissValue: 0,
       searchQuery: '',
       updateInterval: null, // New data property to hold the interval timer
+      cartItemCount: 0,
     };
   },
   computed: {
@@ -101,17 +114,30 @@ export default {
       // Start the recurring update on component mount
       this.startProfileUpdateInterval();
     }
+    
+    // Load cart count
+    this.updateCartCount();
+    
     // Listen for balance updates from other components
     this._balanceUpdatedHandler = () => {
       this.fetchUserProfileAndUpdateBalance();
     };
     eventBus.on('balance-updated', this._balanceUpdatedHandler);
+    
+    // Listen for cart updates
+    this._cartUpdatedHandler = () => {
+      this.updateCartCount();
+    };
+    eventBus.on('cart-updated', this._cartUpdatedHandler);
   },
   beforeUnmount() {
     // Clear the interval to prevent memory leaks when the component is destroyed
     this.stopProfileUpdateInterval();
     if (this._balanceUpdatedHandler) {
       eventBus.off('balance-updated', this._balanceUpdatedHandler);
+    }
+    if (this._cartUpdatedHandler) {
+      eventBus.off('cart-updated', this._cartUpdatedHandler);
     }
   },
   methods: {
@@ -192,6 +218,16 @@ export default {
     onSearch() {
       this.$emit('global-search', this.searchQuery.trim());
     },
+    
+    updateCartCount() {
+      try {
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        this.cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
+      } catch (error) {
+        console.error('Error updating cart count:', error);
+        this.cartItemCount = 0;
+      }
+    },
   },
 };
 </script>
@@ -212,5 +248,39 @@ export default {
 .wallet-link:hover {
   background: rgba(255, 255, 255, 0.1);
   transform: translateY(-1px);
+}
+
+.cart-link {
+  transition: all 0.3s ease;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+}
+
+.cart-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #dc3545;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.cart-badge-mobile {
+  width: 18px;
+  height: 18px;
+  font-size: 0.7rem;
 }
 </style>

@@ -322,13 +322,14 @@ export default {
     },
     setMaxRedeem() {
       console.log('Setting max redeem. Max redeemable:', this.maxRedeemable);
-      this.redeemAmount = this.maxRedeemable;
+      // Truncate to 2 decimal places instead of rounding
+      this.redeemAmount = Math.floor(this.maxRedeemable * 100) / 100;
       this.calculateFinalPrice();
       console.log('Redeem amount set to:', this.redeemAmount);
       
       // Show feedback to user
       if (this.maxRedeemable > 0) {
-        toastService.success(`Maximum amount (₹${this.maxRedeemable.toFixed(2)}) applied!`);
+        toastService.success(`Maximum amount (₹${this.redeemAmount.toFixed(2)}) applied!`);
       }
     },
     async refreshBalance() {

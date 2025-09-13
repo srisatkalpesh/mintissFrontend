@@ -13,7 +13,16 @@
           </div>
           <div class="mb-3">
             <label class="seller-form-label">Description</label>
-            <textarea v-model="form.description" class="form-control" required placeholder="Describe your product"></textarea>
+            <textarea v-model="form.description" class="form-control" required
+              placeholder="Describe your product"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="seller-form-label">Category</label>
+            <select v-model="form.category_id" class="form-select" required>
+              <option value="" disabled>Select Category</option>
+              <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}
+              </option>
+            </select>
           </div>
           <div class="mb-3">
             <label class="seller-form-label">Price <span class="text-muted">(optional)</span></label>
@@ -21,24 +30,22 @@
           </div>
           <div class="mb-3">
             <label class="seller-form-label">Canceled Price <span class="text-muted">(optional)</span></label>
-            <input v-model="form.canceled_price" type="number" step="0.01" class="form-control" placeholder="e.g. 799.00" />
-          </div>
-          <div class="mb-3">
-            <label class="seller-form-label">Purchase URL</label>
-            <input v-model="form.purchase_url" type="url" class="form-control" required placeholder="https://yourstore.com/product" />
-          </div>
-          <div class="mb-3">
-            <label class="seller-form-label">CTA Label</label>
-            <input v-model="form.cta_label" type="text" class="form-control" required placeholder="e.g. Buy Now, Shop Now" />
+            <input v-model="form.canceled_price" type="number" step="0.01" class="form-control"
+              placeholder="e.g. 799.00" />
           </div>
           <div class="mb-3">
             <label class="seller-form-label">Unique Code</label>
-            <input v-model="form.unique_code" type="text" class="form-control" required placeholder="Unique product code" />
+            <input v-model="form.unique_code" type="text" class="form-control" required
+              placeholder="Unique product code" />
+          </div>
+          <div class="mb-3">
+            <label class="seller-form-label">Mintiss <span class="text-muted">(optional)</span></label>
+            <input v-model="form.mintiss" type="number" class="form-control" placeholder="Enter mintiss point" />
           </div>
           <div class="mb-3">
             <label class="seller-form-label">Images</label>
-            <input ref="imageInput" type="file" class="form-control" multiple @change="handleImageChange" accept="image/*" />
-            <!-- <div class="form-text">Recommended image size: <span class="text-success">650x450px</span> for best appearance.</div> -->
+            <input ref="imageInput" type="file" class="form-control" multiple @change="handleImageChange"
+              accept="image/*" />
             <div class="mt-2 d-flex flex-wrap">
               <img v-for="(img, i) in previewImages" :key="i" :src="img" class="seller-preview-img" />
             </div>
@@ -55,7 +62,8 @@
               <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
               Update Product
             </button>
-            <router-link to="/seller/products" class="btn seller-btn-secondary ms-2" :disabled="loading">Cancel</router-link>
+            <router-link to="/seller/products" class="btn seller-btn-secondary ms-2"
+              :disabled="loading">Cancel</router-link>
           </div>
         </form>
         <div v-else class="text-center py-5">
@@ -68,6 +76,7 @@
 
 <script>
 import axios from '@/axios';
+
 export default {
   name: 'EditProduct',
   data() {
@@ -75,13 +84,14 @@ export default {
       form: {
         name: '',
         description: '',
+        category_id: '',
         price: '',
         canceled_price: '',
-        purchase_url: '',
-        cta_label: '',
         unique_code: '',
+        mintiss: '',
         images: []
       },
+      categories: [],
       previewImages: [],
       existingImages: [],
       error: '',
@@ -90,9 +100,18 @@ export default {
     };
   },
   async mounted() {
+    await this.fetchCategories();
     await this.fetchProduct();
   },
   methods: {
+    async fetchCategories() {
+      try {
+        const res = await axios.get('/categories');
+        this.categories = res.data.data || res.data || [];
+      } catch (e) {
+        console.error('Failed to fetch categories.');
+      }
+    },
     async fetchProduct() {
       this.loaded = false;
       try {
@@ -103,11 +122,11 @@ export default {
         this.form = {
           name: p.name,
           description: p.description,
+          category_id: p.category_id,
           price: p.price,
           canceled_price: p.canceled_price,
-          purchase_url: p.purchase_url,
-          cta_label: p.cta_label,
           unique_code: p.unique_code,
+          mintiss: p.mintiss || '',
           images: []
         };
         this.existingImages = Array.isArray(p.images) ? p.images : (p.images ? p.images.split(',') : []);
@@ -124,11 +143,6 @@ export default {
     async submitForm() {
       this.error = '';
       this.loading = true;
-
-      // Ensure price and canceled_price are 0 if empty or null
-      if (!this.form.price) this.form.price = 0;
-      if (!this.form.canceled_price) this.form.canceled_price = 0;
-
       const formData = new FormData();
       for (const key in this.form) {
         if (key === 'images') {
@@ -164,10 +178,19 @@ export default {
   overflow: hidden;
   animation: fadeInUp 0.7s;
 }
+
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(30px);}
-  to { opacity: 1; transform: translateY(0);}
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
+
 .seller-header {
   background: linear-gradient(90deg, #28a745 0%, #1177bf 100%);
   color: #fff;
@@ -175,20 +198,24 @@ export default {
   padding: 2rem 1rem 1rem 1rem;
   border-radius: 1rem 1rem 0 0;
 }
+
 .seller-title {
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
 }
+
 .seller-subtitle {
   font-size: 1rem;
   font-weight: 400;
   opacity: 0.85;
 }
+
 .seller-form-label {
   color: #1177bf;
   font-weight: 600;
 }
+
 .seller-btn-primary {
   background: linear-gradient(90deg, #28a745 0%, #1177bf 100%);
   color: #fff;
@@ -198,14 +225,18 @@ export default {
   padding: 0.75rem 2rem;
   transition: background 0.3s;
 }
-.seller-btn-primary:hover, .seller-btn-primary:focus {
+
+.seller-btn-primary:hover,
+.seller-btn-primary:focus {
   background: linear-gradient(90deg, #1177bf 0%, #28a745 100%);
   color: #fff;
 }
+
 .seller-btn-secondary {
   border-radius: 0.5rem;
   font-weight: 600;
 }
+
 .seller-preview-img {
   width: 60px;
   height: 60px;

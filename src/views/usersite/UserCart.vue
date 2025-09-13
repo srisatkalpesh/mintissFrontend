@@ -59,6 +59,12 @@
                                     <div class="col-6 col-md-3 text-end mt-3 mt-md-0">
                                         <div class="d-flex flex-column align-items-end">
                                             <span class="h5 mb-2">₹{{ item.price * item.quantity }}</span>
+                                            <div v-if="item.mintissPoints" class="mintiss-points-info mb-2">
+                                                <small class="text-success">
+                                                    <i class="bi bi-gift me-1"></i>
+                                                    +{{ (parseFloat(item.mintissPoints) * item.quantity).toFixed(8) }} mintiss
+                                                </small>
+                                            </div>
                                             <button class="btn btn-link text-danger p-0" 
                                                     @click="removeItem(item.id)">
                                                 <i class="bi bi-trash"></i> Remove
@@ -114,6 +120,79 @@
 
                 <!-- Order Summary -->
                 <div class="col-lg-4">
+                    <!-- Points Redemption Section -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Points Redemption</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="fw-bold">Available Balance:</span>
+                                <div class="d-flex align-items-center">
+                                    <span class="text-success fw-bold me-2">₹{{ userBalance || '0.00' }}</span>
+                                    <button 
+                                        class="btn btn-sm btn-outline-secondary refresh-btn" 
+                                        @click="refreshBalance"
+                                        :disabled="isRefreshingBalance"
+                                        title="Refresh Balance"
+                                    >
+                                        <i class="bi bi-arrow-clockwise" :class="{ 'spinning': isRefreshingBalance }"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div v-if="userBalance <= 0" class="alert alert-info alert-sm mb-3">
+                                <small>
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    No balance available. You can earn points by shopping or check your profile for available rewards.
+                                </small>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="fw-bold">Cart Total:</span>
+                                <span class="text-primary fw-bold">₹{{ subtotal }}</span>
+                            </div>
+                            <div class="mb-3">
+                                <label for="redeemAmount" class="form-label fw-bold">Redeem Amount (₹)</label>
+                                <div class="input-group">
+                                    <input 
+                                        type="number" 
+                                        class="form-control" 
+                                        id="redeemAmount" 
+                                        v-model="redeemAmount"
+                                        :max="Math.min(userBalance || 0, subtotal)"
+                                        :min="0"
+                                        step="0.01"
+                                        placeholder="Enter amount to redeem"
+                                        @input="calculateFinalPrice"
+                                        :class="{ 'is-invalid': redeemAmount > maxRedeemable }"
+                                    >
+                                    <button 
+                                        class="btn btn-outline-secondary max-btn" 
+                                        type="button"
+                                        @click="setMaxRedeem"
+                                        :disabled="maxRedeemable <= 0"
+                                    >
+                                        Max
+                                    </button>
+                                </div>
+                                <small class="text-muted">
+                                    Maximum redeemable: ₹{{ maxRedeemable.toFixed(2) }}
+                                </small>
+                                <div v-if="redeemAmount > maxRedeemable" class="invalid-feedback d-block">
+                                    Redeem amount cannot exceed your available balance or cart total.
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-bold">Final Total:</span>
+                                <span class="final-price">₹{{ finalPrice.toFixed(2) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted">You Save:</span>
+                                <span class="savings-amount">₹{{ (subtotal - finalPrice).toFixed(2) }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Summary -->
                     <div class="card shadow-sm">
                         <div class="card-header bg-primary text-white">
                             <h5 class="mb-0">Order Summary</h5>
@@ -127,10 +206,14 @@
                                 <span>Shipping</span>
                                 <span>Free</span>
                             </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Total Mintiss Points</span>
+                                <span class="text-success">{{ totalMintissPoints }}</span>
+                            </div>
                             <hr>
                             <div class="d-flex justify-content-between mb-3">
                                 <strong>Total</strong>
-                                <strong class="text-primary">₹{{ total }}</strong>
+                                <strong class="text-primary">₹{{ finalPrice.toFixed(2) }}</strong>
                             </div>
                             <button class="btn btn-primary w-100" 
                                     @click="confirmOrder"
@@ -187,7 +270,10 @@
                         <div class="alert alert-info">
                             <h6>Order Summary:</h6>
                             <p class="mb-1">Total Items: {{ cartItems.length }}</p>
-                            <p class="mb-1">Total Amount: ₹{{ total }}</p>
+                            <p class="mb-1">Subtotal: ₹{{ subtotal }}</p>
+                            <p v-if="redeemAmount > 0" class="mb-1">Redeemed: ₹{{ redeemAmount.toFixed(2) }}</p>
+                            <p class="mb-1">Final Amount: ₹{{ finalPrice.toFixed(2) }}</p>
+                            <p class="mb-1">Total Mintiss Points: {{ totalMintissPoints }}</p>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -228,7 +314,13 @@ export default {
             showAddressForm: false,
             showOrderConfirmation: false,
             addressFormModal: null,
-            orderConfirmationModal: null
+            orderConfirmationModal: null,
+            // Redemption properties
+            redeemAmount: 0,
+            userBalance: 0,
+            mintissValue: 0,
+            finalPrice: 0,
+            isRefreshingBalance: false,
         };
     },
     computed: {
@@ -237,6 +329,20 @@ export default {
         },
         total() {
             return this.subtotal;
+        },
+        totalMintissPoints() {
+            return this.cartItems.reduce((total, item) => {
+                if (item.mintissPoints) {
+                    return total + (parseFloat(item.mintissPoints) * item.quantity);
+                }
+                return total;
+            }, 0).toFixed(8);
+        },
+        maxRedeemable() {
+            return Math.min(this.userBalance || 0, this.subtotal);
+        },
+        isLoggedIn() {
+            return !!localStorage.getItem("token");
         }
     },
     methods: {
@@ -307,7 +413,11 @@ export default {
                     products: this.cartItems.map(item => ({
                         id: item.id,
                         quantity: item.quantity
-                    }))
+                    })),
+                    redeemAmount: this.redeemAmount,
+                    finalPrice: this.finalPrice,
+                    userBalance: this.userBalance,
+                    mintissValue: this.mintissValue
                 };
 
                 await axios.post('/orders', orderData);
@@ -328,11 +438,101 @@ export default {
                 toastService.error('Failed to place order');
                 console.error('Error placing order:', error);
             }
+        },
+        
+        // Redemption methods
+        async fetchMintissValue() {
+            try {
+                const response = await axios.get("/mintiss-value/latest");
+                this.mintissValue = parseFloat(response.data.data.value);
+                this.calculateUserBalance();
+            } catch (error) {
+                console.error("Error fetching mintiss value:", error);
+                this.mintissValue = 0;
+                this.calculateUserBalance();
+            }
+        },
+        
+        async fetchUserBalance() {
+            try {
+                const response = await axios.get("/user/balance");
+                if (response.data.success) {
+                    this.userBalance = parseFloat(response.data.balance || 0);
+                    console.log('Fetched balance from API:', this.userBalance);
+                }
+            } catch (error) {
+                console.error("Error fetching user balance:", error);
+                this.calculateUserBalance();
+            }
+        },
+        
+        calculateUserBalance() {
+            const user = JSON.parse(localStorage.getItem("user"));
+            console.log('User data:', user);
+            console.log('Mintiss value:', this.mintissValue);
+            
+            if (user && user.mintiss && this.mintissValue) {
+                this.userBalance = parseFloat((parseFloat(user.mintiss) * this.mintissValue).toFixed(2));
+                console.log('Calculated balance:', this.userBalance);
+            } else {
+                if (user && user.balance) {
+                    this.userBalance = parseFloat(user.balance);
+                } else if (user && user.mintiss) {
+                    this.userBalance = parseFloat(user.mintiss) * 0.001;
+                } else {
+                    this.userBalance = 0;
+                }
+                console.log('Fallback balance:', this.userBalance);
+            }
+            this.calculateFinalPrice();
+        },
+        
+        calculateFinalPrice() {
+            this.finalPrice = Math.max(0, this.subtotal - this.redeemAmount);
+        },
+        
+        setMaxRedeem() {
+            console.log('Setting max redeem. Max redeemable:', this.maxRedeemable);
+            // Truncate to 2 decimal places instead of rounding
+            this.redeemAmount = Math.floor(this.maxRedeemable * 100) / 100;
+            this.calculateFinalPrice();
+            console.log('Redeem amount set to:', this.redeemAmount);
+            
+            if (this.maxRedeemable > 0) {
+                toastService.success(`Maximum amount (₹${this.redeemAmount.toFixed(2)}) applied!`);
+            }
+        },
+        
+        async refreshBalance() {
+            this.isRefreshingBalance = true;
+            try {
+                if (this.isLoggedIn) {
+                    await this.fetchUserBalance();
+                    toastService.success('Balance refreshed successfully!');
+                } else {
+                    this.userBalance = Math.floor(Math.random() * 2000) + 500;
+                    toastService.success('Demo balance refreshed! New balance: ₹' + this.userBalance);
+                }
+            } catch (error) {
+                console.error('Error refreshing balance:', error);
+                toastService.error('Failed to refresh balance. Please try again.');
+            } finally {
+                this.isRefreshingBalance = false;
+            }
         }
     },
-    mounted() {
+    async mounted() {
         this.loadCart();
         this.fetchAddresses();
+        
+        // Initialize redemption functionality
+        if (this.isLoggedIn) {
+            await this.fetchMintissValue();
+            await this.fetchUserBalance();
+        } else {
+            this.userBalance = 1000; // Demo balance
+        }
+        this.calculateFinalPrice();
     },
     watch: {
         showAddressForm(newVal) {
@@ -345,6 +545,15 @@ export default {
                     }
                 });
             }
+        },
+        redeemAmount(newVal) {
+            if (newVal > this.maxRedeemable) {
+                this.redeemAmount = this.maxRedeemable;
+            }
+            if (newVal < 0) {
+                this.redeemAmount = 0;
+            }
+            this.calculateFinalPrice();
         }
     },
     beforeUnmount() {
@@ -381,5 +590,70 @@ export default {
 .btn-outline-primary:hover {
   background-color: #1177bf !important;
   border-color: #1177bf !important;
+}
+
+/* Redemption styles */
+.points-redemption-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 1px solid #dee2e6;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.final-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #198754;
+}
+
+.savings-amount {
+  color: #198754;
+  font-weight: 600;
+}
+
+.input-group .btn {
+  border-left: 0;
+}
+
+.input-group .form-control:focus {
+  border-right: 0;
+  box-shadow: none;
+}
+
+.input-group .form-control:focus + .btn {
+  border-color: #86b7fe;
+}
+
+.alert-sm {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.375rem;
+}
+
+.refresh-btn {
+  transition: all 0.2s ease;
+}
+
+.refresh-btn:hover {
+  transform: scale(1.1);
+}
+
+.max-btn {
+  font-weight: 600;
+  min-width: 60px;
+}
+
+.max-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 </style>

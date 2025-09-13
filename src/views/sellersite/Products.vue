@@ -28,9 +28,8 @@ export default {
         { key: 'description', label: 'Description' },
         { key: 'price', label: 'Price' },
         { key: 'canceled_price', label: 'Canceled Price' },
-        { key: 'purchase_url', label: 'Purchase URL' },
-        { key: 'cta_label', label: 'CTA Label' },
         { key: 'unique_code', label: 'Unique Code' },
+        { key: 'mintiss', label: 'Mintiss' }, 
         { key: 'images', label: 'Images', render: item => (item.images ? item.images.map(img => `<img src='${img}' style='width:40px;height:40px;object-fit:cover;margin-right:2px;'/>`).join('') : '') },
         { key: 'actions', label: 'Actions', class: 'text-end' }
       ]
@@ -45,10 +44,14 @@ export default {
       try {
         const token = localStorage.getItem('token');
         const res = await axios.get('/products', { headers: { Authorization: `Bearer ${token}` } });
-        this.products = res.data.data || res.data || [];
-        this.products = this.products.map(p => ({ ...p, images: Array.isArray(p.images) ? p.images : (p.images ? p.images.split(',') : []) }));
+        let products = res.data.products || [];
+        this.products = products.map(p => ({
+          ...p,
+          images: Array.isArray(p.images) ? p.images : (p.images ? p.images.split(',') : []),
+          mintiss: p.mintiss || ''
+        }));
       } catch (e) {
-        // handle error
+        console.error('Failed to fetch products.', e);
       } finally {
         this.loading = false;
       }
@@ -66,7 +69,7 @@ export default {
         await axios.delete(`/products/${product.id}`, { headers: { Authorization: `Bearer ${token}` } });
         this.fetchProducts();
       } catch (e) {
-        // handle error
+        console.error('Failed to delete product.', e);
       }
     }
   }
@@ -78,4 +81,4 @@ export default {
   display: block;
   background: rgba(0,0,0,0.3);
 }
-</style> 
+</style>

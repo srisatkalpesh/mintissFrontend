@@ -1,76 +1,101 @@
 <template>
   <div class="container-fluid bg-light min-vh-100 font-monospace">
-    <!-- ✅ Info Cards -->
-    <div class="row row-cols-2 row-cols-md-4 g-3 my-4 justify-content-center">
+    <!-- ✅ Info Cards - Mobile Responsive -->
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-2 g-md-3 my-3 my-md-4 justify-content-center px-2">
       <div class="col d-flex justify-content-center" v-for="card in infoCards" :key="card.title">
-        <div class="card text-center border-0 shadow-lg rounded-4 card-hover-effect d-flex align-items-stretch"
-          :style="'transition: transform 0.2s, box-shadow 0.2s; width: 180px; height: 180px; min-width: 180px; min-height: 180px; max-width: 180px; max-height: 180px;'"
-          @click="
-            card.title === 'Free Mintiss'
-              ? goToLogin()
-              : card.title === 'Today’s Mintiss Value'
-                ? goToMintiss()
-                : card.title === 'Refer & Earn'
-                  ? goToReferral()
-                  : null
-            " :class="{
-              'cursor-pointer':
-                card.title === 'Free Mintiss' ||
-                card.title === 'Today’s Mintiss Value' ||
-                card.title === 'Refer & Earn'
-            }">
-          <div class="card-body d-flex flex-column align-items-center justify-content-center w-100 h-100 p-2"
+        <div class="card text-center border-0 shadow-lg rounded-3 rounded-md-4 card-hover-effect d-flex align-items-stretch info-card"
+          @click="handleCardClick(card.title)"
+          :class="{ 'cursor-pointer': isClickableCard(card.title) }">
+          <div class="card-body d-flex flex-column align-items-center justify-content-center w-100 h-100 p-2 p-md-3"
             style="min-height: 0;">
-            <div class="mb-2 d-flex align-items-center justify-content-center rounded-circle"
-              style="background: linear-gradient(135deg, #1177bf 60%, #ffd700 100%); width: 56px; height: 56px;">
-              <i :class="card.icon + ' text-white'" style="font-size: 2rem;"></i>
+            <div class="mb-1 mb-md-2 d-flex align-items-center justify-content-center rounded-circle info-icon">
+              <i :class="card.icon + ' text-white'"></i>
             </div>
-            <h6 class="card-title fw-bold mt-2 mb-1" style="font-size: 1.15rem; color: #1177bf;">
+            <h6 class="card-title fw-bold mt-1 mt-md-2 mb-1 info-title">
               {{ card.title }}
-              <span v-if="card.span" style="color: #1177bf;">{{ card.span }}</span>
+              <span v-if="card.span" class="info-span">{{ card.span }}</span>
             </h6>
-            <div v-if="card.value" class="fw-bold text-success mt-1" style="font-size: 1.1rem;">
+            <div v-if="card.value" class="fw-bold text-success mt-1 info-value">
               {{ card.value }}
             </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- ✅ Hero Section (Bootstrap only) -->
-    <div class="my-4">
+    <!-- ✅ Hero Section - Mobile Responsive -->
+    <div class="my-3 my-md-4 px-2">
       <div v-if="heroSections.length > 0" class="w-100">
-        <div v-for="hero in heroSections" :key="hero.id" class="position-relative rounded overflow-hidden shadow">
+        <div v-for="hero in heroSections" :key="hero.id" class="position-relative rounded-2 rounded-md-3 overflow-hidden shadow hero-section">
           <!-- Image -->
-          <img :src="hero.image_url" :alt="hero.title" class="img-fluid w-100"
-            style="object-fit: cover; max-height: 400px;" />
-
-          <!-- Overlay (Title + Subtitle) -->
-          <!-- <div
-            class="position-absolute bottom-0 start-50 translate-middle-x bg-light bg-opacity-75 text-center p-2 rounded w-75 mb-3">
-            <h5 class="fw-bold mb-1">{{ hero.title }}</h5>
-            <p class="mb-0 text-muted">{{ hero.subtitle }}</p>
-          </div> -->
+          <img :src="hero.image_url" :alt="hero.title" class="img-fluid w-100 hero-image" />
         </div>
       </div>
     </div>
 
-    <!-- ✅ Categories -->
-    <div class="w-100 my-4 overflow-auto">
-      <div class="d-flex flex-row flex-nowrap w-100 gx-3">
-        <div v-for="cat in categories.slice(0, 10)" :key="cat.id"
-          class="d-flex flex-column align-items-center flex-fill mx-2">
-          <img :src="cat.image" alt="Category Image" class="rounded-circle border shadow"
-            style="width: 80px; height: 80px; object-fit: cover;" />
-          <div class="mt-3 text-center fw-semibold">{{ cat.name }}</div>
+    <!-- ✅ Categories - Mobile Responsive -->
+    <div class="w-100 my-3 my-md-4 px-2">
+      <div class="categories-container overflow-auto">
+        <div class="d-flex flex-row flex-nowrap w-100 gx-2 gx-md-3">
+          <div v-for="cat in categories.slice(0, 10)" :key="cat.id"
+            class="d-flex flex-column align-items-center flex-fill mx-1 mx-md-2 category-item">
+            <img :src="cat.image" alt="Category Image" class="rounded-circle border shadow category-image" />
+            <div class="mt-2 mt-md-3 text-center fw-semibold category-name">{{ cat.name }}</div>
+          </div>
         </div>
       </div>
     </div>
-    <!-- ✅ Products Carousel -->
-    <div v-if="loading" class="d-flex justify-content-center align-items-center my-5" style="height: 200px;">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
+
+    <!-- ✅ Featured Products Section - Mobile Responsive -->
+    <div v-if="stores.length > 0" class="container-fluid my-3 my-md-4 px-2 px-md-4">
+      <!-- Products Grouped by Category - Mobile Responsive -->
+      <div v-for="(products, categoryName) in groupedByCategory" :key="categoryName" class="mb-4 mb-md-5" :data-category="categoryName">
+        <div class="d-flex justify-content-between align-items-center mb-2 mb-md-3 px-1">
+          <h4 class="text-primary mb-0 category-title">{{ categoryName }}</h4>
+          <button class="btn btn-outline-primary btn-sm view-all-btn" @click="viewAllInCategory(categoryName)">
+            View All <i class="bi bi-arrow-right ms-1"></i>
+          </button>
+        </div>
+        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-2 g-md-3">
+          <div v-for="product in products.slice(0, 6)" :key="product.unique_code" class="col">
+            <div class="card product-card-hover h-100 p-2 p-md-3 product-card" style="cursor: pointer;"
+              @click="goToProductDetail(product.id, product)">
+              <div class="product-image-wrapper-small mb-2 mb-md-3">
+                <img 
+                  v-if="product.images && product.images.length > 0"
+                  :src="product.images[0]" 
+                  alt="Product Image" 
+                  class="product-image-small"
+                  @error="handleImageError"
+                />
+                <div v-else class="no-image-placeholder-small">
+                  <i class="bi bi-image text-muted"></i>
+                </div>
+                <div v-if="product.canceled_price && product.canceled_price > product.price" 
+                     class="discount-badge">
+                  {{ Math.round(((product.canceled_price - product.price) / product.canceled_price) * 100) }}% OFF
+                </div>
+              </div>
+              <div class="product-info-overlay">
+                <h6 class="product-name-ellipsis">{{ product.name }}</h6>
+                <p class="product-description-ellipsis">{{ product.description }}</p>
+                <div class="price-section mb-1 mb-md-2">
+                  <span class="text-success fw-bold product-price">₹{{ product.price }}</span>
+                  <span v-if="product.canceled_price" class="text-muted small text-decoration-line-through ms-1 ms-md-2 original-price">₹{{ product.canceled_price }}</span>
+                </div>
+                <div class="mintiss-reward">
+                  <i class="bi bi-gift text-warning me-1"></i>
+                  <small class="text-success">Earn {{ calculateMintissPoints(product.mintiss) }} mintiss</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+  
     </div>
+
+
   </div>
 </template>
 
@@ -114,6 +139,19 @@ export default {
     },
   },
   computed: {
+    groupedByCategory() {
+      const groups = {};
+      this.stores.forEach(store => {
+        store.products.forEach(product => {
+          const categoryName = product.category ? product.category.name : 'Uncategorized';
+          if (!groups[categoryName]) {
+            groups[categoryName] = [];
+          }
+          groups[categoryName].push(product);
+        });
+      });
+      return groups;
+    },
     userName() {
       const user = JSON.parse(localStorage.getItem('user'));
       return user ? user.name : '';
@@ -132,6 +170,64 @@ export default {
     this.fetchCategories();
   },
   methods: {
+    handleCardClick(cardTitle) {
+      if (cardTitle === 'Free Mintiss') {
+        this.goToLogin();
+      } else if (cardTitle === "Today's Mintiss Value") {
+        this.goToMintiss();
+      } else if (cardTitle === 'Refer & Earn') {
+        this.goToReferral();
+      }
+    },
+    isClickableCard(cardTitle) {
+      return cardTitle === 'Free Mintiss' ||
+             cardTitle === "Today's Mintiss Value" ||
+             cardTitle === 'Refer & Earn';
+    },
+    goToCheckout(product) {
+      this.$router.push({
+        name: 'checkout',
+        query: {
+          product: JSON.stringify(product)
+        }
+      });
+    },
+    goToProductDetail(productId, product) {
+      // Fallback to unique_code if id is not available
+      const idToUse = productId || product?.unique_code;
+      if (!idToUse) {
+        console.error('No product ID or unique_code available');
+        return;
+      }
+      
+      this.$router.push(`/product/${idToUse}`);
+    },
+    viewAllInCategory(categoryName) {
+      // For now, just scroll to the category section
+      // In the future, this could filter products by category
+      const element = document.querySelector(`[data-category="${categoryName}"]`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    },
+    scrollToProducts() {
+      const element = document.querySelector('.featured-banner');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    },
+    handleImageError(event) {
+      event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
+    },
+    
+    calculateMintissPoints(mintissValue) {
+      if (!this.mintissValue || this.mintissValue === 0) {
+        return '0';
+      }
+      // Calculate mintiss points: mintiss value / current mintiss value
+      const points = mintissValue / this.mintissValue;
+      return points.toFixed(8);
+    },
     async fetchHeroSections() {
       try {
         const { data } = await axios.get('/public/hero');
@@ -237,6 +333,38 @@ export default {
   transform: translateY(-4px) scale(1.02);
 }
 
+.small-product-card {
+  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
+  box-shadow: 0 2px 8px rgba(17, 119, 191, 0.12);
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  background: #f4f8fb;
+}
+
+.product-image-wrapper-small {
+  position: relative;
+  width: 100%;
+  background: #f4f8fb;
+  overflow: hidden;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-image-small {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+  background: #e9ecef;
+}
+
+
 .product-image-fit {
   object-fit: contain;
   width: 100%;
@@ -333,69 +461,471 @@ export default {
   cursor: pointer;
 }
 
-/* Responsive product card widths */
-@media (max-width: 1200px) {
-  .product-card {
-    width: 280px;
-    min-width: 280px;
-    max-width: 280px;
-  }
+/* New e-commerce styles */
+.featured-banner {
+  background: linear-gradient(135deg, #1177bf 0%, #0d6efd 100%);
+  box-shadow: 0 4px 20px rgba(17, 119, 191, 0.3);
+}
 
-  .product-image-wrapper {
-    height: 340px;
-    min-height: 340px;
-    max-height: 340px;
+.discount-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #dc3545;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 2;
+}
+
+.product-image-wrapper-small {
+  position: relative;
+}
+
+.price-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mintiss-reward {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.cta-section {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 1px solid #dee2e6;
+}
+
+.no-image-placeholder-small {
+  width: 100%;
+  height: 150px;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+}
+
+.no-image-placeholder-small i {
+  font-size: 2rem;
+}
+
+/* ===== MOBILE RESPONSIVE STYLES ===== */
+
+/* Info Cards - Mobile Responsive */
+.info-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+  width: 100%;
+  height: 140px;
+  min-height: 140px;
+}
+
+.info-icon {
+  background: linear-gradient(135deg, #1177bf 60%, #ffd700 100%);
+  width: 40px;
+  height: 40px;
+}
+
+.info-title {
+  font-size: 0.9rem;
+  color: #1177bf;
+  line-height: 1.2;
+}
+
+.info-span {
+  color: #1177bf;
+  font-size: 0.8rem;
+  display: block;
+}
+
+.info-value {
+  font-size: 0.85rem;
+}
+
+/* Hero Section - Mobile Responsive */
+.hero-section {
+  border-radius: 8px;
+}
+
+.hero-image {
+  object-fit: cover;
+  max-height: 200px;
+}
+
+/* Categories - Mobile Responsive */
+.categories-container {
+  padding: 0 4px;
+}
+
+.category-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+}
+
+.category-name {
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+
+/* Featured Banner - Mobile Responsive */
+.banner-title {
+  font-size: 1.5rem;
+  line-height: 1.3;
+}
+
+.banner-text {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.banner-icon {
+  font-size: 2rem;
+  opacity: 0.7;
+}
+
+/* Product Cards - Mobile Responsive */
+.product-card {
+  min-height: 280px;
+  border-radius: 8px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.product-image-small {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.product-name-ellipsis {
+  font-size: 0.85rem;
+  line-height: 1.3;
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-description-ellipsis {
+  font-size: 0.75rem;
+  line-height: 1.3;
+  margin-bottom: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: #6c757d;
+}
+
+.product-price {
+  font-size: 0.9rem;
+}
+
+.original-price {
+  font-size: 0.75rem;
+}
+
+.category-title {
+  font-size: 1.1rem;
+}
+
+.view-all-btn {
+  font-size: 0.8rem;
+  padding: 4px 8px;
+}
+
+.mintiss-reward {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  padding: 3px 6px;
+  display: flex;
+  align-items: center;
+  font-size: 0.7rem;
+}
+
+.discount-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #dc3545;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: bold;
+}
+
+.no-image-placeholder-small {
+  width: 100%;
+  height: 120px;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+}
+
+.no-image-placeholder-small i {
+  font-size: 1.5rem;
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) {
+  .info-card {
+    height: 160px;
+    min-height: 160px;
+  }
+  
+  .info-icon {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .info-title {
+    font-size: 1rem;
+  }
+  
+  .info-value {
+    font-size: 0.9rem;
+  }
+  
+  .hero-image {
+    max-height: 250px;
+  }
+  
+  .category-image {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .category-name {
+    font-size: 0.8rem;
+  }
+  
+  .banner-title {
+    font-size: 1.75rem;
+  }
+  
+  .banner-text {
+    font-size: 1rem;
+  }
+  
+  .banner-icon {
+    font-size: 2.5rem;
+  }
+  
+  .product-image-small {
+    height: 140px;
+  }
+  
+  .product-name-ellipsis {
+    font-size: 0.9rem;
+  }
+  
+  .product-description-ellipsis {
+    font-size: 0.8rem;
+  }
+  
+  .product-price {
+    font-size: 1rem;
+  }
+  
+  .category-title {
+    font-size: 1.25rem;
+  }
+  
+  .view-all-btn {
+    font-size: 0.85rem;
+    padding: 5px 10px;
+  }
+  
+  .mintiss-reward {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+  }
+  
+  .discount-badge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+  
+  .no-image-placeholder-small {
+    height: 140px;
+  }
+  
+  .no-image-placeholder-small i {
+    font-size: 1.75rem;
   }
 }
 
-@media (max-width: 900px) {
-  .card-body {
-    padding: 12px 6px !important;
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+  .info-card {
+    height: 180px;
+    min-height: 180px;
   }
-}
-
-/* @media (max-width: 600px) {
-  .product-card {
-    width: 160px;
-    min-width: 160px;
-    max-width: 160px;
+  
+  .info-icon {
+    width: 56px;
+    height: 56px;
   }
-  .product-image-wrapper {
-    height: 120px;
-    min-height: 120px;
-    max-height: 120px;
+  
+  .info-title {
+    font-size: 1.15rem;
   }
-  .card-body {
-    padding: 12px 6px !important;
+  
+  .info-value {
+    font-size: 1.1rem;
   }
-} */
-
-/* @media (max-width: 380px) {
-  .product-card {
-    width: 120px;
-    min-width: 120px;
-    max-width: 120px;
+  
+  .hero-image {
+    max-height: 300px;
   }
-  .product-image-wrapper {
+  
+  .category-image {
+    width: 80px;
     height: 80px;
-    min-height: 80px;
-    max-height: 80px;
   }
-} */
-
-/* Reduce padding under the slider for large screens */
-.products-carousel-wrapper {
-  padding-bottom: 16px;
+  
+  .category-name {
+    font-size: 0.9rem;
+  }
+  
+  .banner-title {
+    font-size: 2rem;
+  }
+  
+  .banner-text {
+    font-size: 1.1rem;
+  }
+  
+  .banner-icon {
+    font-size: 3rem;
+  }
+  
+  .product-card {
+    min-height: 300px;
+  }
+  
+  .product-image-small {
+    height: 150px;
+  }
+  
+  .product-name-ellipsis {
+    font-size: 1rem;
+  }
+  
+  .product-description-ellipsis {
+    font-size: 0.85rem;
+  }
+  
+  .product-price {
+    font-size: 1.1rem;
+  }
+  
+  .category-title {
+    font-size: 1.5rem;
+  }
+  
+  .view-all-btn {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+  }
+  
+  .mintiss-reward {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+  }
+  
+  .discount-badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+  }
+  
+  .no-image-placeholder-small {
+    height: 150px;
+  }
+  
+  .no-image-placeholder-small i {
+    font-size: 2rem;
+  }
 }
 
-@media (min-width: 1400px) {
-  .products-carousel-wrapper {
-    padding-bottom: 4px !important;
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+  .hero-image {
+    max-height: 400px;
   }
+  
+  .product-card {
+    min-height: 320px;
+  }
+  
+  .product-image-small {
+    height: 160px;
+  }
+  
+  .no-image-placeholder-small {
+    height: 160px;
+  }
+}
 
-  .card-body {
-    padding-bottom: 12px !important;
-    padding-top: 18px !important;
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+  .product-card {
+    min-height: 340px;
+  }
+  
+  .product-image-small {
+    height: 180px;
+  }
+  
+  .no-image-placeholder-small {
+    height: 180px;
+  }
+}
+
+/* Hover effects for desktop */
+@media (min-width: 768px) {
+  .info-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  }
+  
+  .product-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  }
+}
+
+/* Touch-friendly interactions for mobile */
+@media (max-width: 767px) {
+  .info-card:active {
+    transform: scale(0.98);
+  }
+  
+  .product-card:active {
+    transform: scale(0.98);
+  }
+  
+  .btn:active {
+    transform: scale(0.95);
   }
 }
 </style>
