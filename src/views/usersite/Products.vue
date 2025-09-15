@@ -116,6 +116,17 @@
                   <i class="bi bi-gift me-1"></i>
                   <small>Earn {{ calculateMintissPoints(product.mintiss) }} mintiss</small>
                 </div>
+                <div class="product-actions">
+                  <button 
+                    @click.stop="addToCart(product)" 
+                    class="add-to-cart-btn"
+                    :disabled="isAddingToCart"
+                  >
+                    <i class="bi bi-cart-plus me-1"></i>
+                    <span v-if="!isAddingToCart">Add to Cart</span>
+                    <span v-else>Adding...</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -132,6 +143,7 @@
 import axios from '@/axios';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import 'swiper/swiper-bundle.css';
+import cartService from '@/services/cartService';
 
 export default {
   name: 'StoreFeed',
@@ -155,7 +167,8 @@ export default {
         { icon: 'bi bi-graph-up-arrow', title: 'Today\'s Mintiss Value', value: '₹0.00000000' },
         { icon: 'bi bi-trophy', title: 'Reward Redemption', span: 'Starting Soon' },
       ],
-      heroSections: []
+      heroSections: [],
+      isAddingToCart: false
     };
   },
   watch: {
@@ -337,6 +350,23 @@ export default {
     },
     goToCategory(categoryId) {
       this.$router.push(`/category/${categoryId}`);
+    },
+    
+    async addToCart(product) {
+      try {
+        this.isAddingToCart = true;
+        
+        // Add product to cart using cart service
+        cartService.addToCart(product, 1);
+        
+        // Small delay to show loading state
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+      } catch (error) {
+        console.error('Error adding to cart:', error);
+      } finally {
+        this.isAddingToCart = false;
+      }
     },
   },
 };
@@ -855,6 +885,54 @@ export default {
   font-size: 0.9rem;
 }
 
+/* Add to Cart Button Styles */
+.product-actions {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f1f3f4;
+}
+
+.add-to-cart-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  border: none;
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.add-to-cart-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+}
+
+.add-to-cart-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+.add-to-cart-btn:disabled {
+  background: #e8eaed;
+  color: #9aa0a6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.add-to-cart-btn i {
+  font-size: 1rem;
+}
+
 /* View All Categories Button */
 .modern-categories-btn {
   background: linear-gradient(135deg, #007aff 0%, #0056b3 100%);
@@ -1179,6 +1257,11 @@ export default {
   .mintiss-reward {
     font-size: 0.7rem;
     padding: 0.4rem 0.6rem;
+  }
+  
+  .add-to-cart-btn {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
   }
   
   .modern-categories-btn {

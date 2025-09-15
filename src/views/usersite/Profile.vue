@@ -265,6 +265,12 @@
                     <span class="detail-label">Order Date:</span>
                     <span class="detail-value">{{ formatDate(order.created_at) }}</span>
                   </div>
+                  <div v-if="order.custom_text" class="order-detail-item text-customization">
+                    <span class="detail-label">
+                      <i class="bi bi-type me-1"></i>Custom Text:
+                    </span>
+                    <span class="detail-value">{{ order.custom_text }}</span>
+                  </div>
                 </div>
                 <div class="order-footer">
                   <div class="order-price">
@@ -275,6 +281,16 @@
                     <i class="bi bi-gift"></i>
                     <span>+{{ order.mintiss_value }} mintiss</span>
                   </div>
+                </div>
+                <div class="order-actions">
+                  <button @click="viewInvoice(order.id)" class="invoice-btn">
+                    <i class="bi bi-receipt"></i>
+                    <span>{{ order.invoice_url ? 'View Invoice' : 'Generate Invoice' }}</span>
+                  </button>
+                  <a v-if="order.invoice_url" :href="order.invoice_url" target="_blank" class="download-btn">
+                    <i class="bi bi-download"></i>
+                    <span>Download</span>
+                  </a>
                 </div>
               </div>
             </div>
@@ -455,6 +471,63 @@ export default {
       event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
     },
     
+    async viewInvoice(orderId) {
+      try {
+        // Check if invoice already exists
+        const order = this.orders.find(o => o.id === orderId);
+        
+        if (order && order.invoice_url) {
+          // Invoice exists, navigate to invoice view
+          this.$router.push(`/invoice/${orderId}`);
+        } else {
+          // Generate invoice first
+          this.showToast('Generating invoice...', 'info');
+          
+          const response = await axios.post(`/user/orders/${orderId}/invoice/generate`);
+          
+          if (response.data.status) {
+            // Update the order with invoice URL
+            if (order) {
+              order.invoice_url = response.data.data.invoice_url;
+            }
+            
+            this.showToast('Invoice generated successfully!', 'success');
+            
+            // Navigate to invoice view
+            setTimeout(() => {
+              this.$router.push(`/invoice/${orderId}`);
+            }, 1000);
+          } else {
+            this.showToast(response.data.message || 'Failed to generate invoice', 'error');
+          }
+        }
+      } catch (error) {
+        console.error('Error viewing invoice:', error);
+        
+        // Handle specific error cases
+        if (error.response) {
+          const status = error.response.status;
+          const message = error.response.data?.message || 'Failed to generate invoice';
+          
+          switch (status) {
+            case 404:
+              this.showToast('Order not found or you do not have permission to access this order', 'error');
+              break;
+            case 401:
+              this.showToast('Please login to access invoices', 'error');
+              break;
+            case 500:
+              this.showToast('Server error. Please try again later.', 'error');
+              break;
+            default:
+              this.showToast(message, 'error');
+          }
+        } else {
+          this.showToast('Network error. Please check your connection and try again.', 'error');
+        }
+      }
+    },
+
     showToast(message, type = 'info') {
       // Simple toast notification
       const toast = document.createElement('div');
@@ -1248,6 +1321,24 @@ export default {
   font-weight: 600;
 }
 
+.text-customization {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 6px;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.text-customization .detail-label {
+  color: #856404;
+  font-weight: 600;
+}
+
+.text-customization .detail-value {
+  color: #856404;
+  font-style: italic;
+}
+
 .order-footer {
   display: flex;
   justify-content: space-between;
@@ -1284,6 +1375,58 @@ export default {
 
 .order-mintiss i {
   font-size: 0.9rem;
+}
+
+/* Order Actions */
+.order-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e8eaed;
+}
+
+.invoice-btn,
+.download-btn {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+.invoice-btn {
+  background: linear-gradient(135deg, #007aff 0%, #00d4ff 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+.invoice-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+}
+
+/* Removed disabled state - all orders can generate invoices */
+
+.download-btn {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+.download-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+  color: white;
+  text-decoration: none;
 }
 
 /* No Orders */
@@ -1445,6 +1588,11 @@ export default {
   .order-footer {
     flex-direction: column;
     align-items: stretch;
+    gap: 0.5rem;
+  }
+  
+  .order-actions {
+    flex-direction: column;
     gap: 0.5rem;
   }
   

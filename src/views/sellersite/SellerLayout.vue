@@ -52,6 +52,15 @@
                         </router-link>
                     </li>
                     <li class="nav-item">
+                        <router-link to="/seller/text-management" class="nav-link" active-class="active">
+                            <div class="nav-icon">
+                                <i class="bi bi-type"></i>
+                            </div>
+                            <span class="nav-text">Text Management</span>
+                            <div class="nav-indicator"></div>
+                        </router-link>
+                    </li>
+                    <li class="nav-item">
                         <router-link to="/seller/profile" class="nav-link" active-class="active">
                             <div class="nav-icon">
                                 <i class="bi bi-person"></i>

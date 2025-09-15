@@ -209,6 +209,7 @@
 
 <script>
 import axios from '@/axios';
+import cartService from '@/services/cartService';
 
 export default {
   name: 'CategoryProducts',
@@ -331,36 +332,15 @@ export default {
       this.$router.push(`/category/${categoryId}`);
     },
     
-    addToCart(product) {
-      this.isAddingToCart = true;
-      
+    async addToCart(product) {
       try {
-        // Get existing cart from localStorage
-        let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        this.isAddingToCart = true;
         
-        // Check if product already exists in cart
-        const existingItem = cart.find(item => item.id === product.id);
+        // Add product to cart using cart service
+        cartService.addToCart(product, 1);
         
-        if (existingItem) {
-          existingItem.quantity += 1;
-        } else {
-          cart.push({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            image: product.images && product.images.length > 0 ? product.images[0] : null,
-            quantity: 1,
-            store: product.store
-          });
-        }
-        
-        // Save updated cart to localStorage
-        localStorage.setItem('cart', JSON.stringify(cart));
-        
-        this.showToastMessage(`${product.name} added to cart successfully!`);
-        
-        // Emit cart update event
-        this.$emit('cart-updated');
+        // Small delay to show loading state
+        await new Promise(resolve => setTimeout(resolve, 500));
         
       } catch (error) {
         console.error('Error adding to cart:', error);

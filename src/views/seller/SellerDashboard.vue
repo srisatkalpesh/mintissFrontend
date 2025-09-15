@@ -186,6 +186,15 @@
                       <span class="action-desc">Manage orders</span>
                     </div>
                   </router-link>
+                  <router-link to="/seller/text-management" class="quick-action">
+                    <div class="action-icon">
+                      <i class="bi bi-type"></i>
+                    </div>
+                    <div class="action-content">
+                      <span class="action-title">Text Management</span>
+                      <span class="action-desc">Configure text pricing</span>
+                    </div>
+                  </router-link>
                   <router-link to="/seller/profile" class="quick-action">
                     <div class="action-icon">
                       <i class="bi bi-person-gear"></i>

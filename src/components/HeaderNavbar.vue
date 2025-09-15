@@ -68,6 +68,7 @@
 import axios from "@/axios";
 import toastService from "@/services/toastService";
 import eventBus from "@/eventBus";
+import cartService from "@/services/cartService";
 
 export default {
   name: "HeaderNavbar",
@@ -124,11 +125,11 @@ export default {
     };
     eventBus.on('balance-updated', this._balanceUpdatedHandler);
     
-    // Listen for cart updates
+    // Listen for cart updates from cart service
     this._cartUpdatedHandler = () => {
       this.updateCartCount();
     };
-    eventBus.on('cart-updated', this._cartUpdatedHandler);
+    cartService.onCartUpdated(this._cartUpdatedHandler);
   },
   beforeUnmount() {
     // Clear the interval to prevent memory leaks when the component is destroyed
@@ -137,7 +138,7 @@ export default {
       eventBus.off('balance-updated', this._balanceUpdatedHandler);
     }
     if (this._cartUpdatedHandler) {
-      eventBus.off('cart-updated', this._cartUpdatedHandler);
+      cartService.offCartUpdated(this._cartUpdatedHandler);
     }
   },
   methods: {
@@ -221,8 +222,7 @@ export default {
     
     updateCartCount() {
       try {
-        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        this.cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
+        this.cartItemCount = cartService.getCartCount();
       } catch (error) {
         console.error('Error updating cart count:', error);
         this.cartItemCount = 0;

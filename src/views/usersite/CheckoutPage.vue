@@ -30,6 +30,54 @@
               <h5 v-else class="text-success fw-bold">Price: N/A</h5>
             </div>
           </div>
+
+          <!-- Text Customization Section -->
+          <div class="text-customization-section">
+            <h5 class="fw-bold mb-3" style="color: #1177bf;">
+              <i class="bi bi-type me-2"></i>Text Customization
+            </h5>
+            <div class="card text-customization-card">
+              <div class="card-body">
+                <div class="mb-3">
+                  <label for="customText" class="form-label fw-bold">
+                    <i class="bi bi-pencil me-1"></i>Custom Text
+                  </label>
+                  <textarea
+                    id="customText"
+                    v-model="customText"
+                    class="form-control"
+                    rows="3"
+                    placeholder="Enter your custom text here..."
+                    @input="calculateTextPricing"
+                  ></textarea>
+                  <small class="text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Add personalized text to your product
+                  </small>
+                </div>
+                
+                <div v-if="textSettings" class="text-pricing-info">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-bold">Text Percentage:</span>
+                    <span class="text-primary fw-bold">{{ textSettings.percentage }}%</span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-bold">Include in Price:</span>
+                    <span :class="textSettings.include_in_price ? 'text-success' : 'text-muted'">
+                      <i :class="textSettings.include_in_price ? 'bi bi-check-circle-fill' : 'bi bi-x-circle-fill'"></i>
+                      {{ textSettings.include_in_price ? 'Yes' : 'No' }}
+                    </span>
+                  </div>
+                  <div v-if="customText && textSettings.include_in_price" class="text-pricing-breakdown">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="fw-bold">Text Addition:</span>
+                      <span class="text-warning fw-bold">+₹{{ textAddition.toFixed(2) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="col-md-6">
@@ -51,6 +99,14 @@
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <span class="fw-bold">Product Price:</span>
                 <span class="text-primary fw-bold">₹{{ product.price || 0 }}</span>
+              </div>
+              <div v-if="customText && textSettings && textSettings.include_in_price" class="d-flex justify-content-between align-items-center mb-3">
+                <span class="fw-bold">Text Addition ({{ textSettings.percentage }}%):</span>
+                <span class="text-warning fw-bold">+₹{{ textAddition.toFixed(2) }}</span>
+              </div>
+              <div v-if="customText && textSettings && textSettings.include_in_price" class="d-flex justify-content-between align-items-center mb-3">
+                <span class="fw-bold">Subtotal:</span>
+                <span class="text-info fw-bold">₹{{ (product.price + textAddition).toFixed(2) }}</span>
               </div>
               <div class="mb-3">
                 <label for="redeemAmount" class="form-label fw-bold">Redeem Amount (₹)</label>
@@ -175,9 +231,13 @@ export default {
       referralApplied: false, // Whether referral has been applied
       hasUsedReferral: false, // Whether user has already used a referral
       referralBonus: 0, // Referral bonus amount
+      // Text customization
+      customText: '',
+      textSettings: null,
+      textAddition: 0,
     };
   },
-  async mounted() {
+    async mounted() {
     this.parseProductData();
     if (this.isLoggedIn) {
       // Try to fetch user balance from API first
@@ -186,6 +246,8 @@ export default {
       await this.fetchMintissValue();
       // Check referral status
       await this.checkReferralStatus();
+      // Fetch text settings for the seller
+      await this.fetchTextSettings();
     } else {
       // Demo balance for testing when not logged in
       this.userBalance = 1000; // Demo balance of ₹1000
@@ -288,12 +350,45 @@ export default {
     },
     calculateFinalPrice() {
       if (this.product && this.product.price) {
+        // Calculate base price with text addition
+        const basePrice = this.product.price + this.textAddition;
         // Apply referral bonus to final price calculation
-        const priceAfterRedeem = Math.max(0, this.product.price - this.redeemAmount);
+        const priceAfterRedeem = Math.max(0, basePrice - this.redeemAmount);
         this.finalPrice = Math.max(0, priceAfterRedeem - this.referralBonus);
       } else {
         this.finalPrice = 0;
       }
+    },
+
+    async fetchTextSettings() {
+      try {
+        if (this.product && this.product.store_id) {
+          // For now, we'll use a mock response since we need to get seller's text settings
+          // In a real implementation, you'd call an API to get the seller's text settings
+          const response = await axios.get(`/seller/text-settings`);
+          if (response.data.status) {
+            this.textSettings = response.data.data;
+            this.calculateTextPricing();
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching text settings:', error);
+        // Set default text settings if API fails
+        this.textSettings = {
+          percentage: 10,
+          include_in_price: true
+        };
+      }
+    },
+
+    calculateTextPricing() {
+      if (this.customText && this.textSettings && this.textSettings.include_in_price) {
+        const percentage = parseFloat(this.textSettings.percentage) || 0;
+        this.textAddition = (this.product.price * percentage) / 100;
+      } else {
+        this.textAddition = 0;
+      }
+      this.calculateFinalPrice();
     },
 
     async checkReferralStatus() {
@@ -374,7 +469,13 @@ export default {
         redeemAmount: this.redeemAmount,
         finalPrice: this.finalPrice,
         userBalance: this.userBalance,
-        mintissValue: this.mintissValue
+        mintissValue: this.mintissValue,
+        // Text customization data
+        customText: this.customText,
+        textSettings: this.textSettings,
+        textAddition: this.textAddition,
+        basePrice: this.product.price,
+        subtotal: this.product.price + this.textAddition
       };
       
       // Call checkout API
@@ -586,5 +687,50 @@ export default {
   border-radius: 1rem;
   background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
   border-left: 4px solid #28a745;
+}
+
+/* Text Customization Styles */
+.text-customization-section {
+  margin-top: 2rem;
+}
+
+.text-customization-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 1px solid #dee2e6;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.text-customization-card .card-body {
+  padding: 1.5rem;
+}
+
+.text-pricing-info {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-top: 1rem;
+  border: 1px solid #e9ecef;
+}
+
+.text-pricing-breakdown {
+  border-top: 1px solid #dee2e6;
+  padding-top: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.form-control:focus {
+  border-color: #1177bf;
+  box-shadow: 0 0 0 0.2rem rgba(17, 119, 191, 0.25);
+}
+
+@media (max-width: 768px) {
+  .text-customization-card .card-body {
+    padding: 1rem;
+  }
+  
+  .text-pricing-info {
+    padding: 0.75rem;
+  }
 }
 </style>

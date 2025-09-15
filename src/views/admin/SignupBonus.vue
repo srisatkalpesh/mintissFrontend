@@ -80,6 +80,8 @@
 
 <script>
 import axios from '@/axios';
+import loaderService from '@/services/loaderService';
+import toastService from '@/services/toastService';
 
 export default {
   name: 'SignupBonus',
@@ -100,32 +102,36 @@ export default {
   },
   methods: {
     async fetchValue() {
-      this.isLoading = true;
       try {
-        const response = await axios.get(`/admin/signup-bonus`);
+        const response = await loaderService.withLoader(
+          () => axios.get(`/admin/signup-bonus`),
+          'Loading signup bonus...'
+        );
         this.signupBonus = response.data.data;
       } catch (error) {
         console.error('Error fetching signup bonus:', error);
-        // Add error handling/notification here
-      } finally {
-        this.isLoading = false;
+        toastService.error('Failed to fetch signup bonus');
       }
     },
     async handleSubmit() {
-      this.isSubmitting = true;
       try {
         if (this.isEditing) {
-          await axios.put(`/admin/signup-bonus`, this.formData);
+          await loaderService.withLoader(
+            () => axios.put(`/admin/signup-bonus`, this.formData),
+            'Updating signup bonus...'
+          );
         } else {
-          await axios.post(`/admin/signup-bonus`, this.formData);
+          await loaderService.withLoader(
+            () => axios.post(`/admin/signup-bonus`, this.formData),
+            'Creating signup bonus...'
+          );
         }
+        toastService.success('Signup bonus saved successfully');
         this.resetForm();
         this.fetchValue();
       } catch (error) {
         console.error('Error saving signup bonus:', error);
-        // Add error handling/notification here
-      } finally {
-        this.isSubmitting = false;
+        toastService.error('Failed to save signup bonus');
       }
     },
     resetForm() {

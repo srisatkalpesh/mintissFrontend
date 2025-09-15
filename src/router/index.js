@@ -35,6 +35,12 @@ const routes = [
     name: 'OrderComplete',
     component: () => import("../views/usersite/OrderComplete.vue"),
   },
+  {
+    path: '/invoice/:orderId',
+    name: 'InvoiceView',
+    component: () => import("../views/usersite/InvoiceView.vue"),
+    meta: { requiresAuth: true }
+  },
   // Remove or comment out the old home route if present
   {
     path: "/mintiss",
@@ -218,6 +224,11 @@ const routes = [
         path: "orders/:id",
         name: "SellerOrderDetails",
         component: () => import("../views/seller/SellerOrderDetails.vue")
+      },
+      {
+        path: "text-management",
+        name: "SellerTextManagement",
+        component: () => import("../views/seller/TextManagement.vue")
       }
 
     ]

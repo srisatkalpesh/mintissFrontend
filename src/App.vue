@@ -5,18 +5,21 @@
       <router-view :search-query="searchQuery" />
     </keep-alive>
     <AppFooter v-if="!isAdminRoute && !isSellerRoute && !isComingSoonRoute" />
+    <GlobalLoader />
   </div>
 </template>
 
 <script>
 import HeaderNavbar from "@/components/HeaderNavbar.vue";
 import AppFooter from './components/Footer.vue'
+import GlobalLoader from '@/components/GlobalLoader.vue'
 
 export default {
   name: "App",
   components: {
     HeaderNavbar,
     AppFooter,
+    GlobalLoader,
   },
   data() {
     return {

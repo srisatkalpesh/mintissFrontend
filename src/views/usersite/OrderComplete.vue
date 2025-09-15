@@ -66,6 +66,13 @@
                 Continue Shopping
               </button>
               <button 
+                @click="viewInvoice" 
+                class="btn btn-success"
+              >
+                <i class="bi bi-receipt me-2"></i>
+                View Invoice
+              </button>
+              <button 
                 @click="viewOrders" 
                 class="btn btn-outline-secondary"
               >
@@ -133,6 +140,10 @@ export default {
     viewOrders() {
       // Navigate to orders page if it exists, otherwise go to profile
       this.$router.push('/profile');
+    },
+    viewInvoice() {
+      // Navigate to invoice page
+      this.$router.push(`/invoice/${this.orderId}`);
     }
   }
 };

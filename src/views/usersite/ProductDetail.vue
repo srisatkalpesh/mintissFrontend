@@ -317,6 +317,7 @@
 
 <script>
 import axios from '@/axios';
+import cartService from '@/services/cartService';
 
 export default {
   name: 'ProductDetail',
@@ -367,49 +368,23 @@ export default {
         this.loading = false;
       }
     },
-    addToCart() {
+    async addToCart() {
       if (!this.product) return;
       
-      this.isAddingToCart = true;
-      
       try {
-        // Get existing cart from localStorage
-        const existingCart = JSON.parse(localStorage.getItem('cart') || '[]');
+        this.isAddingToCart = true;
         
-        // Check if product already exists in cart
-        const existingItemIndex = existingCart.findIndex(item => item.id === this.product.id);
+        // Add product to cart using cart service
+        cartService.addToCart(this.product, this.quantity);
         
-        if (existingItemIndex > -1) {
-          // Update quantity if item already exists
-          existingCart[existingItemIndex].quantity += this.quantity;
-        } else {
-          // Add new item to cart
-          const cartItem = {
-            id: this.product.id,
-            name: this.product.name,
-            description: this.product.description,
-            price: this.product.price,
-            image: this.product.images && this.product.images.length > 0 ? this.product.images[0] : null,
-            quantity: this.quantity,
-            mintiss: this.product.mintiss,
-            mintissPoints: this.calculateMintissPoints(this.product.mintiss),
-            store: this.product.store
-          };
-          existingCart.push(cartItem);
-        }
+        // Reset quantity to 1
+        this.quantity = 1;
         
-        // Save updated cart to localStorage
-        localStorage.setItem('cart', JSON.stringify(existingCart));
-        
-        // Show success message
-        this.showToast('Product added to cart successfully!', 'success');
-        
-        // Emit cart update event
-        this.$emit('cart-updated');
+        // Small delay to show loading state
+        await new Promise(resolve => setTimeout(resolve, 500));
         
       } catch (error) {
         console.error('Error adding to cart:', error);
-        this.showToast('Failed to add product to cart', 'error');
       } finally {
         this.isAddingToCart = false;
       }
@@ -523,40 +498,8 @@ export default {
     
     addRelatedToCart(product) {
       try {
-        // Get existing cart from localStorage
-        const existingCart = JSON.parse(localStorage.getItem('cart') || '[]');
-        
-        // Check if product already exists in cart
-        const existingItemIndex = existingCart.findIndex(item => item.id === product.id);
-        
-        if (existingItemIndex > -1) {
-          // Update quantity if item already exists
-          existingCart[existingItemIndex].quantity += 1;
-        } else {
-          // Add new item to cart
-          const cartItem = {
-            id: product.id,
-            name: product.name,
-            description: product.description,
-            price: product.price,
-            image: product.images && product.images.length > 0 ? product.images[0] : null,
-            quantity: 1,
-            mintiss: product.mintiss,
-            mintissPoints: this.calculateMintissPoints(product.mintiss),
-            store: product.store
-          };
-          existingCart.push(cartItem);
-        }
-        
-        // Save updated cart to localStorage
-        localStorage.setItem('cart', JSON.stringify(existingCart));
-        
-        // Show success message
-        this.showToast('Product added to cart successfully!', 'success');
-        
-        // Emit cart update event
-        this.$emit('cart-updated');
-        
+        // Add product to cart using cart service
+        cartService.addToCart(product, 1);
       } catch (error) {
         console.error('Error adding to cart:', error);
         this.showToast('Failed to add product to cart', 'error');
