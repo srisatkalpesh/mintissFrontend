@@ -15,6 +15,27 @@ app.component("VueTelInput", VueTelInput);
 
 app.use(store).use(router).mount("#app");
 
+// Make Bootstrap Modal globally available
+window.Modal = window.bootstrap?.Modal || window.Modal;
+
+// Global error handler for Bootstrap Toast errors
+window.addEventListener('error', (event) => {
+    if (event.error && event.error.message && event.error.message.includes('classList')) {
+        console.warn('Bootstrap Toast error caught and handled:', event.error.message);
+        event.preventDefault();
+        return false;
+    }
+});
+
+// Handle unhandled promise rejections
+window.addEventListener('unhandledrejection', (event) => {
+    if (event.reason && event.reason.message && event.reason.message.includes('classList')) {
+        console.warn('Bootstrap Toast promise rejection caught and handled:', event.reason.message);
+        event.preventDefault();
+        return false;
+    }
+});
+
 if (typeof window !== 'undefined') {
   fetch('https://ipapi.co/json/')
     .then(res => res.json())

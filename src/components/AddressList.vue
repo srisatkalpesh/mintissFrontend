@@ -45,6 +45,8 @@
                                 </ul>
                             </div>
                         </div>
+                        <p v-if="address.full_name" class="card-text mb-1"><strong>{{ address.full_name }}</strong></p>
+                        <p v-if="address.mobile" class="card-text mb-1"><strong>Mobile:</strong> {{ address.mobile }}</p>
                         <p class="card-text mb-1">{{ address.address_line }}</p>
                         <p class="card-text mb-1">
                             {{ address.city }}, {{ address.state }}, {{ address.country }}

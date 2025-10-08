@@ -7,6 +7,22 @@
             <div class="card-body">
                 <form @submit.prevent="handleSubmit">
                     <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" 
+                               class="form-control" 
+                               v-model="formData.full_name" 
+                               placeholder="Enter full name"
+                               required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mobile Number</label>
+                        <input type="tel" 
+                               class="form-control" 
+                               v-model="formData.mobile" 
+                               placeholder="Enter mobile number"
+                               required>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label">Address Title</label>
                         <input type="text" 
                                class="form-control" 
@@ -93,6 +109,8 @@ export default {
     data() {
         return {
             formData: {
+                full_name: '',
+                mobile: '',
                 title: '',
                 address_line: '',
                 city: '',

@@ -103,10 +103,27 @@
                             <p class="text-muted">You don't have any orders yet. Orders will appear here once customers purchase your products.</p>
                         </div>
 
-                        <div v-else class="table-responsive">
-                            <table class="table table-hover">
+                        <div v-else>
+                            <!-- Bulk Actions Bar -->
+                            <div v-if="selectedOrders.length > 0" class="alert alert-info d-flex justify-content-between align-items-center mb-3">
+                                <span>{{ selectedOrders.length }} order(s) selected</span>
+                                <div>
+                                    <button class="btn btn-sm btn-success me-2" @click="bulkDownloadInvoices">
+                                        <i class="bi bi-download"></i> Download Invoices
+                                    </button>
+                                    <button class="btn btn-sm btn-secondary" @click="clearSelection">
+                                        <i class="bi bi-x"></i> Clear Selection
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-hover">
                                 <thead>
                                     <tr>
+                                        <th>
+                                            <input type="checkbox" v-model="selectAll" @change="toggleSelectAll">
+                                        </th>
                                         <th>Order ID</th>
                                         <th>Customer</th>
                                         <th>Product</th>
@@ -119,6 +136,9 @@
                                 </thead>
                                 <tbody>
                                     <tr v-for="order in orders" :key="order.id">
+                                        <td>
+                                            <input type="checkbox" v-model="selectedOrders" :value="order.id">
+                                        </td>
                                         <td>#{{ order.id }}</td>
                                         <td>
                                             <div>
@@ -142,11 +162,23 @@
                                         <td>{{ formatDate(order.created_at) }}</td>
                                         <td>
                                             <div class="btn-group" role="group">
-                                                <button class="btn btn-sm btn-outline-primary" @click="viewOrder(order)">
+                                                <button class="btn btn-sm btn-outline-primary" @click="viewOrder(order)" title="View Details">
                                                     <i class="bi bi-eye"></i>
                                                 </button>
+                                                <button 
+                                                    class="btn btn-sm btn-outline-success" 
+                                                    @click="downloadInvoice(order)" 
+                                                    :disabled="downloadingInvoices.has(order.id)"
+                                                    title="Download Invoice"
+                                                >
+                                                    <i v-if="downloadingInvoices.has(order.id)" class="bi bi-hourglass-split"></i>
+                                                    <i v-else class="bi bi-download"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-info" @click="viewInvoice(order)" title="View Invoice">
+                                                    <i class="bi bi-file-text"></i>
+                                                </button>
                                                 <div class="dropdown">
-                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" title="More Actions">
                                                         <i class="bi bi-gear"></i>
                                                     </button>
                                                     <ul class="dropdown-menu">
@@ -162,6 +194,7 @@
                                     </tr>
                                 </tbody>
                             </table>
+                            </div>
                         </div>
 
                         <!-- Pagination -->
@@ -249,7 +282,10 @@ export default {
                 date_from: '',
                 date_to: ''
             },
-            availableStatuses: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled']
+            availableStatuses: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'],
+            downloadingInvoices: new Set(), // Track which invoices are being downloaded
+            selectedOrders: [], // Track selected orders for bulk actions
+            selectAll: false // Track select all checkbox
         };
     },
     computed: {
@@ -280,6 +316,12 @@ export default {
             }
 
             return rangeWithDots;
+        }
+    },
+    watch: {
+        selectedOrders(newVal) {
+            // Update selectAll checkbox based on individual selections
+            this.selectAll = newVal.length === this.orders.length && this.orders.length > 0;
         }
     },
     mounted() {
@@ -420,6 +462,109 @@ export default {
                 hour: '2-digit',
                 minute: '2-digit'
             });
+        },
+        async downloadInvoice(order) {
+            // Add to downloading set
+            this.downloadingInvoices.add(order.id);
+            
+            try {
+                // First, generate the invoice if it doesn't exist
+                const generateResponse = await axios.post(`/api/seller/orders/${order.id}/invoice/generate`);
+                
+                if (generateResponse.data && generateResponse.data.status) {
+                    // Download the invoice PDF
+                    const downloadResponse = await axios.get(`/api/seller/orders/${order.id}/invoice/download`, {
+                        responseType: 'blob'
+                    });
+                    
+                    // Create a blob URL and trigger download
+                    const blob = new Blob([downloadResponse.data], { type: 'application/pdf' });
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `invoice_${order.id}.pdf`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                    
+                    if (this.$toast) {
+                        this.$toast.success('Invoice downloaded successfully');
+                    }
+                } else {
+                    throw new Error(generateResponse.data?.message || 'Failed to generate invoice');
+                }
+            } catch (error) {
+                console.error('Error downloading invoice:', error);
+                let errorMessage = 'Failed to download invoice';
+                if (error.response) {
+                    if (error.response.status === 404) {
+                        errorMessage = 'Invoice not found for this order';
+                    } else if (error.response.data && error.response.data.message) {
+                        errorMessage = error.response.data.message;
+                    }
+                }
+                
+                if (this.$toast) {
+                    this.$toast.error(errorMessage);
+                } else {
+                    alert(errorMessage);
+                }
+            } finally {
+                // Remove from downloading set
+                this.downloadingInvoices.delete(order.id);
+            }
+        },
+        async viewInvoice(order) {
+            try {
+                // Navigate to the invoice view page
+                this.$router.push(`/seller/orders/${order.id}/invoice`);
+            } catch (error) {
+                console.error('Error navigating to invoice:', error);
+                if (this.$toast) {
+                    this.$toast.error('Failed to open invoice');
+                } else {
+                    alert('Failed to open invoice');
+                }
+            }
+        },
+        toggleSelectAll() {
+            if (this.selectAll) {
+                this.selectedOrders = this.orders.map(order => order.id);
+            } else {
+                this.selectedOrders = [];
+            }
+        },
+        clearSelection() {
+            this.selectedOrders = [];
+            this.selectAll = false;
+        },
+        async bulkDownloadInvoices() {
+            if (this.selectedOrders.length === 0) return;
+            
+            try {
+                // Download invoices one by one
+                for (const orderId of this.selectedOrders) {
+                    const order = this.orders.find(o => o.id === orderId);
+                    if (order) {
+                        await this.downloadInvoice(order);
+                        // Add a small delay between downloads
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+                }
+                
+                if (this.$toast) {
+                    this.$toast.success(`Downloaded ${this.selectedOrders.length} invoice(s)`);
+                }
+                
+                // Clear selection after bulk download
+                this.clearSelection();
+            } catch (error) {
+                console.error('Error in bulk download:', error);
+                if (this.$toast) {
+                    this.$toast.error('Some invoices failed to download');
+                }
+            }
         }
     }
 };
@@ -447,5 +592,52 @@ export default {
 .spinner-border {
     width: 3rem;
     height: 3rem;
+}
+
+/* Invoice button styles */
+.btn-outline-success:hover {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+}
+
+.btn-outline-info:hover {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    color: white;
+}
+
+/* Responsive button group */
+@media (max-width: 768px) {
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .btn-group .btn {
+        margin-bottom: 2px;
+        margin-right: 0;
+    }
+}
+
+/* Bulk actions styling */
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+.alert-info .btn {
+    font-size: 0.875rem;
+}
+
+/* Checkbox styling */
+input[type="checkbox"] {
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
+/* Table row selection */
+tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
 }
 </style>

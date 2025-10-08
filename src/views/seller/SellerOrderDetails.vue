@@ -139,10 +139,25 @@
               </div>
               <div class="card-body">
                 <div class="shipping-address">
-                  <p><strong>{{ order.address_full_name }}</strong></p>
-                  <p>{{ order.address_line1 }}</p>
-                  <p v-if="order.address_line2">{{ order.address_line2 }}</p>
-                  <p>{{ order.address_city }}, {{ order.address_postal_code }}</p>
+                  <!-- Address from relationship (newer orders) -->
+                  <div v-if="order.address">
+                    <p v-if="order.address.full_name"><strong>{{ order.address.full_name }}</strong></p>
+                    <p v-if="order.address.mobile"><strong>Mobile:</strong> {{ order.address.mobile }}</p>
+                    <p v-if="order.address.address_line">{{ order.address.address_line }}</p>
+                    <p v-if="order.address.landmark">{{ order.address.landmark }}</p>
+                    <p v-if="order.address.city || order.address.postal_code">
+                      {{ order.address.city }}{{ order.address.city && order.address.postal_code ? ', ' : '' }}{{ order.address.postal_code }}
+                    </p>
+                    <p v-if="order.address.state">{{ order.address.state }}</p>
+                    <p v-if="order.address.country">{{ order.address.country }}</p>
+                  </div>
+                  <div v-else class="text-muted">
+                    <div class="alert alert-warning mb-0">
+                      <i class="bi bi-exclamation-triangle me-2"></i>
+                      <strong>No shipping address provided</strong><br>
+                      <small>This order was created without shipping address information. Please contact the customer for delivery details.</small>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -304,6 +319,8 @@ export default {
       newStatus: '',
       updating: false
     };
+  },
+  computed: {
   },
   async mounted() {
     await this.fetchOrderDetails();

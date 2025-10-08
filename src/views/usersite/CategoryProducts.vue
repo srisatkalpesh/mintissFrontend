@@ -116,8 +116,7 @@
                   <span v-if="product.canceled_price" class="original-price">₹{{ product.canceled_price }}</span>
                 </div>
                 <div v-if="product.mintiss" class="mintiss-reward">
-                  <i class="bi bi-gem me-1" style="color: #007aff;"></i>
-                  <span style="color: #007aff;">{{ product.mintiss }} Mintiss</span>
+                  <span style="color: #1177bf;">{{ product.mintiss }} Mintiss</span>
                 </div>
                 <div v-if="product.store" class="store-info">
                   <i class="bi bi-shop me-1" style="color: #666;"></i>

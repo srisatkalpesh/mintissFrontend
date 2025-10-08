@@ -118,7 +118,9 @@ export default {
         const token = localStorage.getItem('token');
         const id = this.$route.params.id;
         const res = await axios.get(`/products/${id}`, { headers: { Authorization: `Bearer ${token}` } });
-        const p = res.data.data || res.data;
+        console.log('Product API Response:', res.data); // Debug log
+        const p = res.data.product || res.data.data || res.data;
+        console.log('Product Data:', p); // Debug log
         this.form = {
           name: p.name,
           description: p.description,
@@ -133,7 +135,9 @@ export default {
         this.previewImages = [];
         this.loaded = true;
       } catch (e) {
+        console.error('Error fetching product:', e); // Debug log
         this.error = 'Failed to load product.';
+        this.loaded = true; // Set loaded to true even on error to show the form
       }
     },
     handleImageChange(e) {

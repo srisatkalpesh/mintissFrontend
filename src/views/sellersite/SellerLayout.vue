@@ -1,12 +1,12 @@
 <template>
-    <div class="seller-layout">
+    <div class="modern-seller-layout">
         <!-- Mobile Toggle Button -->
-        <button class="btn btn-primary d-md-none sidebar-toggle" @click="toggleSidebar">
+        <button class="mobile-toggle-btn" @click="toggleSidebar">
             <i class="bi bi-list"></i>
         </button>
 
         <!-- Sidebar -->
-        <div class="sidebar" :class="{ 'show': isSidebarOpen }">
+        <div class="modern-sidebar" :class="{ 'show': isSidebarOpen }">
             <div class="sidebar-header">
                 <div class="brand-section">
                     <div class="brand-logo">
@@ -17,7 +17,7 @@
                         <p class="brand-subtitle">Manage Your Store</p>
                     </div>
                 </div>
-                <button class="btn btn-close d-md-none" @click="toggleSidebar">
+                <button class="close-btn d-md-none" @click="toggleSidebar">
                     <i class="bi bi-x"></i>
                 </button>
             </div>
@@ -48,15 +48,6 @@
                                 <i class="bi bi-cart-check"></i>
                             </div>
                             <span class="nav-text">Orders</span>
-                            <div class="nav-indicator"></div>
-                        </router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link to="/seller/text-management" class="nav-link" active-class="active">
-                            <div class="nav-icon">
-                                <i class="bi bi-type"></i>
-                            </div>
-                            <span class="nav-text">Text Management</span>
                             <div class="nav-indicator"></div>
                         </router-link>
                     </li>
@@ -173,25 +164,54 @@ export default {
 </script>
 
 <style scoped>
-.seller-layout {
+/* Modern Seller Layout */
+.modern-seller-layout {
     display: flex;
     min-height: 100vh;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    position: relative;
+}
+
+/* Mobile Toggle Button */
+.mobile-toggle-btn {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1001;
+    background: linear-gradient(135deg, #1177bf 0%, #0d5a9a 100%);
+    border: none;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(17, 119, 191, 0.3);
+    transition: all 0.3s ease;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.mobile-toggle-btn:hover {
+    background: linear-gradient(135deg, #0d5a9a 0%, #1177bf 100%);
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(17, 119, 191, 0.4);
 }
 
 /* Sidebar Styles */
-.sidebar {
+.modern-sidebar {
     width: 280px;
     min-height: 100vh;
     position: fixed;
     top: 0;
     left: 0;
     z-index: 1000;
-    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    background: linear-gradient(180deg, #1177bf 0%, #0d5a9a 100%);
     box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
+    backdrop-filter: blur(10px);
 }
 
 .sidebar-header {
@@ -211,14 +231,16 @@ export default {
 .brand-logo {
     width: 50px;
     height: 50px;
-    background: linear-gradient(135deg, #007aff 0%, #0056b3 100%);
+    background: rgba(255, 255, 255, 0.2);
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
     color: white;
-    box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .brand-info {
@@ -289,10 +311,11 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, #007aff 0%, #0056b3 100%);
+    background: rgba(255, 255, 255, 0.2);
     opacity: 0;
     transition: opacity 0.3s ease;
     border-radius: 12px;
+    backdrop-filter: blur(10px);
 }
 
 .nav-link:hover::before,
@@ -304,7 +327,7 @@ export default {
 .nav-link.active {
     color: white;
     transform: translateX(4px);
-    box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
 }
 
 .nav-icon {
@@ -329,7 +352,7 @@ export default {
 .nav-indicator {
     width: 4px;
     height: 20px;
-    background: #007aff;
+    background: rgba(255, 255, 255, 0.8);
     border-radius: 2px;
     margin-left: auto;
     opacity: 0;
@@ -362,13 +385,15 @@ export default {
 .user-avatar {
     width: 40px;
     height: 40px;
-    background: linear-gradient(135deg, #007aff 0%, #0056b3 100%);
+    background: rgba(255, 255, 255, 0.2);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-size: 1.25rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .user-details {
@@ -402,13 +427,15 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+    backdrop-filter: blur(10px);
 }
 
 .btn-logout:hover {
-    background: #dc3545;
-    color: white;
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.2);
+    border-color: rgba(220, 53, 69, 0.5);
 }
 
 /* Main Content */
@@ -500,13 +527,17 @@ export default {
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
-    .sidebar {
+    .mobile-toggle-btn {
+        display: flex;
+    }
+
+    .modern-sidebar {
         transform: translateX(-100%);
         width: 100%;
         max-width: 300px;
     }
 
-    .sidebar.show {
+    .modern-sidebar.show {
         transform: translateX(0);
     }
 
@@ -570,7 +601,7 @@ export default {
 }
 
 @media (max-width: 480px) {
-    .sidebar {
+    .modern-sidebar {
         width: 100%;
     }
 

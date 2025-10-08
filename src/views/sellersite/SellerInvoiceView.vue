@@ -1,5 +1,5 @@
 <template>
-  <div class="invoice-view">
+  <div class="seller-invoice-view">
     <div class="invoice-container">
       <!-- Modern Invoice Header -->
       <div class="invoice-header">
@@ -36,7 +36,8 @@
       <div v-else-if="invoiceData" class="invoice-content">
         <!-- Invoice Title -->
         <div class="invoice-title">
-          <h1>INVOICE</h1>
+          <h1>SELLER INVOICE</h1>
+          <p class="invoice-subtitle">GST Invoice for Business</p>
         </div>
 
         <!-- Invoice Details and Customer Info -->
@@ -50,29 +51,34 @@
               <span class="label">Invoice No:</span>
               <span class="value">{{ invoiceData.invoice_number }}</span>
             </div>
+            <div class="detail-row">
+              <span class="label">Order ID:</span>
+              <span class="value">#{{ invoiceData.order.id }}</span>
+            </div>
           </div>
           <div class="customer-info">
-            <div class="customer-name">{{ invoiceData.order.address_full_name }}</div>
+            <div class="customer-name">{{ invoiceData.order.user.name }}</div>
             <div class="customer-address">
-              <div>{{ invoiceData.order.address_line1 }}</div>
-              <div v-if="invoiceData.order.address_line2">{{ invoiceData.order.address_line2 }}</div>
-              <div>{{ invoiceData.order.address_city }}, {{ invoiceData.order.address_postal_code }}</div>
+              <div>{{ invoiceData.order.address.address_line }}</div>
+              <div v-if="invoiceData.order.address.landmark">{{ invoiceData.order.address.landmark }}</div>
+              <div>{{ invoiceData.order.address.city }}, {{ invoiceData.order.address.state }} {{ invoiceData.order.address.postal_code }}</div>
+              <div>Phone: {{ invoiceData.order.address.mobile }}</div>
             </div>
           </div>
         </div>
 
         <!-- GST Information -->
-        <div class="gst-info-section" v-if="invoiceData.seller_gst_number || invoiceData.gst_breakdown">
+        <div class="gst-info-section">
           <h3>GST Information</h3>
           <div class="gst-details-grid">
             <div class="seller-gst-info">
-              <h4>Seller GST Details</h4>
+              <h4>Your GST Details</h4>
               <p><strong>GST Number:</strong> {{ invoiceData.seller_gst_number || 'Not Available' }}</p>
-              <p><strong>Business Name:</strong> {{ invoiceData.seller_store_name || 'Mintiss' }}</p>
-              <p><strong>Address:</strong> {{ invoiceData.seller_address || 'Mangal Murti Apartment, Katargam Surat, Gujarat 395004' }}</p>
+              <p><strong>Business Name:</strong> {{ invoiceData.seller_store_name }}</p>
+              <p><strong>Address:</strong> {{ invoiceData.seller_address }}</p>
             </div>
             <div class="customer-gst-info">
-              <h4>Your Details</h4>
+              <h4>Customer Details</h4>
               <p><strong>Name:</strong> {{ invoiceData.order.user.name }}</p>
               <p><strong>Email:</strong> {{ invoiceData.order.user.email }}</p>
               <p><strong>State:</strong> {{ invoiceData.order.address.state }}</p>
@@ -109,14 +115,6 @@
                 <td>1</td>
                 <td>₹{{ formatCurrency(invoiceData.order.text_addition) }}</td>
                 <td>₹{{ formatCurrency(invoiceData.order.text_addition) }}</td>
-              </tr>
-              <tr v-if="invoiceData.order.redeem_amount > 0">
-                <td>{{ invoiceData.order.custom_text ? '3' : '2' }}</td>
-                <td>Points Redeemed</td>
-                <td>-</td>
-                <td>1</td>
-                <td>-₹{{ formatCurrency(invoiceData.order.redeem_amount) }}</td>
-                <td>-₹{{ formatCurrency(invoiceData.order.redeem_amount) }}</td>
               </tr>
             </tbody>
             <tfoot>
@@ -174,17 +172,19 @@
           </div>
         </div>
 
-        <!-- Notes and Signature -->
-        <div class="notes-signature">
+        <!-- Business Notes -->
+        <div class="business-notes">
           <div class="notes-section">
-            <div class="note-title">Note:</div>
+            <div class="note-title">Business Notes:</div>
             <div class="note-content">
-              Thank you for your business!
+              <p>• This is a GST compliant invoice</p>
+              <p>• All taxes are as per applicable GST rates</p>
+              <p>• Payment terms: As per order agreement</p>
             </div>
           </div>
           <div class="signature-section">
-            <div class="signature">Mintiss</div>
-            <div class="signature-title">Finance Manager</div>
+            <div class="signature">{{ invoiceData.seller_store_name }}</div>
+            <div class="signature-title">Authorized Signatory</div>
           </div>
         </div>
       </div>
@@ -198,7 +198,7 @@ import loaderService from '@/services/loaderService';
 import toastService from '@/services/toastService';
 
 export default {
-  name: 'InvoiceView',
+  name: 'SellerInvoiceView',
   data() {
     return {
       orderId: null,
@@ -219,8 +219,8 @@ export default {
         this.error = null;
         
         const response = await loaderService.withLoader(
-          () => axios.get(`/user/orders/${this.orderId}/invoice`),
-          'Loading invoice...'
+          () => axios.get(`/seller/orders/${this.orderId}/invoice`),
+          'Loading seller invoice...'
         );
         
         if (response.data.status) {
@@ -229,7 +229,7 @@ export default {
           this.error = response.data.message || 'Failed to load invoice';
         }
       } catch (error) {
-        console.error('Error loading invoice:', error);
+        console.error('Error loading seller invoice:', error);
         this.error = 'Failed to load invoice. Please try again.';
       } finally {
         this.loading = false;
@@ -240,7 +240,7 @@ export default {
       try {
         this.downloading = true;
         
-        const response = await axios.get(`/user/orders/${this.orderId}/invoice/download`, {
+        const response = await axios.get(`/seller/orders/${this.orderId}/invoice/download`, {
           responseType: 'blob'
         });
         
@@ -248,16 +248,16 @@ export default {
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', `invoice_${this.invoiceData.invoice_number}.pdf`);
+        link.setAttribute('download', `seller_invoice_${this.invoiceData.invoice_number}.pdf`);
         document.body.appendChild(link);
         link.click();
         link.remove();
         window.URL.revokeObjectURL(url);
         
-        toastService.success('Invoice downloaded successfully');
+        toastService.success('Seller invoice downloaded successfully');
       } catch (error) {
-        console.error('Error downloading invoice:', error);
-        toastService.error('Failed to download invoice');
+        console.error('Error downloading seller invoice:', error);
+        toastService.error('Failed to download seller invoice');
       } finally {
         this.downloading = false;
       }
@@ -280,23 +280,6 @@ export default {
         month: 'long',
         day: 'numeric'
       });
-    },
-
-    calculateSubtotal() {
-      if (!this.invoiceData || !this.invoiceData.order) return 0;
-      
-      const order = this.invoiceData.order;
-      let subtotal = 0;
-      
-      // Add base price
-      subtotal += parseFloat(order.base_price || order.price || 0);
-      
-      // Add text addition if exists
-      if (order.text_addition) {
-        subtotal += parseFloat(order.text_addition);
-      }
-      
-      return subtotal;
     },
 
     calculateTaxableAmount() {
@@ -329,50 +312,45 @@ export default {
         total += parseFloat(this.invoiceData.gst_breakdown.totals.total_gst);
       }
       
-      // Subtract redeem amount if exists
-      if (order.redeem_amount) {
-        total -= parseFloat(order.redeem_amount);
-      }
-      
-      return Math.max(0, total);
+      return total;
     }
   }
 };
 </script>
 
 <style scoped>
-.invoice-view {
+.seller-invoice-view {
   min-height: 100vh;
   background: white;
   position: relative;
 }
 
-.invoice-view::before {
+.seller-invoice-view::before {
   content: '';
   position: fixed;
   top: 0;
   right: 0;
   width: 200px;
   height: 200px;
-  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  background: linear-gradient(135deg, #1177bf 0%, #0d5a9a 100%);
   clip-path: polygon(0 0, 100% 0, 100% 100%);
   z-index: 0;
 }
 
-.invoice-view::after {
+.seller-invoice-view::after {
   content: '';
   position: fixed;
   bottom: 0;
   left: 0;
   width: 200px;
   height: 200px;
-  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  background: linear-gradient(135deg, #0d5a9a 0%, #1177bf 100%);
   clip-path: polygon(0 0, 0 100%, 100% 100%);
   z-index: 0;
 }
 
 .invoice-container {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 2rem;
   position: relative;
@@ -408,18 +386,20 @@ export default {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  border: 1px solid #ddd;
+  border: 1px solid #1177bf;
   background: white;
-  color: #333;
+  color: #1177bf;
 }
 
 .btn-download:hover:not(:disabled) {
-  background: #f8f9fa;
+  background: #1177bf;
+  color: white;
   transform: translateY(-1px);
 }
 
 .btn-print:hover {
-  background: #f8f9fa;
+  background: #1177bf;
+  color: white;
   transform: translateY(-1px);
 }
 
@@ -444,7 +424,7 @@ export default {
   width: 50px;
   height: 50px;
   border: 5px solid #f3f3f3;
-  border-top: 5px solid #333;
+  border-top: 5px solid #1177bf;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1rem;
@@ -467,7 +447,7 @@ export default {
 }
 
 .btn-retry {
-  background: #333;
+  background: #1177bf;
   color: white;
   border: none;
   padding: 0.875rem 1.5rem;
@@ -482,7 +462,7 @@ export default {
 }
 
 .btn-retry:hover {
-  background: #555;
+  background: #0d5a9a;
   transform: translateY(-1px);
 }
 
@@ -494,15 +474,22 @@ export default {
 
 .invoice-title {
   margin-bottom: 2rem;
+  text-align: center;
 }
 
 .invoice-title h1 {
   font-size: 3rem;
   font-weight: 700;
-  color: #333;
+  color: #1177bf;
   margin: 0;
   font-family: 'Arial', sans-serif;
   letter-spacing: 2px;
+}
+
+.invoice-subtitle {
+  color: #666;
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
 }
 
 .invoice-details-section {
@@ -511,7 +498,7 @@ export default {
   align-items: flex-start;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 2px solid #1177bf;
 }
 
 .invoice-info {
@@ -529,7 +516,7 @@ export default {
 .detail-row .label {
   font-weight: 500;
   color: #666;
-  min-width: 80px;
+  min-width: 100px;
 }
 
 .detail-row .value {
@@ -556,198 +543,6 @@ export default {
 
 .customer-address div {
   margin-bottom: 0.2rem;
-}
-
-/* Items Table */
-.items-table {
-  margin: 2rem 0;
-}
-
-.items-table table {
-  width: 100%;
-  border-collapse: collapse;
-  border: 1px solid #ddd;
-}
-
-.items-table th {
-  background: #f5f5f5;
-  color: #333;
-  font-weight: 600;
-  padding: 1rem 0.5rem;
-  text-align: left;
-  border: 1px solid #ddd;
-  font-size: 0.9rem;
-}
-
-.items-table td {
-  padding: 1rem 0.5rem;
-  border: 1px solid #ddd;
-  color: #333;
-  font-size: 0.9rem;
-}
-
-.items-table tbody tr:nth-child(even) {
-  background: #f9f9f9;
-}
-
-.subtotal-row {
-  background: #f5f5f5 !important;
-  border-top: 2px solid #ddd;
-}
-
-.subtotal-label {
-  font-weight: 600;
-  color: #333;
-  text-align: right;
-  padding: 1rem 0.5rem;
-}
-
-.subtotal-amount {
-  font-weight: 600;
-  color: #333;
-  padding: 1rem 0.5rem;
-}
-
-/* Grand Total */
-.grand-total {
-  margin: 2rem 0;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.total-row {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  background: #f5f5f5;
-  padding: 1rem 1.5rem;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-}
-
-.total-label {
-  font-weight: 600;
-  color: #333;
-  font-size: 1rem;
-}
-
-.total-amount {
-  font-weight: 700;
-  color: #333;
-  font-size: 1.2rem;
-}
-
-/* Notes and Signature */
-.notes-signature {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-top: 3rem;
-  padding-top: 2rem;
-  border-top: 1px solid #eee;
-}
-
-.notes-section {
-  flex: 1;
-}
-
-.note-title {
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
-}
-
-.note-content {
-  color: #666;
-  font-size: 0.9rem;
-  line-height: 1.6;
-}
-
-.signature-section {
-  text-align: right;
-}
-
-.signature {
-  font-family: 'Brush Script MT', cursive;
-  font-size: 1.5rem;
-  color: #333;
-  margin-bottom: 0.5rem;
-  font-weight: 400;
-}
-
-.signature-title {
-  color: #666;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .invoice-container {
-    padding: 1rem;
-    margin: 1rem;
-  }
-  
-  .invoice-title h1 {
-    font-size: 2rem;
-  }
-  
-  .invoice-details-section {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .customer-info {
-    text-align: left;
-  }
-  
-  .items-table {
-    overflow-x: auto;
-  }
-  
-  .items-table table {
-    min-width: 500px;
-  }
-  
-  .notes-signature {
-    flex-direction: column;
-    gap: 2rem;
-    align-items: flex-start;
-  }
-  
-  .signature-section {
-    text-align: left;
-  }
-  
-  .header-actions {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
-  .btn-download,
-  .btn-print {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .invoice-title h1 {
-    font-size: 1.5rem;
-  }
-  
-  .items-table th,
-  .items-table td {
-    padding: 0.5rem 0.25rem;
-    font-size: 0.8rem;
-  }
-  
-  .total-row {
-    flex-direction: column;
-    gap: 0.5rem;
-    text-align: center;
-  }
 }
 
 /* GST Information Section */
@@ -785,7 +580,57 @@ export default {
   color: #666;
 }
 
-/* GST Breakdown Section */
+/* Items Table */
+.items-table {
+  margin: 2rem 0;
+}
+
+.items-table table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ddd;
+}
+
+.items-table th {
+  background: #1177bf;
+  color: white;
+  font-weight: 600;
+  padding: 1rem 0.5rem;
+  text-align: left;
+  border: 1px solid #ddd;
+  font-size: 0.9rem;
+}
+
+.items-table td {
+  padding: 1rem 0.5rem;
+  border: 1px solid #ddd;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.items-table tbody tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+.subtotal-row {
+  background: #f5f5f5 !important;
+  border-top: 2px solid #1177bf;
+}
+
+.subtotal-label {
+  font-weight: 600;
+  color: #333;
+  text-align: right;
+  padding: 1rem 0.5rem;
+}
+
+.subtotal-amount {
+  font-weight: 600;
+  color: #333;
+  padding: 1rem 0.5rem;
+}
+
+/* GST Breakdown */
 .gst-breakdown-section {
   margin: 2rem 0;
 }
@@ -833,10 +678,164 @@ export default {
   text-align: right;
 }
 
+/* Grand Total */
+.grand-total {
+  margin: 2rem 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.total-row {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  background: #1177bf;
+  color: white;
+  padding: 1.5rem 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(17, 119, 191, 0.3);
+}
+
+.total-label {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.total-amount {
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+/* Business Notes */
+.business-notes {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #eee;
+}
+
+.notes-section {
+  flex: 1;
+}
+
+.note-title {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.note-content {
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.note-content p {
+  margin: 0.3rem 0;
+}
+
+.signature-section {
+  text-align: right;
+}
+
+.signature {
+  font-family: 'Brush Script MT', cursive;
+  font-size: 1.5rem;
+  color: #1177bf;
+  margin-bottom: 0.5rem;
+  font-weight: 400;
+}
+
+.signature-title {
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .invoice-container {
+    padding: 1rem;
+    margin: 1rem;
+  }
+  
+  .invoice-title h1 {
+    font-size: 2rem;
+  }
+  
+  .invoice-details-section {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .customer-info {
+    text-align: left;
+  }
+  
+  .gst-details-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .items-table,
+  .gst-table {
+    overflow-x: auto;
+  }
+  
+  .items-table table,
+  .gst-table {
+    min-width: 600px;
+  }
+  
+  .business-notes {
+    flex-direction: column;
+    gap: 2rem;
+    align-items: flex-start;
+  }
+  
+  .signature-section {
+    text-align: left;
+  }
+  
+  .header-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .btn-download,
+  .btn-print {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .invoice-title h1 {
+    font-size: 1.5rem;
+  }
+  
+  .items-table th,
+  .items-table td,
+  .gst-table th,
+  .gst-table td {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.8rem;
+  }
+  
+  .total-row {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+}
+
 /* Print Styles */
 @media print {
-  .invoice-view::before,
-  .invoice-view::after {
+  .seller-invoice-view::before,
+  .seller-invoice-view::after {
     display: none;
   }
   
@@ -844,7 +843,7 @@ export default {
     display: none;
   }
   
-  .invoice-view {
+  .seller-invoice-view {
     background: white;
   }
   

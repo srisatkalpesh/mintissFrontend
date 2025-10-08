@@ -361,13 +361,17 @@
               <div class="col-12">
                 <h6 class="fw-bold mb-3">Shipping Address</h6>
                 <div class="shipping-address">
-                  <div v-if="selectedOrder.address_full_name || selectedOrder.address_line1 || selectedOrder.address_city">
-                    <p v-if="selectedOrder.address_full_name"><strong>{{ selectedOrder.address_full_name }}</strong></p>
-                    <p v-if="selectedOrder.address_line1">{{ selectedOrder.address_line1 }}</p>
-                    <p v-if="selectedOrder.address_line2">{{ selectedOrder.address_line2 }}</p>
-                    <p v-if="selectedOrder.address_city || selectedOrder.address_postal_code">
-                      {{ selectedOrder.address_city }}{{ selectedOrder.address_city && selectedOrder.address_postal_code ? ', ' : '' }}{{ selectedOrder.address_postal_code }}
+                  <!-- Address from relationship (newer orders) -->
+                  <div v-if="selectedOrder.address">
+                    <p v-if="selectedOrder.address.full_name"><strong>{{ selectedOrder.address.full_name }}</strong></p>
+                    <p v-if="selectedOrder.address.mobile"><strong>Mobile:</strong> {{ selectedOrder.address.mobile }}</p>
+                    <p v-if="selectedOrder.address.address_line">{{ selectedOrder.address.address_line }}</p>
+                    <p v-if="selectedOrder.address.landmark">{{ selectedOrder.address.landmark }}</p>
+                    <p v-if="selectedOrder.address.city || selectedOrder.address.postal_code">
+                      {{ selectedOrder.address.city }}{{ selectedOrder.address.city && selectedOrder.address.postal_code ? ', ' : '' }}{{ selectedOrder.address.postal_code }}
                     </p>
+                    <p v-if="selectedOrder.address.state">{{ selectedOrder.address.state }}</p>
+                    <p v-if="selectedOrder.address.country">{{ selectedOrder.address.country }}</p>
                   </div>
                   <div v-else class="text-muted">
                     <div class="alert alert-warning mb-0">
@@ -689,6 +693,7 @@ export default {
         minute: '2-digit'
       });
     },
+
 
     showToast(message, type = 'info') {
       // Simple toast implementation without Bootstrap dependency

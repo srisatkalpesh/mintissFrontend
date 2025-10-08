@@ -226,9 +226,9 @@ const routes = [
         component: () => import("../views/seller/SellerOrderDetails.vue")
       },
       {
-        path: "text-management",
-        name: "SellerTextManagement",
-        component: () => import("../views/seller/TextManagement.vue")
+        path: "orders/:orderId/invoice",
+        name: "SellerInvoice",
+        component: () => import("../views/sellersite/SellerInvoiceView.vue")
       }
 
     ]

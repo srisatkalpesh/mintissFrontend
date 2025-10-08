@@ -84,6 +84,11 @@
             <input type="text" v-model="store_zip_code" class="form-control" placeholder="Store Zip Code" required />
             <div v-if="errors.store_zip_code" class="text-danger small mt-1">{{ errors.store_zip_code[0] }}</div>
           </div>
+          <div class="mb-3">
+            <input type="text" v-model="store_gst_number" class="form-control" placeholder="GST Number (Optional)" />
+            <div v-if="errors.store_gst_number" class="text-danger small mt-1">{{ errors.store_gst_number[0] }}</div>
+            <small class="text-muted">Format: 22ABCDE1234F1Z5</small>
+          </div>
           <div class="d-flex justify-content-between">
             <button type="button" class="btn btn-outline-secondary" @click="step = 1">Back</button>
             <button type="submit" class="btn btn-primary fw-bold" :disabled="loading">
@@ -132,6 +137,7 @@ export default {
       store_city: '',
       store_state: '',
       store_zip_code: '',
+      store_gst_number: '',
       errors: {},
       loading: false,
       googleLoading: false,
@@ -201,7 +207,8 @@ export default {
           store_address: this.store_address,
           store_city: this.store_city,
           store_state: this.store_state,
-          store_zip_code: this.store_zip_code
+          store_zip_code: this.store_zip_code,
+          store_gst_number: this.store_gst_number
         };
 
         // Add referral code if present
@@ -346,5 +353,16 @@ export default {
   position: relative;
   top: 0.5rem;
   z-index: 0;
+}
+
+/* GST Number field styling */
+input[placeholder*="GST Number"] {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+input[placeholder*="GST Number"]:focus {
+  border-color: #1177bf;
+  box-shadow: 0 0 0 0.25rem rgba(17, 119, 191, 0.25);
 }
 </style>

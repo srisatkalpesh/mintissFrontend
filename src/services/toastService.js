@@ -15,11 +15,38 @@ const showToast = (message, type = 'success') => {
     // Mount the toast
     const toast = app.mount(toastContainer);
 
-    // Remove the toast after it's hidden
-    setTimeout(() => {
-        app.unmount();
-        document.body.removeChild(toastContainer);
-    }, 3000);
+    // Cleanup function
+    const cleanup = () => {
+        try {
+            // Clear any pending timeouts
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+            
+            // Unmount the app
+            app.unmount();
+            
+            // Remove the container from DOM
+            if (document.body.contains(toastContainer)) {
+                document.body.removeChild(toastContainer);
+            }
+        } catch (error) {
+            console.warn('Toast cleanup failed:', error);
+        }
+    };
+
+    // Set up timeout cleanup (fallback)
+    const timeoutId = setTimeout(cleanup, 3000);
+    
+    // Listen for the hidden event on the toast element
+    const toastElement = toastContainer.querySelector('.modern-toast');
+    if (toastElement) {
+        const handleHidden = () => {
+            cleanup();
+            toastElement.removeEventListener('hidden.bs.toast', handleHidden);
+        };
+        toastElement.addEventListener('hidden.bs.toast', handleHidden);
+    }
 };
 
 export default {

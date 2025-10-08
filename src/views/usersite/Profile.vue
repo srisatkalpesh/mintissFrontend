@@ -73,7 +73,6 @@
                 <label class="form-label">Account Role</label>
                 <div class="form-display">
                   <span class="display-value">{{ user.role || 'Customer' }}</span>
-                  <i class="bi bi-shield-check"></i>
                 </div>
                 </div>
               <div class="form-group">
@@ -139,7 +138,6 @@
             <div class="details-grid">
               <div class="detail-item">
                 <div class="detail-icon">
-                  <i class="bi bi-shield-check"></i>
                 </div>
                 <div class="detail-content">
                   <label class="detail-label">Account Role</label>
@@ -210,15 +208,6 @@
             <div class="stat-content">
               <span class="stat-value">{{ orderStats.pending_orders + orderStats.processing_orders + orderStats.shipped_orders }}</span>
               <span class="stat-label">In Progress</span>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="bi bi-currency-rupee"></i>
-            </div>
-            <div class="stat-content">
-              <span class="stat-value">₹{{ orderStats.total_spent || 0 }}</span>
-              <span class="stat-label">Total Spent</span>
             </div>
           </div>
         </div>
@@ -945,6 +934,386 @@ export default {
 .mintiss-value {
   color: #007aff;
   font-weight: 700;
+}
+
+/* Mobile-First Responsive Design */
+/* Base styles are mobile-first */
+
+/* Small mobile devices (320px and up) */
+@media (min-width: 320px) {
+  .modern-profile-page {
+    padding: 1rem 0;
+  }
+  
+  .profile-container {
+    padding: 0 0.5rem;
+  }
+  
+  .profile-header {
+    padding: 1.5rem 1rem;
+    border-radius: 12px;
+  }
+  
+  .profile-info {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .profile-avatar {
+    width: 80px;
+    height: 80px;
+    font-size: 2rem;
+  }
+  
+  .profile-details h1 {
+    font-size: 1.5rem;
+  }
+  
+  .profile-details p {
+    font-size: 0.9rem;
+  }
+  
+  .profile-stats {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .stat-card {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+  
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+  
+  .stat-value {
+    font-size: 1.25rem;
+  }
+  
+  .stat-label {
+    font-size: 0.8rem;
+  }
+  
+  .profile-content {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .profile-section {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+  
+  .section-title {
+    font-size: 1.1rem;
+  }
+  
+  .detail-item {
+    padding: 0.75rem;
+    border-radius: 8px;
+  }
+  
+  .detail-icon {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+  }
+  
+  .detail-label {
+    font-size: 0.75rem;
+  }
+  
+  .detail-value {
+    font-size: 0.9rem;
+  }
+  
+  .account-actions {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+  }
+  
+  .logout-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Mobile devices (480px and up) */
+@media (min-width: 480px) {
+  .profile-header {
+    padding: 2rem 1.5rem;
+  }
+  
+  .profile-info {
+    flex-direction: row;
+    text-align: left;
+  }
+  
+  .profile-avatar {
+    width: 90px;
+    height: 90px;
+    font-size: 2.2rem;
+  }
+  
+  .profile-details h1 {
+    font-size: 1.75rem;
+  }
+  
+  .profile-details p {
+    font-size: 1rem;
+  }
+  
+  .profile-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .stat-card {
+    padding: 1.25rem;
+  }
+  
+  .stat-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 1.3rem;
+  }
+  
+  .stat-value {
+    font-size: 1.5rem;
+  }
+  
+  .stat-label {
+    font-size: 0.9rem;
+  }
+}
+
+/* Tablet devices (768px and up) */
+@media (min-width: 768px) {
+  .modern-profile-page {
+    padding: 1.5rem 0;
+  }
+  
+  .profile-container {
+    padding: 0 1rem;
+  }
+  
+  .profile-header {
+    padding: 2.5rem 2rem;
+    border-radius: 16px;
+  }
+  
+  .profile-avatar {
+    width: 100px;
+    height: 100px;
+    font-size: 2.5rem;
+  }
+  
+  .profile-details h1 {
+    font-size: 2rem;
+  }
+  
+  .profile-details p {
+    font-size: 1.1rem;
+  }
+  
+  .profile-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .stat-card {
+    padding: 1.5rem;
+    border-radius: 16px;
+  }
+  
+  .stat-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+  
+  .stat-value {
+    font-size: 1.75rem;
+  }
+  
+  .stat-label {
+    font-size: 1rem;
+  }
+  
+  .profile-content {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .profile-section {
+    padding: 1.5rem;
+    border-radius: 16px;
+  }
+  
+  .section-title {
+    font-size: 1.25rem;
+  }
+  
+  .detail-item {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+  
+  .detail-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+  
+  .detail-label {
+    font-size: 0.8rem;
+  }
+  
+  .detail-value {
+    font-size: 1rem;
+  }
+}
+
+/* Desktop devices (1024px and up) */
+@media (min-width: 1024px) {
+  .modern-profile-page {
+    padding: 2rem 0;
+  }
+  
+  .profile-container {
+    padding: 0 1rem;
+  }
+  
+  .profile-header {
+    padding: 3rem 2.5rem;
+    border-radius: 20px;
+  }
+  
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+    font-size: 3rem;
+  }
+  
+  .profile-details h1 {
+    font-size: 2.5rem;
+  }
+  
+  .profile-details p {
+    font-size: 1.2rem;
+  }
+  
+  .profile-stats {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+  
+  .stat-card {
+    padding: 2rem;
+    border-radius: 20px;
+  }
+  
+  .stat-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 1.8rem;
+  }
+  
+  .stat-value {
+    font-size: 2rem;
+  }
+  
+  .stat-label {
+    font-size: 1.1rem;
+  }
+  
+  .profile-content {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+  
+  .profile-section {
+    padding: 2rem;
+    border-radius: 20px;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+  }
+  
+  .detail-item {
+    padding: 1.25rem;
+    border-radius: 16px;
+  }
+  
+  .detail-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+  
+  .detail-label {
+    font-size: 0.9rem;
+  }
+  
+  .detail-value {
+    font-size: 1.1rem;
+  }
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 767px) {
+  .profile-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .stat-card {
+    text-align: center;
+  }
+  
+  .stat-content {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .detail-item {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  
+  .detail-content {
+    align-items: center;
+  }
+  
+  .account-actions {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .logout-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Touch-friendly improvements */
+@media (max-width: 767px) {
+  .stat-card,
+  .detail-item,
+  .logout-btn {
+    min-height: 44px;
+  }
+  
+  .stat-card:active,
+  .detail-item:active {
+    transform: scale(0.98);
+  }
 }
 
 /* Account Actions */

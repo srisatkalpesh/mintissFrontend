@@ -108,6 +108,10 @@
                 <span class="fw-bold">Subtotal:</span>
                 <span class="text-info fw-bold">₹{{ (product.price + textAddition).toFixed(2) }}</span>
               </div>
+              <div v-else-if="!customText || !textSettings || !textSettings.include_in_price" class="d-flex justify-content-between align-items-center mb-3">
+                <span class="fw-bold">Subtotal:</span>
+                <span class="text-info fw-bold">₹{{ product.price.toFixed(2) }}</span>
+              </div>
               <div class="mb-3">
                 <label for="redeemAmount" class="form-label fw-bold">Redeem Amount (₹)</label>
                 <div class="input-group">
@@ -116,7 +120,7 @@
                     class="form-control" 
                     id="redeemAmount" 
                     v-model="redeemAmount"
-                    :max="Math.min(userBalance || 0, product.price || 0)"
+                    :max="maxRedeemable"
                     :min="0"
                     step="0.01"
                     placeholder="Enter amount to redeem"
@@ -139,6 +143,12 @@
                   Redeem amount cannot exceed your available balance or product price.
                 </div>
               </div>
+              <div v-if="redeemAmount > 0" class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold text-primary">
+                  <i class="bi bi-wallet2 me-1"></i>Points Redeemed:
+                </span>
+                <span class="text-primary fw-bold">-₹{{ redeemAmount.toFixed(2) }}</span>
+              </div>
               <div v-if="referralBonus > 0" class="d-flex justify-content-between align-items-center mb-2">
                 <span class="fw-bold text-success">
                   <i class="bi bi-gift-fill me-1"></i>Referral Bonus:
@@ -151,7 +161,7 @@
               </div>
               <div class="d-flex justify-content-between align-items-center">
                 <span class="text-muted">You Save:</span>
-                <span class="savings-amount">₹{{ (product.price - finalPrice).toFixed(2) }}</span>
+                <span class="savings-amount">₹{{ ((product.price + textAddition) - finalPrice).toFixed(2) }}</span>
               </div>
             </div>
           </div>
@@ -161,6 +171,10 @@
             <div class="mb-3">
               <label for="fullName" class="form-label">Full Name</label>
               <input type="text" class="form-control" id="fullName" v-model="address.fullName" required>
+            </div>
+            <div class="mb-3">
+              <label for="mobile" class="form-label">Mobile Number</label>
+              <input type="tel" class="form-control" id="mobile" v-model="address.mobile" required>
             </div>
             <div class="mb-3">
               <label for="addressLine1" class="form-label">Address Line 1</label>
@@ -179,6 +193,20 @@
                 <label for="postalCode" class="form-label">Postal Code</label>
                 <input type="text" class="form-control" id="postalCode" v-model="address.postalCode" required>
               </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="state" class="form-label">State</label>
+                <input type="text" class="form-control" id="state" v-model="address.state">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="country" class="form-label">Country</label>
+                <input type="text" class="form-control" id="country" v-model="address.country" value="India">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="landmark" class="form-label">Landmark (Optional)</label>
+              <input type="text" class="form-control" id="landmark" v-model="address.landmark" placeholder="e.g., Near City Mall">
             </div>
             <div class="mb-4 form-check">
               <input type="checkbox" class="form-check-input" id="cod" v-model="isCodSelected">
@@ -216,10 +244,14 @@ export default {
       product: null,
       address: {
         fullName: '',
+        mobile: '',
         addressLine1: '',
         addressLine2: '',
         city: '',
+        state: '',
+        country: 'India',
         postalCode: '',
+        landmark: '',
       },
       isCodSelected: false,
       redeemAmount: 0,
@@ -272,7 +304,8 @@ export default {
       return !!localStorage.getItem("token");
     },
     maxRedeemable() {
-      return Math.min(this.userBalance || 0, this.product?.price || 0);
+      const basePrice = (this.product?.price || 0) + this.textAddition;
+      return Math.min(this.userBalance || 0, basePrice);
     }
   },
   watch: {
@@ -352,8 +385,9 @@ export default {
       if (this.product && this.product.price) {
         // Calculate base price with text addition
         const basePrice = this.product.price + this.textAddition;
-        // Apply referral bonus to final price calculation
+        // Apply redemption amount first
         const priceAfterRedeem = Math.max(0, basePrice - this.redeemAmount);
+        // Then apply referral bonus
         this.finalPrice = Math.max(0, priceAfterRedeem - this.referralBonus);
       } else {
         this.finalPrice = 0;
@@ -484,7 +518,7 @@ export default {
     
     validateForm() {
       // Check if all required address fields are filled
-      const requiredFields = ['fullName', 'addressLine1', 'city', 'postalCode'];
+      const requiredFields = ['fullName', 'mobile', 'addressLine1', 'city', 'postalCode'];
       const missingFields = requiredFields.filter(field => !this.address[field] || this.address[field].trim() === '');
       
       if (missingFields.length > 0) {
