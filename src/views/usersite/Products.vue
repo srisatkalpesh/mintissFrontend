@@ -1,17 +1,12 @@
 <template>
   <div class="amazon-style-homepage">
-    
+
     <!-- Clean Hero Banners -->
     <div v-if="heroSections.length > 0" class="amazon-hero-section">
       <div class="hero-carousel">
         <div v-for="hero in heroSections" :key="hero.id" class="hero-slide" @click="handleBannerClick(hero)">
-          <img 
-            :src="hero.image_url" 
-            :alt="hero.title || 'Banner Image'" 
-            class="hero-image"
-            @error="handleHeroImageError"
-            loading="lazy"
-          />
+          <img :src="hero.image_url" :alt="hero.title || 'Banner Image'" class="hero-image"
+            @error="handleHeroImageError" loading="lazy" />
         </div>
       </div>
     </div>
@@ -31,10 +26,8 @@
     <div class="amazon-info-section">
       <div class="container">
         <div class="info-cards-grid">
-          <div v-for="card in infoCards" :key="card.title" 
-               class="amazon-info-card"
-               @click="handleCardClick(card.title)"
-               :class="{ 'clickable': isClickableCard(card.title) }">
+          <div v-for="card in infoCards" :key="card.title" class="amazon-info-card" @click="handleCardClick(card.title)"
+            :class="{ 'clickable': isClickableCard(card.title) }">
             <div class="card-icon">
               <i :class="card.icon"></i>
             </div>
@@ -55,9 +48,8 @@
           <h3 class="categories-title">Categories</h3>
         </div>
         <div class="compact-categories-grid">
-          <div v-for="(category, index) in categories.slice(0, 4)" :key="category.id" 
-               class="compact-category-item"
-               @click="goToCategory(category.id)">
+          <div v-for="(category, index) in categories.slice(0, 4)" :key="category.id" class="compact-category-item"
+            @click="goToCategory(category.id)">
             <div class="category-icon">
               <img v-if="category.image" :src="category.image" :alt="category.name" class="category-icon-image" />
               <i v-else class="bi bi-grid-3x3-gap"></i>
@@ -72,24 +64,16 @@
     <div v-if="firstProducts.length > 0" class="amazon-products-section">
       <div class="container">
         <div class="section-header">
-          <h2 class="section-title">Featured Products <span class="product-count">({{ firstProducts.length }})</span></h2>
+          <h2 class="section-title">Featured Products <span class="product-count">({{ firstProducts.length }})</span>
+          </h2>
           <p class="section-subtitle">Discover our top-rated products</p>
         </div>
         <div class="row g-5">
-          <div
-            v-for="product in firstProducts"
-            :key="product.unique_code"
-            class="col-6 col-md-4 col-lg-3"
-          >
+          <div v-for="product in firstProducts" :key="product.unique_code" class="col-6 col-md-4 col-lg-3">
             <div class="modern-product-card" @click="goToProductDetail(product.id, product)">
               <div class="product-image-container">
-                <img
-                  v-if="product.images && product.images.length > 0"
-                  :src="product.images[0]"
-                  :alt="product.name"
-                  class="product-image"
-                  @error="handleImageError"
-                />
+                <img v-if="product.images && product.images.length > 0" :src="product.images[0]" :alt="product.name"
+                  class="product-image" @error="handleImageError" />
                 <div v-else class="no-image-placeholder">
                   <i class="bi bi-image" style="color: #007aff; font-size: 2rem;"></i>
                   <small style="color: #666;">No Image</small>
@@ -102,19 +86,18 @@
                   <span class="product-price">₹{{ product.price }}</span>
                   <span v-if="product.canceled_price" class="original-price">₹{{ product.canceled_price }}</span>
                 </div>
-                <div v-if="product.mintiss" class="mintiss-reward">
-                  <span style="color: #1177bf;">{{ product.mintiss }} Mintiss</span>
+                <div v-if="product.mintiss && product.price" class="mintiss-reward">
+                  <i class="bi bi-gift-fill me-1"></i>
+                  <span style="color: #1177bf; font-weight: 600;">Get {{ calculateMintissPercentage(product.mintiss,
+                    product.price) }}% Mintiss back</span>
                 </div>
                 <div v-if="product.store" class="store-info">
                   <i class="bi bi-shop me-1" style="color: #666;"></i>
                   <small style="color: #666;">{{ product.store.name }}</small>
                 </div>
                 <div class="product-actions mt-2">
-                  <button 
-                    class="btn btn-sm modern-add-to-cart-btn"
-                    @click.stop="addToCart(product)"
-                    :disabled="isAddingToCart"
-                  >
+                  <button class="btn btn-sm modern-add-to-cart-btn" @click.stop="addToCart(product)"
+                    :disabled="isAddingToCart">
                     <i class="bi bi-cart-plus me-1"></i>
                     <span v-if="isAddingToCart">Adding...</span>
                     <span v-else>Add to Cart</span>
@@ -135,7 +118,8 @@
         <div class="search-wrapper">
           <div class="amazon-search-bar">
             <div class="search-input-group">
-              <input type="text" placeholder="Search products..." class="search-input" v-model="searchQuery" @input="filterProducts">
+              <input type="text" placeholder="Search products..." class="search-input" v-model="searchQuery"
+                @input="filterProducts">
               <button class="search-btn">
                 <i class="bi bi-search"></i>
               </button>
@@ -167,20 +151,11 @@
           <p class="section-subtitle">Discover more amazing products at great prices</p>
         </div>
         <div class="row g-5">
-          <div
-            v-for="product in moreProducts"
-            :key="product.unique_code"
-            class="col-6 col-md-4 col-lg-3"
-          >
+          <div v-for="product in moreProducts" :key="product.unique_code" class="col-6 col-md-4 col-lg-3">
             <div class="modern-product-card" @click="goToProductDetail(product.id, product)">
               <div class="product-image-container">
-                <img
-                  v-if="product.images && product.images.length > 0"
-                  :src="product.images[0]"
-                  :alt="product.name"
-                  class="product-image"
-                  @error="handleImageError"
-                />
+                <img v-if="product.images && product.images.length > 0" :src="product.images[0]" :alt="product.name"
+                  class="product-image" @error="handleImageError" />
                 <div v-else class="no-image-placeholder">
                   <i class="bi bi-image" style="color: #007aff; font-size: 2rem;"></i>
                   <small style="color: #666;">No Image</small>
@@ -201,11 +176,8 @@
                   <small style="color: #666;">{{ product.store.name }}</small>
                 </div>
                 <div class="product-actions mt-2">
-                  <button 
-                    class="btn btn-sm modern-add-to-cart-btn"
-                    @click.stop="addToCart(product)"
-                    :disabled="isAddingToCart"
-                  >
+                  <button class="btn btn-sm modern-add-to-cart-btn" @click.stop="addToCart(product)"
+                    :disabled="isAddingToCart">
                     <i class="bi bi-cart-plus me-1"></i>
                     <span v-if="isAddingToCart">Adding...</span>
                     <span v-else>Add to Cart</span>
@@ -319,12 +291,12 @@ export default {
   },
   methods: {
     handleCardClick(cardTitle) {
-       if (cardTitle === "Today's Mintiss Value") {
+      if (cardTitle === "Today's Mintiss Value") {
         this.goToMintiss();
       }
     },
     isClickableCard(cardTitle) {
-      return cardTitle === "Today's Mintiss Value" ;
+      return cardTitle === "Today's Mintiss Value";
     },
     goToCheckout(product) {
       this.$router.push({
@@ -341,7 +313,7 @@ export default {
         console.error('No product ID or unique_code available');
         return;
       }
-      
+
       this.$router.push(`/product/${idToUse}`);
     },
     scrollToProducts() {
@@ -353,7 +325,7 @@ export default {
     handleImageError(event) {
       event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
     },
-    
+
     calculateMintissPoints(mintissValue) {
       if (!this.mintissValue || this.mintissValue === 0) {
         return '0';
@@ -361,6 +333,16 @@ export default {
       // Calculate mintiss points: mintiss value / current mintiss value
       const points = mintissValue / this.mintissValue;
       return points.toFixed(8);
+    },
+    calculateMintissPercentage(mintiss, price) {
+      if (!mintiss || !price) {
+        return '0.00';
+      }
+
+      // Formula: (mintiss / price) × 100
+      const percentage = (mintiss / price) * 100;
+
+      return percentage.toFixed(2);
     },
     async fetchHeroSections() {
       try {
@@ -456,42 +438,42 @@ export default {
     goToCategory(categoryId) {
       this.$router.push(`/category/${categoryId}`);
     },
-    
+
     async addToCart(product) {
       try {
         this.isAddingToCart = true;
-        
+
         // Add product to cart using cart service
         cartService.addToCart(product, 1);
-        
+
         // Small delay to show loading state
         await new Promise(resolve => setTimeout(resolve, 500));
-        
+
       } catch (error) {
         console.error('Error adding to cart:', error);
       } finally {
         this.isAddingToCart = false;
       }
     },
-    
+
     // Search and filter methods
     initializeFilteredProducts() {
       this.filteredProducts = [...this.allProducts];
     },
-    
+
     filterProducts() {
       let products = [...this.allProducts];
-      
+
       // Apply search filter
       if (this.searchQuery.trim()) {
         const query = this.searchQuery.toLowerCase();
-        products = products.filter(product => 
+        products = products.filter(product =>
           product.name.toLowerCase().includes(query) ||
           product.description.toLowerCase().includes(query) ||
           (product.store && product.store.name.toLowerCase().includes(query))
         );
       }
-      
+
       // Apply category filter
       switch (this.selectedFilter) {
         case 'new':
@@ -500,7 +482,7 @@ export default {
           break;
         case 'sale':
           // Filter products with discount
-          products = products.filter(product => 
+          products = products.filter(product =>
             product.canceled_price && product.canceled_price > product.price
           );
           break;
@@ -512,28 +494,28 @@ export default {
           // 'all' - no additional filtering
           break;
       }
-      
+
       this.filteredProducts = products;
     },
-    
+
     setFilter(filter) {
       this.selectedFilter = filter;
       this.filterProducts();
     },
-    
+
     clearFilters() {
       this.searchQuery = '';
       this.selectedFilter = 'all';
       this.filteredProducts = [...this.allProducts];
     },
-    
+
     // Banner handling methods
     handleBannerClick(hero) {
       // Handle banner click - could navigate to specific page or show modal
       console.log('Banner clicked:', hero);
       // You can add navigation logic here based on hero.link or hero.action
     },
-    
+
     handleHeroImageError(event) {
       // Fallback image for broken hero images
       event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjhmOWZhIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzZjNzU3ZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEJhbm5lciBJbWFnZTwvdGV4dD48L3N2Zz4=';
@@ -558,17 +540,23 @@ export default {
   background: #232f3e;
   padding: 0;
   margin-bottom: 2rem;
+  overflow: visible;
 }
 
 .hero-carousel {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  width: 100%;
 }
 
 .hero-slide {
   position: relative;
   cursor: pointer;
   transition: transform 0.3s ease;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .hero-slide:hover {
@@ -577,9 +565,11 @@ export default {
 
 .hero-image {
   width: 100%;
-  height: 300px;
-  object-fit: cover;
+  height: auto;
+  object-fit: contain;
   display: block;
+  max-height: none;
+  max-width: 100%;
 }
 
 /* Amazon-style No Banners */
@@ -637,7 +627,7 @@ export default {
 }
 
 .amazon-info-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
 }
 
@@ -722,7 +712,7 @@ export default {
 }
 
 .compact-category-item:hover {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transform: translateY(-1px);
   border-color: #1177bf;
 }
@@ -1169,84 +1159,92 @@ export default {
 @media (max-width: 768px) {
   .amazon-hero-section {
     margin-bottom: 1rem;
+    overflow: visible;
   }
-  
+
+  .hero-carousel {
+    overflow: visible;
+  }
+
   .hero-image {
-    height: 200px;
+    height: auto;
+    object-fit: none;
+    max-height: none;
+    max-width: 100%;
   }
-  
+
   .info-cards-grid {
     grid-template-columns: 1fr;
     gap: 0.5rem;
     padding: 0 1rem;
   }
-  
+
   .amazon-info-card {
     padding: 0.75rem;
     margin: 0;
   }
-  
+
   .card-icon {
     width: 40px;
     height: 40px;
     font-size: 1.2rem;
   }
-  
+
   .card-title {
     font-size: 1rem;
   }
-  
+
   .card-subtitle {
     font-size: 0.8rem;
   }
-  
+
   .card-value {
     font-size: 1rem;
   }
-  
+
   .compact-categories-section {
     padding: 0.75rem 0;
   }
-  
+
   .compact-categories-grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 0.5rem;
     padding: 0 1rem;
   }
-  
+
   .compact-category-item {
     padding: 0.5rem 0.25rem;
   }
-  
+
   .category-icon {
     width: 35px;
     height: 35px;
     font-size: 1rem;
   }
-  
+
   .category-label {
     font-size: 0.6rem;
   }
-  
+
   .amazon-products-section,
   .amazon-more-products {
     padding: 0.2rem 0;
   }
-  
+
   .amazon-products-grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 0.3rem;
     padding: 0 1rem;
   }
-  
+
   .amazon-product-card {
     margin: 0;
   }
-  
+
   .product-image-container {
     height: 240px;
   }
-  
+
   .product-info {
     padding: 0.3rem;
     display: flex;
@@ -1254,88 +1252,88 @@ export default {
     flex-grow: 1;
     justify-content: space-between;
   }
-  
+
   .product-details {
     flex-grow: 1;
   }
-  
+
   .product-title {
     font-size: 0.65rem;
     line-height: 1.1;
     margin-bottom: 0.15rem;
   }
-  
+
   .product-rating {
     margin-bottom: 0.25rem;
   }
-  
+
   .stars {
     font-size: 0.7rem;
   }
-  
+
   .rating-count {
     font-size: 0.6rem;
   }
-  
+
   .current-price {
     font-size: 0.9rem;
   }
-  
+
   .original-price {
     font-size: 0.7rem;
   }
-  
+
   .product-bottom {
     margin-top: auto;
   }
-  
+
   .mintiss-reward {
     font-size: 0.7rem;
     margin-bottom: 0.5rem;
   }
-  
+
   .amazon-add-to-cart-btn {
     padding: 0.25rem 0.3rem;
     font-size: 0.6rem;
   }
-  
+
   .amazon-search-section {
     padding: 1rem 0;
   }
-  
+
   .search-input-group {
     max-width: 100%;
     margin: 0 1rem;
   }
-  
+
   .search-input {
     padding: 0.5rem 0.75rem;
     font-size: 0.9rem;
   }
-  
+
   .search-btn {
     padding: 0.5rem 0.75rem;
   }
-  
+
   .filter-tabs {
     gap: 0.25rem;
     padding: 0 1rem;
     flex-wrap: wrap;
   }
-  
+
   .filter-tab {
     padding: 0.3rem 0.6rem;
     font-size: 0.7rem;
   }
-  
+
   .section-title {
     font-size: 0.8rem;
   }
-  
+
   .product-count {
     font-size: 0.6rem;
   }
-  
+
   .section-subtitle {
     font-size: 0.6rem;
   }
@@ -1345,75 +1343,75 @@ export default {
   .hero-image {
     height: 150px;
   }
-  
+
   .section-title {
     font-size: 0.75rem;
   }
-  
+
   .product-count {
     font-size: 0.55rem;
   }
-  
+
   .section-subtitle {
     font-size: 0.55rem;
   }
-  
+
   .info-cards-grid {
     padding: 0 0.5rem;
   }
-  
+
   .amazon-info-card {
     padding: 0.5rem;
     flex-direction: column;
     text-align: center;
   }
-  
+
   .card-icon {
     width: 35px;
     height: 35px;
     font-size: 1rem;
   }
-  
+
   .card-title {
     font-size: 0.9rem;
   }
-  
+
   .card-subtitle {
     font-size: 0.7rem;
   }
-  
+
   .card-value {
     font-size: 0.9rem;
   }
-  
+
   .compact-categories-grid {
     grid-template-columns: repeat(2, 1fr);
     padding: 0 0.5rem;
   }
-  
+
   .compact-category-item {
     padding: 0.4rem 0.2rem;
   }
-  
+
   .category-icon {
     width: 30px;
     height: 30px;
     font-size: 0.9rem;
   }
-  
+
   .category-label {
     font-size: 0.55rem;
   }
-  
+
   .amazon-products-grid {
     grid-template-columns: repeat(4, 1fr);
     padding: 0 0.5rem;
   }
-  
+
   .product-image-container {
     height: 60px;
   }
-  
+
   .product-info {
     padding: 0.25rem;
     display: flex;
@@ -1421,62 +1419,62 @@ export default {
     flex-grow: 1;
     justify-content: space-between;
   }
-  
+
   .product-details {
     flex-grow: 1;
   }
-  
+
   .product-title {
     font-size: 0.6rem;
     line-height: 1.1;
   }
-  
+
   .stars {
     font-size: 0.6rem;
   }
-  
+
   .rating-count {
     font-size: 0.5rem;
   }
-  
+
   .current-price {
     font-size: 0.8rem;
   }
-  
+
   .original-price {
     font-size: 0.6rem;
   }
-  
+
   .product-bottom {
     margin-top: auto;
   }
-  
+
   .mintiss-reward {
     font-size: 0.6rem;
   }
-  
+
   .amazon-add-to-cart-btn {
     padding: 0.2rem 0.25rem;
     font-size: 0.5rem;
   }
-  
+
   .search-input-group {
     margin: 0 0.5rem;
   }
-  
+
   .search-input {
     padding: 0.4rem 0.6rem;
     font-size: 0.8rem;
   }
-  
+
   .search-btn {
     padding: 0.4rem 0.6rem;
   }
-  
+
   .filter-tabs {
     padding: 0 0.5rem;
   }
-  
+
   .filter-tab {
     padding: 0.25rem 0.5rem;
     font-size: 0.6rem;
@@ -1747,7 +1745,6 @@ export default {
   position: relative;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   cursor: pointer;
   background: #f8f9fa;
@@ -1764,7 +1761,7 @@ export default {
 .hero-image {
   width: 100%;
   height: 250px;
-  object-fit: cover;
+  object-fit: none;
   display: block;
   transition: transform 0.3s ease;
   background: #f8f9fa;
@@ -2309,9 +2306,17 @@ export default {
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .product-overlay {
@@ -2976,174 +2981,174 @@ export default {
 
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
-  
+
   .section-title {
     font-size: 1.75rem;
     white-space: nowrap;
   }
-  
+
   .categories-horizontal-scroll {
     margin: 0 -0.5rem;
   }
-  
+
   .categories-scroll-container {
     gap: 1rem;
     padding: 0 0.5rem;
   }
-  
+
   .category-card-horizontal {
     width: 120px;
     height: 160px;
   }
-  
+
   .category-image-container-horizontal {
     height: 100px;
   }
-  
+
   .products-grid {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.5rem;
     padding: 0 0.5rem;
   }
-  
+
   .hero-container {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .hero-card {
     min-height: 200px;
   }
-  
+
   .hero-image {
     height: 350px;
   }
-  
+
   .hero-banner-title {
     font-size: 1.2rem;
   }
-  
+
   .hero-banner-description {
     font-size: 0.8rem;
   }
-  
+
   .category-image-container {
     height: 100px;
   }
-  
+
   .product-image-container {
     height: 180px;
   }
-  
+
   .modern-product-card {
     height: 380px;
     min-height: 380px;
     max-height: 380px;
   }
-  
+
   .product-content {
     padding: 0.6rem;
   }
-  
+
   .product-name {
     font-size: 0.95rem;
     min-height: 2.6rem;
   }
-  
+
   .product-description {
     font-size: 0.8rem;
     min-height: 2.4rem;
   }
-  
+
   .product-price {
     font-size: 1.1rem;
   }
-  }
-  
+}
+
 @media (max-width: 480px) {
   .section-title {
     font-size: 1.5rem;
     white-space: nowrap;
   }
-  
+
   .categories-horizontal-scroll {
     margin: 0 -0.25rem;
   }
-  
+
   .categories-scroll-container {
     gap: 0.75rem;
     padding: 0 0.25rem;
   }
-  
+
   .category-card-horizontal {
     width: 100px;
     height: 140px;
   }
-  
+
   .category-image-container-horizontal {
     height: 80px;
   }
-  
+
   .category-info-horizontal {
     padding: 0.75rem;
   }
-  
+
   .category-name-horizontal {
     font-size: 0.8rem;
   }
-  
+
   .products-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
     padding: 0 0.25rem;
   }
-  
+
   .hero-image {
     height: 150px;
   }
-  
+
   .category-image-container {
     height: 80px;
   }
-  
+
   .product-image-container {
     height: 140px;
   }
-  
+
   .modern-product-card {
     height: 340px;
     min-height: 340px;
     max-height: 340px;
   }
-  
+
   .product-content {
     padding: 0.5rem;
   }
-  
+
   .product-name {
     font-size: 0.9rem;
     min-height: 2.4rem;
   }
-  
+
   .product-description {
     font-size: 0.75rem;
     min-height: 2.25rem;
   }
-  
+
   .product-price {
     font-size: 1rem;
   }
-  
+
   .mintiss-reward {
     font-size: 0.5rem;
     padding: 0.4rem 0.6rem;
   }
-  
+
   .add-to-cart-btn {
     padding: 0.35rem 0.5rem;
     font-size: 0.7rem;
   }
-  
+
   .modern-categories-btn {
     padding: 0.5rem 1.5rem;
     font-size: 0.9rem;
@@ -3159,57 +3164,57 @@ export default {
     min-height: 160px !important;
     max-height: 160px !important;
   }
-  
+
   .modern-info-icon {
     width: 40px;
     height: 40px;
     font-size: 1rem;
     background: linear-gradient(135deg, #007aff 0%, #0056cc 100%);
   }
-  
+
   .modern-info-title {
     font-size: 0.8rem;
   }
-  
+
   .modern-info-span {
     font-size: 0.7rem;
   }
-  
+
   .modern-info-value {
     font-size: 0.8rem;
   }
-  
-  
+
+
   .hero-image-simple {
     max-height: 200px;
   }
-  
+
   .product-image-container {
     height: 150px;
   }
-  
+
   .modern-product-card {
     height: 360px;
     min-height: 360px;
     max-height: 360px;
   }
-  
+
   .product-name {
     font-size: 0.8rem;
   }
-  
+
   .product-description {
     font-size: 0.75rem;
   }
-  
+
   .product-price {
     font-size: 0.9rem;
   }
-  
+
   .section-title {
     font-size: 1.3rem;
   }
-  
+
   .category-title {
     font-size: 1.1rem;
   }
@@ -3222,41 +3227,41 @@ export default {
     min-height: 160px !important;
     max-height: 160px !important;
   }
-  
+
   .modern-info-icon {
     width: 45px;
     height: 45px;
     font-size: 1.1rem;
     background: linear-gradient(135deg, #007aff 0%, #0056cc 100%);
   }
-  
+
   .modern-info-title {
     font-size: 0.85rem;
   }
-  
+
   .modern-info-value {
     font-size: 0.85rem;
   }
-  
-  
+
+
   .hero-image-simple {
     max-height: 220px;
   }
-  
+
   .product-image-container {
     height: 160px;
   }
-  
+
   .modern-product-card {
     height: 370px;
     min-height: 370px;
     max-height: 370px;
   }
-  
+
   .product-name {
     font-size: 0.85rem;
   }
-  
+
   .product-price {
     font-size: 0.95rem;
   }
@@ -3264,33 +3269,33 @@ export default {
 
 /* Medium devices (tablets, 768px and up) */
 @media (min-width: 768px) {
-  
+
   .hero-image-simple {
     max-height: 240px;
   }
-  
+
   .product-image-container {
     height: 170px;
   }
-  
+
   .modern-product-card {
     height: 300px;
     min-height: 300px;
     max-height: 300px;
   }
-  
+
   .product-name {
     font-size: 0.9rem;
   }
-  
+
   .product-price {
     font-size: 1rem;
   }
-  
+
   .section-title {
     font-size: 1.4rem;
   }
-  
+
   .category-title {
     font-size: 1.15rem;
   }
@@ -3298,19 +3303,19 @@ export default {
 
 /* Large devices (desktops, 992px and up) */
 @media (min-width: 992px) {
-  
+
   .hero-image-simple {
     max-height: 250px;
   }
-  
+
   .product-image-container {
     height: 180px;
   }
-  
+
   .section-title {
     font-size: 1.5rem;
   }
-  
+
   .category-title {
     font-size: 1.2rem;
   }
@@ -3321,12 +3326,12 @@ export default {
   .modern-info-card:active {
     transform: scale(0.98);
   }
-  
+
   .modern-product-card:active {
     transform: scale(0.98);
   }
-  
-  
+
+
   .btn:active {
     transform: scale(0.95);
   }
@@ -3369,6 +3374,7 @@ export default {
     opacity: 0;
     transform: translateY(40px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -3463,53 +3469,53 @@ export default {
   .product-content {
     padding: 0.75rem;
   }
-  
+
   .product-header {
     margin-bottom: 0.5rem;
   }
-  
-  
+
+
   .store-info {
     font-size: 0.7rem;
     margin-bottom: 0.5rem;
     padding: 0.2rem 0.6rem;
   }
-  
+
   .store-info i {
     font-size: 0.8rem;
   }
-  
+
   .mintiss-reward {
     margin-bottom: 0;
     padding: 0.6rem;
   }
-  
+
   .price-section {
     margin-bottom: 0.5rem;
   }
-  
+
   .current-price {
     font-size: 1rem;
   }
-  
+
   .original-price {
     font-size: 0.8rem;
   }
-  
+
   .discount-badge {
     font-size: 0.7rem;
     padding: 0.2rem 0.5rem;
   }
-  
+
   .product-actions {
     gap: 0.5rem;
   }
-  
+
   .add-to-cart-btn {
     padding: 0.3rem 0.4rem;
     font-size: 0.65rem;
   }
-  
+
   .wishlist-btn {
     width: 35px;
     height: 35px;
@@ -3522,32 +3528,32 @@ export default {
   .product-content {
     padding: 0.5rem;
   }
-  
-  
+
+
   .store-info {
     font-size: 0.65rem;
     margin-bottom: 0.4rem;
     padding: 0.15rem 0.5rem;
   }
-  
+
   .mintiss-reward {
     margin-bottom: 0;
     padding: 0.5rem;
   }
-  
+
   .current-price {
     font-size: 0.9rem;
   }
-  
+
   .original-price {
     font-size: 0.75rem;
   }
-  
+
   .add-to-cart-btn {
     padding: 0.25rem 0.35rem;
     font-size: 0.6rem;
   }
-  
+
   .wishlist-btn {
     width: 32px;
     height: 32px;
@@ -3557,7 +3563,7 @@ export default {
 
 /* Mobile devices (480px and up) */
 @media (min-width: 480px) {
-  
+
   .hero-features {
     gap: 0.5rem;
     flex-wrap: nowrap;
@@ -3566,31 +3572,31 @@ export default {
     padding: 0.5rem 0;
     -webkit-overflow-scrolling: touch;
   }
-  
+
   .feature-item {
     padding: 0.5rem 0.75rem;
     flex-shrink: 0;
     white-space: nowrap;
     min-height: 36px;
   }
-  
+
   .feature-item span {
     font-size: 0.75rem;
   }
-  
+
   .search-filters-section {
     padding: 1.5rem 0;
   }
-  
+
   .search-container {
     padding: 0 1.5rem;
   }
-  
+
   .filter-buttons {
     grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
   }
-  
+
   .filter-btn {
     padding: 0.75rem 1.25rem;
     font-size: 0.9rem;
@@ -3599,7 +3605,7 @@ export default {
 
 /* Tablet devices (768px and up) */
 @media (min-width: 768px) {
-  
+
   .hero-features {
     gap: 0.4rem;
     flex-wrap: nowrap;
@@ -3608,38 +3614,38 @@ export default {
     padding: 0.4rem 0;
     -webkit-overflow-scrolling: touch;
   }
-  
+
   .feature-item {
     padding: 0.4rem 0.6rem;
     flex-shrink: 0;
     white-space: nowrap;
     min-height: 32px;
   }
-  
+
   .feature-item span {
     font-size: 0.7rem;
   }
-  
+
   .search-filters-section {
     padding: 2rem 0;
   }
-  
+
   .search-container {
     padding: 0 2rem;
     flex-direction: row;
     align-items: center;
     gap: 2rem;
   }
-  
+
   .search-bar {
     max-width: 500px;
   }
-  
+
   .filter-buttons {
     grid-template-columns: repeat(4, 1fr);
     gap: 1.25rem;
   }
-  
+
   .filter-btn {
     padding: 0.75rem 1.5rem;
     font-size: 1rem;
@@ -3648,7 +3654,7 @@ export default {
 
 /* Desktop devices (1024px and up) */
 @media (min-width: 1024px) {
-  
+
   .hero-features {
     gap: 0.3rem;
     flex-wrap: nowrap;
@@ -3657,30 +3663,30 @@ export default {
     padding: 0.3rem 0;
     -webkit-overflow-scrolling: touch;
   }
-  
+
   .feature-item {
     padding: 0.3rem 0.5rem;
     flex-shrink: 0;
     white-space: nowrap;
     min-height: 28px;
   }
-  
+
   .feature-item span {
     font-size: 0.65rem;
   }
-  
+
   .search-filters-section {
     padding: 2.5rem 0;
   }
-  
+
   .search-container {
     padding: 0 2.5rem;
   }
-  
+
   .filter-buttons {
     gap: 1.5rem;
   }
-  
+
   .filter-btn {
     padding: 1rem 2rem;
     font-size: 1.1rem;
@@ -3692,22 +3698,22 @@ export default {
   .hero-section {
     padding: 2rem 1.5rem;
   }
-  
-  
+
+
   .products-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
-  
+
   .product-image {
     height: 180px;
   }
-  
+
   .categories-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
-  
+
   .category-card {
     height: 160px;
   }
@@ -3718,41 +3724,41 @@ export default {
   .modern-products-page {
     padding: 1.5rem 0;
   }
-  
+
   .products-container {
     padding: 0 1rem;
   }
-  
+
   .hero-section {
     padding: 2.5rem 2rem;
     border-radius: 16px;
   }
-  
-  
+
+
   .search-section {
     padding: 1.5rem;
     border-radius: 16px;
   }
-  
+
   .products-grid {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
   }
-  
+
   .product-card {
     padding: 1.25rem;
     border-radius: 16px;
   }
-  
+
   .product-image {
     height: 350px;
   }
-  
+
   .categories-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
   }
-  
+
   .category-card {
     height: 180px;
   }
@@ -3763,41 +3769,41 @@ export default {
   .modern-products-page {
     padding: 2rem 0;
   }
-  
+
   .products-container {
     padding: 0 1rem;
   }
-  
+
   .hero-section {
     padding: 3rem 2.5rem;
     border-radius: 20px;
   }
-  
-  
+
+
   .search-section {
     padding: 2rem;
     border-radius: 20px;
   }
-  
+
   .products-grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 2rem;
   }
-  
+
   .product-card {
     padding: 1.5rem;
     border-radius: 20px;
   }
-  
+
   .product-image {
     height: 120px;
   }
-  
+
   .categories-grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 2rem;
   }
-  
+
   .category-card {
     height: 350px;
   }
@@ -3809,54 +3815,54 @@ export default {
     flex-direction: column;
     gap: 0.75rem;
   }
-  
+
   .search-input {
     width: 100%;
   }
-  
+
   .filter-btn {
     width: 100%;
     justify-content: center;
   }
-  
+
   .product-actions {
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   .add-to-cart-btn {
     width: 100%;
   }
-  
+
   .view-details-btn {
     width: 100%;
   }
-  
+
   .category-badge {
     width: 25px;
     height: 25px;
     font-size: 0.8rem;
   }
-  
+
   .loading-spinner {
     width: 40px;
     height: 40px;
   }
-  
+
   .empty-state {
     padding: 2rem 1rem;
   }
-  
+
   .empty-state-icon {
     width: 80px;
     height: 80px;
     font-size: 2rem;
   }
-  
+
   .empty-state-title {
     font-size: 1.25rem;
   }
-  
+
   .empty-state-message {
     font-size: 0.9rem;
   }
@@ -3864,6 +3870,7 @@ export default {
 
 /* Touch-friendly improvements */
 @media (max-width: 767px) {
+
   .add-to-cart-btn,
   .view-details-btn,
   .filter-btn,
@@ -3871,15 +3878,15 @@ export default {
     min-height: 44px;
     min-width: 44px;
   }
-  
+
   .product-card {
     transition: transform 0.2s ease;
   }
-  
+
   .product-card:active {
     transform: scale(0.98);
   }
-  
+
   .category-card:active {
     transform: scale(0.98);
   }
@@ -3904,19 +3911,19 @@ export default {
 
 /* Mobile responsive for category cards */
 @media (max-width: 576px) {
-  
+
   .category-image-container {
     height: 100px;
   }
-  
+
   .category-info {
     padding: 12px;
   }
-  
+
   .category-name {
     font-size: 0.8rem;
   }
-  
+
   .category-badge {
     width: 25px;
     height: 25px;

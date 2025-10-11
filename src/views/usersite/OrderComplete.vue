@@ -1,84 +1,123 @@
 <template>
-  <div class="container my-5">
-    <div class="row justify-content-center">
-      <div class="col-md-8 col-lg-6">
-        <div class="card shadow-lg border-0 text-center">
-          <div class="card-body p-5">
-            <!-- Success Icon -->
-            <div class="success-icon mb-4">
-              <div class="checkmark-circle">
-                <div class="checkmark draw"></div>
-              </div>
+  <div class="order-complete-container">
+    <!-- Success Animation Overlay -->
+    <div v-if="showSuccessAnimation" class="success-animation-overlay">
+      <div class="success-animation">
+        <!-- Animated Success Icon -->
+        <div class="success-icon-container">
+          <div class="success-circle">
+            <div class="success-checkmark">
+              <div class="checkmark-stem"></div>
+              <div class="checkmark-kick"></div>
             </div>
-            
-            <!-- Order Success Message -->
-            <h2 class="text-success fw-bold mb-3">Order Placed Successfully!</h2>
-            <p class="text-muted mb-4">Your order has been confirmed and is being processed.</p>
-            
-            <!-- Order Details -->
-            <div class="order-details mb-4">
-              <div class="row text-start">
-                <div class="col-6">
-                  <span class="text-muted">Order ID:</span>
-                </div>
-                <div class="col-6">
-                  <span class="fw-bold">{{ orderId }}</span>
+          </div>
+        </div>
+        
+        <!-- Success Message -->
+        <div class="success-message">
+          <h2 class="success-title">Payment Complete!</h2>
+          <p class="success-subtitle">Your order has been placed successfully</p>
+        </div>
+        
+        <!-- Order ID Display -->
+        <div class="order-id-display">
+          <div class="order-id-label">Order ID</div>
+          <div class="order-id-value">{{ orderId }}</div>
+        </div>
+        
+        <!-- Got it Button -->
+        <button 
+          @click="hideSuccessAnimation" 
+          class="got-it-button"
+          :class="{ 'animate-in': showGotItButton }"
+        >
+          Got it
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content (shown after animation) -->
+    <div v-if="!showSuccessAnimation" class="container my-5">
+      <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+          <div class="card shadow-lg border-0 text-center">
+            <div class="card-body p-5">
+              <!-- Success Icon -->
+              <div class="success-icon mb-4">
+                <div class="checkmark-circle">
+                  <div class="checkmark draw"></div>
                 </div>
               </div>
-              <div class="row text-start">
-                <div class="col-6">
-                  <span class="text-muted">Order Date:</span>
+              
+              <!-- Order Success Message -->
+              <h2 class="text-success fw-bold mb-3">Order Placed Successfully!</h2>
+              <p class="text-muted mb-4">Your order has been confirmed and is being processed.</p>
+              
+              <!-- Order Details -->
+              <div class="order-details mb-4">
+                <div class="row text-start">
+                  <div class="col-6">
+                    <span class="text-muted">Order ID:</span>
+                  </div>
+                  <div class="col-6">
+                    <span class="fw-bold">{{ orderId }}</span>
+                  </div>
                 </div>
-                <div class="col-6">
-                  <span class="fw-bold">{{ orderDate }}</span>
+                <div class="row text-start">
+                  <div class="col-6">
+                    <span class="text-muted">Order Date:</span>
+                  </div>
+                  <div class="col-6">
+                    <span class="fw-bold">{{ orderDate }}</span>
+                  </div>
+                </div>
+                <div class="row text-start">
+                  <div class="col-6">
+                    <span class="text-muted">Total Amount:</span>
+                  </div>
+                  <div class="col-6">
+                    <span class="fw-bold text-success">₹{{ totalAmount }}</span>
+                  </div>
                 </div>
               </div>
-              <div class="row text-start">
-                <div class="col-6">
-                  <span class="text-muted">Total Amount:</span>
+              
+              <!-- WhatsApp Notification Info -->
+              <div class="whatsapp-info mb-4 p-3" style="background-color: #f8f9fa; border-radius: 10px;">
+                <div class="d-flex align-items-center mb-2">
+                  <i class="fab fa-whatsapp text-success me-2" style="font-size: 1.2rem;"></i>
+                  <span class="fw-bold">WhatsApp Updates</span>
                 </div>
-                <div class="col-6">
-                  <span class="fw-bold text-success">₹{{ totalAmount }}</span>
-                </div>
+                <p class="text-muted mb-0 small">
+                  You will receive order updates and tracking information on WhatsApp at 
+                  <span class="fw-bold">{{ phoneNumber }}</span>
+                </p>
               </div>
-            </div>
-            
-            <!-- WhatsApp Notification Info -->
-            <div class="whatsapp-info mb-4 p-3" style="background-color: #f8f9fa; border-radius: 10px;">
-              <div class="d-flex align-items-center mb-2">
-                <i class="fab fa-whatsapp text-success me-2" style="font-size: 1.2rem;"></i>
-                <span class="fw-bold">WhatsApp Updates</span>
+              
+              <!-- Action Buttons -->
+              <div class="d-grid gap-2">
+                <button 
+                  @click="goToHome" 
+                  class="btn btn-primary btn-lg fw-bold"
+                  style="background-color: #1177bf; border-color: #1177bf;"
+                >
+                  <i class="fas fa-home me-2"></i>
+                  Continue Shopping
+                </button>
+                <button 
+                  @click="viewInvoice" 
+                  class="btn btn-success"
+                >
+                  <i class="bi bi-receipt me-2"></i>
+                  View Invoice
+                </button>
+                <button 
+                  @click="viewOrders" 
+                  class="btn btn-outline-secondary"
+                >
+                  <i class="fas fa-list me-2"></i>
+                  View My Orders
+                </button>
               </div>
-              <p class="text-muted mb-0 small">
-                You will receive order updates and tracking information on WhatsApp at 
-                <span class="fw-bold">{{ phoneNumber }}</span>
-              </p>
-            </div>
-            
-            <!-- Action Buttons -->
-            <div class="d-grid gap-2">
-              <button 
-                @click="goToHome" 
-                class="btn btn-primary btn-lg fw-bold"
-                style="background-color: #1177bf; border-color: #1177bf;"
-              >
-                <i class="fas fa-home me-2"></i>
-                Continue Shopping
-              </button>
-              <button 
-                @click="viewInvoice" 
-                class="btn btn-success"
-              >
-                <i class="bi bi-receipt me-2"></i>
-                View Invoice
-              </button>
-              <button 
-                @click="viewOrders" 
-                class="btn btn-outline-secondary"
-              >
-                <i class="fas fa-list me-2"></i>
-                View My Orders
-              </button>
             </div>
           </div>
         </div>
@@ -95,12 +134,16 @@ export default {
       orderId: '',
       orderDate: '',
       totalAmount: 0,
-      phoneNumber: ''
+      phoneNumber: '',
+      showSuccessAnimation: true,
+      showGotItButton: false
     };
   },
   mounted() {
     // Get order details from route params or localStorage
     this.getOrderDetails();
+    // Start the success animation sequence
+    this.startSuccessAnimation();
   },
   methods: {
     getOrderDetails() {
@@ -144,6 +187,15 @@ export default {
     viewInvoice() {
       // Navigate to invoice page
       this.$router.push(`/invoice/${this.orderId}`);
+    },
+    startSuccessAnimation() {
+      // Show the "Got it" button after a delay
+      setTimeout(() => {
+        this.showGotItButton = true;
+      }, 2000);
+    },
+    hideSuccessAnimation() {
+      this.showSuccessAnimation = false;
     }
   }
 };

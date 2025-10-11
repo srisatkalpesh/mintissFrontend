@@ -1,327 +1,296 @@
 <template>
-    <div class="amazon-cart-page">
-        <div class="cart-container">
-            <!-- Amazon-style Cart Header -->
-            <div class="amazon-cart-header">
-                <div class="header-content">
-                    <div class="header-left">
-                        <div class="cart-icon">
-                            <i class="bi bi-cart3"></i>
-                        </div>
-                        <div class="header-text">
-                            <h1 class="cart-title">Shopping Cart</h1>
-                            <p class="cart-subtitle">Review your items before checkout</p>
-                        </div>
-                    </div>
-                    
-                    <div class="header-right">
-                        <div class="item-count-badge">
-                            <span class="count-number">{{ cartItems.length }}</span>
-                            <span class="count-text">items</span>
-                        </div>
-                    </div>
-                </div>
+  <div class="amazon-cart-page">
+    <div class="cart-container">
+      <!-- Amazon-style Cart Header -->
+      <div class="amazon-cart-header">
+        <div class="header-content">
+          <div class="header-left">
+            <div class="cart-icon">
+              <i class="bi bi-cart3"></i>
             </div>
-
-            <!-- Empty Cart Message -->
-            <div v-if="cartItems.length === 0" class="empty-cart-container">
-                <div class="empty-cart-content">
-                    <div class="empty-cart-icon">
-                        <i class="bi bi-cart-x"></i>
-                    </div>
-                    <h2 class="empty-cart-title">Your cart is empty</h2>
-                    <p class="empty-cart-message">Looks like you haven't added any items to your cart yet. Start shopping to fill it up!</p>
-                    <router-link to="/" class="continue-shopping-btn">
-                        <i class="bi bi-arrow-left me-2"></i>
-                    Continue Shopping
-                </router-link>
-                </div>
+            <div class="header-text">
+              <h1 class="cart-title">Shopping Cart</h1>
+              <p class="cart-subtitle">Review your items before checkout</p>
             </div>
+          </div>
 
-            <!-- Amazon-style Cart Items -->
-            <div v-else class="amazon-cart-content">
-                <div class="cart-items-section">
-                    <div class="cart-items-container">
-                        <div v-for="item in cartItems" :key="item.id" class="amazon-cart-item">
-                            <div class="item-content">
-                                <!-- Product Image -->
-                                <div class="item-image-container">
-                                    <img :src="item.image || 'https://via.placeholder.com/100x100?text=No+Image'"
-                                         class="item-image"
-                                         :alt="item.name"
-                                         @error="handleImageError">
-                                </div>
-                                
-                                <!-- Product Details -->
-                                <div class="item-details">
-                                    <h3 class="item-name">{{ item.name }}</h3>
-                                    <p class="item-description">{{ item.description || 'No description available' }}</p>
-                                    <div class="item-price">
-                                        <span class="current-price">₹{{ item.price }}</span>
-                                        <span v-if="item.originalPrice && item.originalPrice > item.price" class="original-price">
-                                            ₹{{ item.originalPrice }}
-                                        </span>
-                                    </div>
-                                    
-                                    <!-- Quantity Controls -->
-                                    <div class="quantity-section">
-                                        <label class="quantity-label">Quantity</label>
-                                        <div class="quantity-controls">
-                                            <button class="quantity-btn decrease"
-                                                        @click="updateQuantity(item.id, item.quantity - 1)"
-                                                        :disabled="item.quantity <= 1">
-                                                    <i class="bi bi-dash"></i>
-                                                </button>
-                                                <input type="number" 
-                                                   class="quantity-input" 
-                                                       v-model.number="item.quantity"
-                                                       min="1"
-                                                       @change="updateQuantity(item.id, item.quantity)">
-                                            <button class="quantity-btn increase"
-                                                        @click="updateQuantity(item.id, item.quantity + 1)">
-                                                    <i class="bi bi-plus"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    
-                                    <!-- Mintiss Points -->
-                                    <div v-if="item.mintissPoints" class="mintiss-points">
-                                        <i class="bi bi-gift"></i>
-                                        <span>+{{ (parseFloat(item.mintissPoints) * item.quantity).toFixed(8) }} mintiss</span>
-                                    </div>
-                                    
-                                    <!-- Price and Remove -->
-                                    <div class="item-actions">
-                                        <div class="item-total">
-                                            <span class="total-price">₹{{ item.price * item.quantity }}</span>
-                                        </div>
-                                        <button class="remove-btn" @click="removeItem(item.id)">
-                                            <i class="bi bi-trash"></i>
-                                            <span>Remove</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Address Selection -->
-                    <div class="card shadow-sm mb-2 compact-address-card">
-                        <div class="card-header text-white compact-card-header" style="background: linear-gradient(135deg, #1177bf 0%, #0d5a9a 100%);">
-                            <h6 class="mb-0 compact-header-title">Delivery Address</h6>
-                        </div>
-                        <div class="card-body">
-                            <div v-if="addresses.length === 0" class="text-center py-3">
-                                <p class="text-muted mb-3">No addresses found</p>
-                                <button class="btn text-white" style="background: linear-gradient(135deg, #1177bf 0%, #0d5a9a 100%);" @click="showAddressModal">
-                                    Add New Address
-                                </button>
-                            </div>
-                            <div v-else>
-                                <div class="list-group">
-                                    <label v-for="address in addresses" 
-                                           :key="address.id" 
-                                           class="list-group-item list-group-item-action">
-                                        <div class="form-check">
-                                            <input class="form-check-input" 
-                                                   type="radio" 
-                                                   :value="address.id"
-                                                   v-model="selectedAddressId"
-                                                   name="address">
-                                            <div class="form-check-label">
-                                                <h6 class="mb-1">{{ address.title }}</h6>
-                                                <p class="mb-1">{{ address.address_line }}</p>
-                                                <p class="mb-1">
-                                                    {{ address.city }}, {{ address.state }}, {{ address.country }}
-                                                </p>
-                                                <p class="mb-0">Postal Code: {{ address.postal_code }}</p>
-                                            </div>
-                                        </div>
-                                    </label>
-                                </div>
-                                <button class="btn btn-outline-primary mt-3" @click="showAddressModal">
-                                    <i class="bi bi-plus-lg"></i> Add New Address
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Order Summary -->
-                <div class="order-summary-section">
-                    <!-- Points Redemption Section -->
-                    <div class="points-redemption-card">
-                        <div class="card-header">
-                            <div class="header-icon">
-                                <i class="bi bi-gift"></i>
-                            </div>
-                            <div class="header-content">
-                                <h5 class="card-title">Points Redemption</h5>
-                                <p class="card-subtitle">Use your earned points to save money</p>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <!-- Available Balance -->
-                            <div class="balance-section">
-                                <div class="balance-header">
-                                    <span class="balance-label">Available Balance</span>
-                                    <button 
-                                        class="refresh-btn" 
-                                        @click="refreshBalance"
-                                        :disabled="isRefreshingBalance"
-                                        title="Refresh Balance"
-                                    >
-                                        <i class="bi bi-arrow-clockwise" :class="{ 'spinning': isRefreshingBalance }"></i>
-                                    </button>
-                                </div>
-                                <div class="balance-amount">
-                                    <span class="amount">₹{{ userBalance || '0.00' }}</span>
-                                    <span class="currency">INR</span>
-                            </div>
-                            </div>
-
-                            <!-- No Balance Alert -->
-                            <div v-if="userBalance <= 0" class="no-balance-alert">
-                                <div class="alert-icon">
-                                    <i class="bi bi-info-circle"></i>
-                            </div>
-                                <div class="alert-content">
-                                    <p class="alert-title">No Balance Available</p>
-                                    <p class="alert-message">You can earn points by shopping or check your profile for available rewards.</p>
-                                </div>
-                            </div>
-
-                            <!-- Cart Total -->
-                            <div class="cart-total-section">
-                                <span class="total-label">Cart Total</span>
-                                <span class="total-amount">₹{{ subtotal }}</span>
-                            </div>
-
-                            <!-- Redeem Input -->
-                            <div class="redeem-section">
-                                <label for="redeemAmount" class="redeem-label">Redeem Amount (₹)</label>
-                                <div class="redeem-input-group">
-                                    <input 
-                                        type="number" 
-                                        id="redeemAmount" 
-                                        v-model="redeemAmount"
-                                        :max="Math.min(userBalance || 0, subtotal)"
-                                        :min="0"
-                                        step="0.01"
-                                        placeholder="Enter amount to redeem"
-                                        @input="calculateFinalPrice"
-                                        class="redeem-input"
-                                        :class="{ 'error': redeemAmount > maxRedeemable }"
-                                    >
-                                    <button 
-                                        class="max-btn" 
-                                        type="button"
-                                        @click="setMaxRedeem"
-                                        :disabled="maxRedeemable <= 0"
-                                    >
-                                        Max
-                                    </button>
-                                </div>
-                                <div class="redeem-info">
-                                    <span class="max-info">Maximum redeemable: ₹{{ maxRedeemable.toFixed(2) }}</span>
-                                </div>
-                                <div v-if="redeemAmount > maxRedeemable" class="error-message">
-                                    Redeem amount cannot exceed your available balance or cart total.
-                                </div>
-                            </div>
-
-                            <!-- Final Calculation -->
-                            <div class="final-calculation">
-                                <div class="final-total">
-                                    <span class="final-label">Final Total</span>
-                                    <span class="final-amount">₹{{ finalPrice.toFixed(2) }}</span>
-                            </div>
-                                <div class="savings">
-                                    <span class="savings-label">You Save</span>
-                                <span class="savings-amount">₹{{ (subtotal - finalPrice).toFixed(2) }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Order Summary -->
-                    <div class="order-summary-card">
-                        <div class="summary-header">
-                            <div class="summary-icon">
-                                <i class="bi bi-receipt"></i>
-                        </div>
-                            <div class="summary-content">
-                                <h5 class="summary-title">Order Summary</h5>
-                                <p class="summary-subtitle">Review your order details</p>
-                            </div>
-                            </div>
-                        <div class="summary-body">
-                            <div class="summary-item">
-                                <span class="item-label">Subtotal</span>
-                                <span class="item-value">₹{{ subtotal }}</span>
-                            </div>
-                            <div class="summary-item">
-                                <span class="item-label">Shipping</span>
-                                <span class="item-value free">Free</span>
-                            </div>
-                            <div class="summary-item">
-                                <span class="item-label">Total Mintiss Points</span>
-                                <span class="item-value points">{{ totalMintissPoints }}</span>
-                            </div>
-                            
-                            <div class="summary-divider"></div>
-                            
-                            <!-- Amount Breakdown -->
-                            <div class="amount-breakdown">
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Subtotal</span>
-                                    <span class="breakdown-value">₹{{ finalPrice }} </span>
-                                </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">+ Tax (18%)</span>
-                                    <span class="breakdown-value">₹{{ (finalPrice * 0.18) }}</span>
-                                </div>
-                                <div class="breakdown-divider"></div>
-                                <div class="breakdown-total">
-                                    <span class="total-label">Total Amount</span>
-                                    <span class="total-value">₹{{ finalPrice + (finalPrice * 0.18) }}</span>
-                                </div>
-                            </div>
-                            <button 
-                                class="checkout-btn" 
-                                    @click="confirmOrder"
-                                :disabled="!selectedAddressId"
-                            >
-                                <i class="bi bi-credit-card"></i>
-                                <span>Proceed to Checkout</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+          <div class="header-right">
+            <div class="item-count-badge">
+              <span class="count-number">{{ cartItems.length }}</span>
+              <span class="count-text">items</span>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty Cart Message -->
+      <div v-if="cartItems.length === 0" class="empty-cart-container">
+        <div class="empty-cart-content">
+          <div class="empty-cart-icon">
+            <i class="bi bi-cart-x"></i>
+          </div>
+          <h2 class="empty-cart-title">Your cart is empty</h2>
+          <p class="empty-cart-message">Looks like you haven't added any items to your cart yet. Start shopping to fill
+            it up!</p>
+          <router-link to="/" class="continue-shopping-btn">
+            <i class="bi bi-arrow-left me-2"></i>
+            Continue Shopping
+          </router-link>
+        </div>
+      </div>
+
+      <!-- Amazon-style Cart Items -->
+      <div v-else class="amazon-cart-content">
+        <div class="cart-items-section">
+          <div class="cart-items-container">
+            <div v-for="item in cartItems" :key="item.id" class="amazon-cart-item">
+              <div class="item-content">
+                <!-- Product Image -->
+                <div class="item-image-container">
+                  <img :src="item.image || 'https://via.placeholder.com/100x100?text=No+Image'" class="item-image"
+                    :alt="item.name" @error="handleImageError">
+                </div>
+
+                <!-- Product Details -->
+                <div class="item-details">
+                  <h3 class="item-name">{{ item.name }}</h3>
+                  <p class="item-description">{{ item.description || 'No description available' }}</p>
+                  <div class="item-price">
+                    <span class="current-price">₹{{ item.price }}</span>
+                    <span v-if="item.originalPrice && item.originalPrice > item.price" class="original-price">
+                      ₹{{ item.originalPrice }}
+                    </span>
+                  </div>
+
+                  <!-- Quantity Controls -->
+                  <div class="quantity-section">
+                    <label class="quantity-label">Quantity</label>
+                    <div class="quantity-controls">
+                      <button class="quantity-btn decrease" @click="updateQuantity(item.id, item.quantity - 1)"
+                        :disabled="item.quantity <= 1">
+                        <i class="bi bi-dash"></i>
+                      </button>
+                      <input type="number" class="quantity-input" v-model.number="item.quantity" min="1"
+                        @change="updateQuantity(item.id, item.quantity)">
+                      <button class="quantity-btn increase" @click="updateQuantity(item.id, item.quantity + 1)">
+                        <i class="bi bi-plus"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Mintiss Points -->
+                  <div v-if="item.mintissPoints" class="mintiss-points">
+                    <i class="bi bi-gift"></i>
+                    <span>+{{ (parseFloat(item.mintissPoints) * item.quantity).toFixed(8) }} mintiss</span>
+                  </div>
+
+                  <!-- Price and Remove -->
+                  <div class="item-actions">
+                    <div class="item-total">
+                      <span class="total-price">₹{{ item.price * item.quantity }}</span>
+                    </div>
+                    <button class="remove-btn" @click="removeItem(item.id)">
+                      <i class="bi bi-trash"></i>
+                      <span>Remove</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Address Selection -->
+          <div class="card shadow-sm mb-2 compact-address-card">
+            <div class="card-header text-white compact-card-header"
+              style="background: linear-gradient(135deg, #1177bf 0%, #0d5a9a 100%);">
+              <h6 class="mb-0 compact-header-title">Delivery Address</h6>
+            </div>
+            <div class="card-body">
+              <div v-if="addresses.length === 0" class="text-center py-3">
+                <p class="text-muted mb-3">No addresses found</p>
+                <button class="btn text-white" style="background: linear-gradient(135deg, #1177bf 0%, #0d5a9a 100%);"
+                  @click="showAddressModal">
+                  Add New Address
+                </button>
+              </div>
+              <div v-else>
+                <div class="list-group">
+                  <label v-for="address in addresses" :key="address.id" class="list-group-item list-group-item-action">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" :value="address.id" v-model="selectedAddressId"
+                        name="address">
+                      <div class="form-check-label">
+                        <h6 class="mb-1">{{ address.title }}</h6>
+                        <p class="mb-1">{{ address.address_line }}</p>
+                        <p class="mb-1">
+                          {{ address.city }}, {{ address.state }}, {{ address.country }}
+                        </p>
+                        <p class="mb-0">Postal Code: {{ address.postal_code }}</p>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+                <button class="btn btn-outline-primary mt-3" @click="showAddressModal">
+                  <i class="bi bi-plus-lg"></i> Add New Address
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Address Form Modal -->
-        <div v-if="showAddressForm" class="modal-overlay" @click.self="closeAddressModal">
-            <div class="modal-container">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Add New Address</h5>
-                        <button type="button" 
-                                class="btn-close" 
-                                @click="closeAddressModal">
-                            <i class="bi bi-x"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <AddressForm @submit="handleAddressSubmit" @cancel="closeAddressModal" />
-                    </div>
-                </div>
+        <!-- Order Summary -->
+        <div class="order-summary-section">
+          <!-- Points Redemption Section -->
+          <div class="points-redemption-card">
+            <div class="card-header">
+              <div class="header-icon">
+                <i class="bi bi-gift"></i>
+              </div>
+              <div class="header-content">
+                <h5 class="card-title">Points Redemption</h5>
+                <p class="card-subtitle">Use your earned points to save money</p>
+              </div>
             </div>
+            <div class="card-body">
+              <!-- Available Balance -->
+              <div class="balance-section">
+                <div class="balance-header">
+                  <span class="balance-label">Available Balance</span>
+                  <button class="refresh-btn" @click="refreshBalance" :disabled="isRefreshingBalance"
+                    title="Refresh Balance">
+                    <i class="bi bi-arrow-clockwise" :class="{ 'spinning': isRefreshingBalance }"></i>
+                  </button>
+                </div>
+                <div class="balance-amount">
+                  <span class="amount">₹{{ userBalance || '0.00' }}</span>
+                  <span class="currency">INR</span>
+                </div>
+              </div>
+
+              <!-- No Balance Alert -->
+              <div v-if="userBalance <= 0" class="no-balance-alert">
+                <div class="alert-icon">
+                  <i class="bi bi-info-circle"></i>
+                </div>
+                <div class="alert-content">
+                  <p class="alert-title">No Balance Available</p>
+                  <p class="alert-message">You can earn points by shopping or check your profile for available rewards.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Cart Total -->
+              <div class="cart-total-section">
+                <span class="total-label">Cart Total</span>
+                <span class="total-amount">₹{{ subtotal }}</span>
+              </div>
+
+              <!-- Redeem Input -->
+              <div class="redeem-section">
+                <label for="redeemAmount" class="redeem-label">Redeem Amount (₹)</label>
+                <div class="redeem-input-group">
+                  <input type="number" id="redeemAmount" v-model="redeemAmount"
+                    :max="Math.min(userBalance || 0, subtotal)" :min="0" step="0.01"
+                    placeholder="Enter amount to redeem" @input="calculateFinalPrice" class="redeem-input"
+                    :class="{ 'error': redeemAmount > maxRedeemable }">
+                  <button class="max-btn" type="button" @click="setMaxRedeem" :disabled="maxRedeemable <= 0">
+                    Max
+                  </button>
+                </div>
+                <div class="redeem-info">
+                  <span class="max-info">Maximum redeemable: ₹{{ maxRedeemable.toFixed(2) }}</span>
+                </div>
+                <div v-if="redeemAmount > maxRedeemable" class="error-message">
+                  Redeem amount cannot exceed your available balance or cart total.
+                </div>
+              </div>
+
+              <!-- Final Calculation -->
+              <div class="final-calculation">
+                <div class="final-total">
+                  <span class="final-label">Final Total</span>
+                  <span class="final-amount">₹{{ finalPrice.toFixed(2) }}</span>
+                </div>
+                <div class="savings">
+                  <span class="savings-label">You Save</span>
+                  <span class="savings-amount">₹{{ (subtotal - finalPrice).toFixed(2) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Order Summary -->
+          <div class="order-summary-card">
+            <div class="summary-header">
+              <div class="summary-icon">
+                <i class="bi bi-receipt"></i>
+              </div>
+              <div class="summary-content">
+                <h5 class="summary-title">Order Summary</h5>
+                <p class="summary-subtitle">Review your order details</p>
+              </div>
+            </div>
+            <div class="summary-body">
+              <div class="summary-item">
+                <span class="item-label">Subtotal</span>
+                <span class="item-value">₹{{ subtotal }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="item-label">Shipping</span>
+                <span class="item-value free">Free</span>
+              </div>
+              <div class="summary-item">
+                <span class="item-label">Total Mintiss Points</span>
+                <span class="item-value points">{{ totalMintissPoints }}</span>
+              </div>
+
+              <div class="summary-divider"></div>
+
+              <!-- Amount Breakdown -->
+              <div class="amount-breakdown">
+                <div class="breakdown-item">
+                  <span class="breakdown-label">Base Amount</span>
+                  <span class="breakdown-value">₹{{ (finalPrice / 1.05).toFixed(2) }}</span>
+                </div>
+                <div class="breakdown-item">
+                  <span class="breakdown-label">Tax (5% included)</span>
+                  <span class="breakdown-value">₹{{ (finalPrice - (finalPrice / 1.05)).toFixed(2) }}</span>
+                </div>
+                <div class="breakdown-divider"></div>
+                <div class="breakdown-total">
+                  <span class="total-label">Total Amount</span>
+                  <span class="total-value">₹{{ finalPrice.toFixed(2) }}</span>
+                </div>
+              </div>
+              <button class="checkout-btn" @click="confirmOrder" :disabled="!selectedAddressId">
+                <i class="bi bi-credit-card"></i>
+                <span>Proceed to Checkout</span>
+              </button>
+            </div>
+          </div>
         </div>
-
-
+      </div>
     </div>
+
+    <!-- Address Form Modal -->
+    <div v-if="showAddressForm" class="modal-overlay" @click.self="closeAddressModal">
+      <div class="modal-container">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add New Address</h5>
+            <button type="button" class="btn-close" @click="closeAddressModal">
+              <i class="bi bi-x"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <AddressForm @submit="handleAddressSubmit" @cancel="closeAddressModal" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
 </template>
 
 <script>
@@ -330,332 +299,333 @@ import toastService from '@/services/toastService';
 import AddressForm from '@/components/AddressForm.vue';
 
 export default {
-    name: "UserCart",
-    components: {
-        AddressForm
+  name: "UserCart",
+  components: {
+    AddressForm
+  },
+  data() {
+    return {
+      cartItems: [],
+      addresses: [],
+      selectedAddressId: null,
+      showAddressForm: false,
+      placingOrder: false,
+      // Redemption properties
+      redeemAmount: 0,
+      userBalance: 0,
+      mintissValue: 0,
+      finalPrice: 0,
+      isRefreshingBalance: false,
+    };
+  },
+  computed: {
+    subtotal() {
+      return this.cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     },
-    data() {
-        return {
-            cartItems: [],
-            addresses: [],
-            selectedAddressId: null,
-            showAddressForm: false,
-            placingOrder: false,
-            // Redemption properties
-            redeemAmount: 0,
-            userBalance: 0,
-            mintissValue: 0,
-            finalPrice: 0,
-            isRefreshingBalance: false,
-        };
+    total() {
+      return this.subtotal;
     },
-    computed: {
-        subtotal() {
-            return this.cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-        },
-        total() {
-            return this.subtotal;
-        },
-        totalMintissPoints() {
-            return this.cartItems.reduce((total, item) => {
-                if (item.mintissPoints) {
-                    return total + (parseFloat(item.mintissPoints) * item.quantity);
-                }
-                return total;
-            }, 0).toFixed(8);
-        },
-        maxRedeemable() {
-            return Math.min(this.userBalance || 0, this.subtotal);
-        },
-        isLoggedIn() {
-            return !!localStorage.getItem("token");
+    totalMintissPoints() {
+      return this.cartItems.reduce((total, item) => {
+        if (item.mintissPoints) {
+          return total + (parseFloat(item.mintissPoints) * item.quantity);
         }
+        return total;
+      }, 0).toFixed(8);
     },
-    methods: {
-        loadCart() {
-            const savedCart = localStorage.getItem('cart');
-            this.cartItems = savedCart ? JSON.parse(savedCart) : [];
-            console.log('Loaded cart items:', this.cartItems);
-            
-            // Ensure each cart item has required fields
-            this.cartItems = this.cartItems.map(item => ({
-                id: item.id || 0,
-                name: item.name || 'Unknown Product',
-                price: item.price || 0,
-                quantity: item.quantity || 1,
-                images: item.images || [],
-                ...item // Keep any other properties
-            }));
-            
-            console.log('Processed cart items:', this.cartItems);
-        },
-        saveCart() {
-            localStorage.setItem('cart', JSON.stringify(this.cartItems));
-        },
-        async fetchAddresses() {
-            try {
-                const response = await axios.get('/addresses');
-                this.addresses = response.data.data;
-                if (this.addresses.length > 0) {
-                    this.selectedAddressId = this.addresses[0].id;
-                }
-            } catch (error) {
-                toastService.error('Failed to fetch addresses');
-                console.error('Error fetching addresses:', error);
-            }
-        },
-        updateQuantity(itemId, newQuantity) {
-            if (newQuantity < 1) return;
-            
-            const item = this.cartItems.find(item => item.id === itemId);
-            if (item) {
-                item.quantity = newQuantity;
-                this.saveCart();
-                // Recalculate final price when quantity changes
-                this.calculateFinalPrice();
-                toastService.success('Cart updated successfully!');
-            }
-        },
-        removeItem(itemId) {
-            this.cartItems = this.cartItems.filter(item => item.id !== itemId);
-            this.saveCart();
-            // Recalculate final price when item is removed
-            this.calculateFinalPrice();
-            toastService.success('Item removed from cart!');
-        },
-        async handleAddressSubmit(formData) {
-            try {
-                const response = await axios.post('/addresses', formData);
-                this.addresses.push(response.data);
-                this.selectedAddressId = response.data.id;
-                this.closeAddressModal();
-                toastService.success('Address added successfully');
-            } catch (error) {
-                toastService.error('Failed to add address');
-                console.error('Error adding address:', error);
-            }
-        },
-
-        showAddressModal() {
-            console.log('showAddressModal called');
-            this.showAddressForm = true;
-        },
-
-        closeAddressModal() {
-            this.showAddressForm = false;
-        },
-
-
-
-
-        async placeOrder() {
-            if (!this.selectedAddressId) {
-                toastService.error('Please select a delivery address');
-                return;
-            }
-
-            if (this.cartItems.length === 0) {
-                toastService.error('Your cart is empty');
-                return;
-            }
-
-            this.placingOrder = true;
-
-            try {
-                // Validate required data
-                if (!this.selectedAddressId) {
-                    throw new Error('No address selected');
-                }
-                
-                if (this.cartItems.length === 0) {
-                    throw new Error('Cart is empty');
-                }
-                
-                if (!this.finalPrice || this.finalPrice <= 0) {
-                    throw new Error('Invalid final price');
-                }
-
-                const orderData = {
-                    address_id: this.selectedAddressId,
-                    products: this.cartItems.map(item => ({
-                        id: item.id,
-                        quantity: item.quantity,
-                        price: item.price
-                    })),
-                    redeem_amount: this.redeemAmount,
-                    finalPrice: this.finalPrice,
-                    total_amount: this.finalPrice
-                };
-
-                console.log('Order Data:', orderData);
-                console.log('Cart Items:', this.cartItems);
-                console.log('Final Price:', this.finalPrice);
-
-                const response = await axios.post('/orders', orderData);
-                
-                console.log('Order response:', response.data);
-                
-                // Check if order was successful
-                if (response.data.success) {
-                    // Clear cart
-                    localStorage.removeItem('cart');
-                    this.cartItems = [];
-                    
-                    toastService.success('Order placed successfully!');
-                    
-                    // Redirect to home page
-                    this.$router.push('/');
-                } else {
-                    throw new Error(response.data.message || 'Order failed');
-                }
-                
-            } catch (error) {
-                console.error('Error placing order:', error);
-                
-                // Show specific error message
-                let errorMessage = 'Failed to place order. Please try again.';
-                
-                if (error.response && error.response.data && error.response.data.message) {
-                    errorMessage = error.response.data.message;
-                } else if (error.message) {
-                    errorMessage = error.message;
-                }
-                
-                toastService.error(errorMessage);
-            } finally {
-                this.placingOrder = false;
-            }
-        },
-
-        confirmOrder() {
-            if (!this.selectedAddressId) {
-                toastService.error('Please select a delivery address');
-                return;
-            }
-            // Directly place order without confirmation modal
-            this.placeOrder();
-        },
-        
-        // Redemption methods
-        async fetchMintissValue() {
-            try {
-                const response = await axios.get("/mintiss-value/latest");
-                this.mintissValue = parseFloat(response.data.data.value);
-                this.calculateUserBalance();
-            } catch (error) {
-                console.error("Error fetching mintiss value:", error);
-                this.mintissValue = 0;
-                this.calculateUserBalance();
-            }
-        },
-        
-        async fetchUserBalance() {
-            try {
-                const response = await axios.get("/user/balance");
-                if (response.data.success) {
-                    this.userBalance = parseFloat(response.data.balance || 0);
-                    console.log('Fetched balance from API:', this.userBalance);
-                }
-            } catch (error) {
-                console.error("Error fetching user balance:", error);
-                this.calculateUserBalance();
-            }
-        },
-        
-        calculateUserBalance() {
-            const user = JSON.parse(localStorage.getItem("user"));
-            console.log('User data:', user);
-            console.log('Mintiss value:', this.mintissValue);
-            
-            if (user && user.mintiss && this.mintissValue) {
-                this.userBalance = parseFloat((parseFloat(user.mintiss) * this.mintissValue).toFixed(2));
-                console.log('Calculated balance:', this.userBalance);
-            } else {
-                if (user && user.balance) {
-                    this.userBalance = parseFloat(user.balance);
-                } else if (user && user.mintiss) {
-                    this.userBalance = parseFloat(user.mintiss) * 0.001;
-                } else {
-                    this.userBalance = 0;
-                }
-                console.log('Fallback balance:', this.userBalance);
-            }
-            this.calculateFinalPrice();
-        },
-        
-        calculateFinalPrice() {
-            this.finalPrice = Math.max(0, this.subtotal - this.redeemAmount);
-            console.log('Calculating final price:', {
-                subtotal: this.subtotal,
-                redeemAmount: this.redeemAmount,
-                finalPrice: this.finalPrice
-            });
-        },
-        
-        setMaxRedeem() {
-            console.log('Setting max redeem. Max redeemable:', this.maxRedeemable);
-            // Truncate to 2 decimal places instead of rounding
-            this.redeemAmount = Math.floor(this.maxRedeemable * 100) / 100;
-            this.calculateFinalPrice();
-            console.log('Redeem amount set to:', this.redeemAmount);
-            
-            if (this.maxRedeemable > 0) {
-                toastService.success(`Maximum amount (₹${this.redeemAmount.toFixed(2)}) applied!`);
-            }
-        },
-        
-        async refreshBalance() {
-            this.isRefreshingBalance = true;
-            try {
-                if (this.isLoggedIn) {
-                    await this.fetchUserBalance();
-                    toastService.success('Balance refreshed successfully!');
-                } else {
-                    this.userBalance = Math.floor(Math.random() * 2000) + 500;
-                    toastService.success('Demo balance refreshed! New balance: ₹' + this.userBalance);
-                }
-            } catch (error) {
-                console.error('Error refreshing balance:', error);
-                toastService.error('Failed to refresh balance. Please try again.');
-            } finally {
-                this.isRefreshingBalance = false;
-            }
-        }
+    maxRedeemable() {
+      return Math.min(this.userBalance || 0, this.subtotal);
     },
-    async mounted() {
-        this.loadCart();
-        this.fetchAddresses();
-        
-        // Initialize redemption functionality
-        if (this.isLoggedIn) {
-            await this.fetchMintissValue();
-            await this.fetchUserBalance();
-        } else {
-            this.userBalance = 1000; // Demo balance
-        }
-        this.calculateFinalPrice();
-    },
-    
-    
-    watch: {
-        subtotal() {
-            // Recalculate final price when subtotal changes
-            this.calculateFinalPrice();
-            // Adjust redeem amount if it exceeds new maxRedeemable
-            if (this.redeemAmount > this.maxRedeemable) {
-                this.redeemAmount = this.maxRedeemable;
-            }
-        },
-        redeemAmount(newVal) {
-            if (newVal > this.maxRedeemable) {
-                this.redeemAmount = this.maxRedeemable;
-            }
-            if (newVal < 0) {
-                this.redeemAmount = 0;
-            }
-            this.calculateFinalPrice();
-        }
+    isLoggedIn() {
+      return !!localStorage.getItem("token");
     }
+  },
+  methods: {
+    loadCart() {
+      const savedCart = localStorage.getItem('cart');
+      this.cartItems = savedCart ? JSON.parse(savedCart) : [];
+      console.log('Loaded cart items:', this.cartItems);
+
+      // Ensure each cart item has required fields
+      this.cartItems = this.cartItems.map(item => ({
+        id: item.id || 0,
+        name: item.name || 'Unknown Product',
+        price: item.price || 0,
+        quantity: item.quantity || 1,
+        images: item.images || [],
+        ...item // Keep any other properties
+      }));
+
+      console.log('Processed cart items:', this.cartItems);
+    },
+    saveCart() {
+      localStorage.setItem('cart', JSON.stringify(this.cartItems));
+    },
+    async fetchAddresses() {
+      try {
+        const response = await axios.get('/addresses');
+        this.addresses = response.data.data;
+        if (this.addresses.length > 0) {
+          this.selectedAddressId = this.addresses[0].id;
+        }
+      } catch (error) {
+        toastService.error('Failed to fetch addresses');
+        console.error('Error fetching addresses:', error);
+      }
+    },
+    updateQuantity(itemId, newQuantity) {
+      if (newQuantity < 1) return;
+
+      const item = this.cartItems.find(item => item.id === itemId);
+      if (item) {
+        item.quantity = newQuantity;
+        this.saveCart();
+        // Recalculate final price when quantity changes
+        this.calculateFinalPrice();
+        toastService.success('Cart updated successfully!');
+      }
+    },
+    removeItem(itemId) {
+      this.cartItems = this.cartItems.filter(item => item.id !== itemId);
+      this.saveCart();
+      // Recalculate final price when item is removed
+      this.calculateFinalPrice();
+      toastService.success('Item removed from cart!');
+    },
+    async handleAddressSubmit(formData) {
+      try {
+        const response = await axios.post('/addresses', formData);
+        this.addresses.push(response.data);
+        this.selectedAddressId = response.data.id;
+        this.closeAddressModal();
+        toastService.success('Address added successfully');
+      } catch (error) {
+        toastService.error('Failed to add address');
+        console.error('Error adding address:', error);
+      }
+    },
+
+    showAddressModal() {
+      console.log('showAddressModal called');
+      this.showAddressForm = true;
+    },
+
+    closeAddressModal() {
+      this.showAddressForm = false;
+    },
+
+
+
+
+    async placeOrder() {
+      if (!this.selectedAddressId) {
+        toastService.error('Please select a delivery address');
+        return;
+      }
+
+      if (this.cartItems.length === 0) {
+        toastService.error('Your cart is empty');
+        return;
+      }
+
+      this.placingOrder = true;
+
+      try {
+        // Validate required data
+        if (!this.selectedAddressId) {
+          throw new Error('No address selected');
+        }
+
+        if (this.cartItems.length === 0) {
+          throw new Error('Cart is empty');
+        }
+
+        if (!this.finalPrice || this.finalPrice <= 0) {
+          throw new Error('Invalid final price');
+        }
+
+        const orderData = {
+          address_id: this.selectedAddressId,
+          products: this.cartItems.map(item => ({
+            id: item.id,
+            quantity: item.quantity,
+            price: item.price,
+            description: item.description
+          })),
+          redeem_amount: this.redeemAmount,
+          finalPrice: this.finalPrice,
+          total_amount: this.finalPrice
+        };
+
+        console.log('Order Data:', orderData);
+        console.log('Cart Items:', this.cartItems);
+        console.log('Final Price:', this.finalPrice);
+
+        const response = await axios.post('/orders', orderData);
+
+        console.log('Order response:', response.data);
+
+        // Check if order was successful
+        if (response.data.success) {
+          // Clear cart
+          localStorage.removeItem('cart');
+          this.cartItems = [];
+
+          toastService.success('Order placed successfully!');
+
+          // Redirect to home page
+          this.$router.push('/');
+        } else {
+          throw new Error(response.data.message || 'Order failed');
+        }
+
+      } catch (error) {
+        console.error('Error placing order:', error);
+
+        // Show specific error message
+        let errorMessage = 'Failed to place order. Please try again.';
+
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+
+        toastService.error(errorMessage);
+      } finally {
+        this.placingOrder = false;
+      }
+    },
+
+    confirmOrder() {
+      if (!this.selectedAddressId) {
+        toastService.error('Please select a delivery address');
+        return;
+      }
+      // Directly place order without confirmation modal
+      this.placeOrder();
+    },
+
+    // Redemption methods
+    async fetchMintissValue() {
+      try {
+        const response = await axios.get("/mintiss-value/latest");
+        this.mintissValue = parseFloat(response.data.data.value);
+        this.calculateUserBalance();
+      } catch (error) {
+        console.error("Error fetching mintiss value:", error);
+        this.mintissValue = 0;
+        this.calculateUserBalance();
+      }
+    },
+
+    async fetchUserBalance() {
+      try {
+        const response = await axios.get("/user/balance");
+        if (response.data.success) {
+          this.userBalance = parseFloat(response.data.balance || 0);
+          console.log('Fetched balance from API:', this.userBalance);
+        }
+      } catch (error) {
+        console.error("Error fetching user balance:", error);
+        this.calculateUserBalance();
+      }
+    },
+
+    calculateUserBalance() {
+      const user = JSON.parse(localStorage.getItem("user"));
+      console.log('User data:', user);
+      console.log('Mintiss value:', this.mintissValue);
+
+      if (user && user.mintiss && this.mintissValue) {
+        this.userBalance = parseFloat((parseFloat(user.mintiss) * this.mintissValue).toFixed(2));
+        console.log('Calculated balance:', this.userBalance);
+      } else {
+        if (user && user.balance) {
+          this.userBalance = parseFloat(user.balance);
+        } else if (user && user.mintiss) {
+          this.userBalance = parseFloat(user.mintiss) * 0.001;
+        } else {
+          this.userBalance = 0;
+        }
+        console.log('Fallback balance:', this.userBalance);
+      }
+      this.calculateFinalPrice();
+    },
+
+    calculateFinalPrice() {
+      this.finalPrice = Math.max(0, this.subtotal - this.redeemAmount);
+      console.log('Calculating final price:', {
+        subtotal: this.subtotal,
+        redeemAmount: this.redeemAmount,
+        finalPrice: this.finalPrice
+      });
+    },
+
+    setMaxRedeem() {
+      console.log('Setting max redeem. Max redeemable:', this.maxRedeemable);
+      // Truncate to 2 decimal places instead of rounding
+      this.redeemAmount = Math.floor(this.maxRedeemable * 100) / 100;
+      this.calculateFinalPrice();
+      console.log('Redeem amount set to:', this.redeemAmount);
+
+      if (this.maxRedeemable > 0) {
+        toastService.success(`Maximum amount (₹${this.redeemAmount.toFixed(2)}) applied!`);
+      }
+    },
+
+    async refreshBalance() {
+      this.isRefreshingBalance = true;
+      try {
+        if (this.isLoggedIn) {
+          await this.fetchUserBalance();
+          toastService.success('Balance refreshed successfully!');
+        } else {
+          this.userBalance = Math.floor(Math.random() * 2000) + 500;
+          toastService.success('Demo balance refreshed! New balance: ₹' + this.userBalance);
+        }
+      } catch (error) {
+        console.error('Error refreshing balance:', error);
+        toastService.error('Failed to refresh balance. Please try again.');
+      } finally {
+        this.isRefreshingBalance = false;
+      }
+    }
+  },
+  async mounted() {
+    this.loadCart();
+    this.fetchAddresses();
+
+    // Initialize redemption functionality
+    if (this.isLoggedIn) {
+      await this.fetchMintissValue();
+      await this.fetchUserBalance();
+    } else {
+      this.userBalance = 1000; // Demo balance
+    }
+    this.calculateFinalPrice();
+  },
+
+
+  watch: {
+    subtotal() {
+      // Recalculate final price when subtotal changes
+      this.calculateFinalPrice();
+      // Adjust redeem amount if it exceeds new maxRedeemable
+      if (this.redeemAmount > this.maxRedeemable) {
+        this.redeemAmount = this.maxRedeemable;
+      }
+    },
+    redeemAmount(newVal) {
+      if (newVal > this.maxRedeemable) {
+        this.redeemAmount = this.maxRedeemable;
+      }
+      if (newVal < 0) {
+        this.redeemAmount = 0;
+      }
+      this.calculateFinalPrice();
+    }
+  }
 };
 </script>
 
@@ -760,7 +730,7 @@ export default {
 }
 
 .amazon-cart-item:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
 }
 
@@ -932,60 +902,60 @@ export default {
     display: flex;
     flex-direction: column;
   }
-  
+
   /* Reorder sections for mobile - Address and Product Details first */
   .order-summary-section {
     order: 1;
   }
-  
+
   .cart-items-section {
     order: 2;
   }
-  
+
   .cart-items-container {
     padding: 0;
   }
-  
+
   .header-content {
     padding: 0 0.25rem;
   }
-  
+
   .amazon-cart-header {
     padding: 0.25rem 0;
     margin-bottom: 0.25rem;
   }
-  
+
   .cart-title {
     font-size: 1rem;
   }
-  
+
   .cart-subtitle {
     font-size: 0.7rem;
   }
-  
+
   .cart-icon {
     width: 30px;
     height: 30px;
     font-size: 0.9rem;
   }
-  
+
   .amazon-cart-item {
     margin-bottom: 0.05rem;
   }
-  
+
   .item-content {
     flex-direction: row;
     padding: 0.1rem;
     gap: 0.15rem;
     align-items: center;
   }
-  
+
   .item-image-container {
     width: 30px;
     height: 30px;
     flex-shrink: 0;
   }
-  
+
   .item-details {
     flex: 1;
     gap: 0.05rem;
@@ -994,7 +964,7 @@ export default {
     align-items: center;
     justify-content: space-between;
   }
-  
+
   .item-name {
     font-size: 0.6rem;
     line-height: 1.0;
@@ -1004,16 +974,16 @@ export default {
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  
+
   .item-description {
     display: none;
   }
-  
+
   .current-price {
     font-size: 0.65rem;
     margin-right: 0.15rem;
   }
-  
+
   .quantity-section {
     display: flex;
     flex-direction: row;
@@ -1021,45 +991,45 @@ export default {
     gap: 0.1rem;
     margin-right: 0.15rem;
   }
-  
+
   .quantity-label {
     display: none;
   }
-  
+
   .quantity-btn {
     width: 16px;
     height: 16px;
     font-size: 0.5rem;
   }
-  
+
   .quantity-input {
     width: 22px;
     height: 16px;
     font-size: 0.5rem;
   }
-  
+
   .mintiss-points {
     font-size: 0.5rem;
     margin-right: 0.25rem;
     display: none;
   }
-  
+
   .item-actions {
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
     margin-top: 0;
   }
-  
+
   .item-total {
     align-items: flex-end;
     margin-right: 0.25rem;
   }
-  
+
   .total-price {
     font-size: 0.65rem;
   }
-  
+
   .remove-btn {
     padding: 0.08rem 0.15rem;
     font-size: 0.45rem;
@@ -1071,57 +1041,57 @@ export default {
     padding: 0.25rem 0;
     margin-bottom: 0.1rem;
   }
-  
+
   .header-content {
     flex-direction: row;
     gap: 0.25rem;
   }
-  
+
   .header-left {
     flex-direction: row;
     gap: 0.25rem;
   }
-  
+
   .cart-title {
     font-size: 0.9rem;
   }
-  
+
   .cart-subtitle {
     font-size: 0.65rem;
   }
-  
+
   .cart-icon {
     width: 25px;
     height: 25px;
     font-size: 0.8rem;
   }
-  
+
   .item-count-badge {
     padding: 0.2rem 0.4rem;
   }
-  
+
   .count-number {
     font-size: 0.9rem;
   }
-  
+
   .count-text {
     font-size: 0.7rem;
   }
-  
+
   .amazon-cart-item {
     margin-bottom: 0.05rem;
   }
-  
+
   .item-content {
     padding: 0.1rem;
     gap: 0.15rem;
   }
-  
+
   .item-image-container {
     width: 30px;
     height: 30px;
   }
-  
+
   .item-name {
     font-size: 0.6rem;
     line-height: 1.0;
@@ -1129,70 +1099,70 @@ export default {
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  
+
   .current-price {
     font-size: 0.65rem;
   }
-  
+
   .quantity-btn {
     width: 16px;
     height: 16px;
     font-size: 0.5rem;
   }
-  
+
   .quantity-input {
     width: 22px;
     height: 16px;
     font-size: 0.5rem;
   }
-  
+
   .mintiss-points {
     display: none;
   }
-  
+
   .total-price {
     font-size: 0.65rem;
   }
-  
+
   .remove-btn {
     padding: 0.08rem 0.15rem;
     font-size: 0.5rem;
   }
-  
+
   /* Ultra-compact Address Section */
   .card {
     margin-bottom: 0.25rem !important;
   }
-  
+
   .card-header {
     padding: 0.25rem 0.5rem !important;
   }
-  
+
   .card-header h5 {
     font-size: 0.8rem !important;
     margin: 0 !important;
   }
-  
+
   .card-body {
     padding: 0.25rem 0.5rem !important;
   }
-  
+
   .list-group-item {
     padding: 0.25rem 0.5rem !important;
     margin-bottom: 0.1rem !important;
   }
-  
+
   .form-check-label h6 {
     font-size: 0.7rem !important;
     margin-bottom: 0.1rem !important;
   }
-  
+
   .form-check-label p {
     font-size: 0.6rem !important;
     margin-bottom: 0.1rem !important;
     line-height: 1.2 !important;
   }
-  
+
   .btn {
     padding: 0.2rem 0.4rem !important;
     font-size: 0.6rem !important;
@@ -1203,21 +1173,26 @@ export default {
 .bg-primary {
   background: linear-gradient(135deg, #1177bf 0%, #0d6efd 100%) !important;
 }
+
 .text-primary {
   color: #1177bf !important;
 }
+
 .btn-primary {
   background-color: #1177bf !important;
   border-color: #1177bf !important;
 }
+
 .btn-primary:hover {
   background-color: #0d6efd !important;
   border-color: #0d6efd !important;
 }
+
 .btn-outline-primary {
   color: #1177bf !important;
   border-color: #1177bf !important;
 }
+
 .btn-outline-primary:hover {
   background-color: #1177bf !important;
   border-color: #1177bf !important;
@@ -1305,7 +1280,7 @@ export default {
   box-shadow: none;
 }
 
-.input-group .form-control:focus + .btn {
+.input-group .form-control:focus+.btn {
   border-color: #86b7fe;
 }
 
@@ -1338,8 +1313,13 @@ export default {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ===== MODERN CART PAGE STYLES ===== */
@@ -2260,44 +2240,44 @@ export default {
   .modern-cart-page {
     padding: 1rem 0;
   }
-  
+
   .cart-container {
     padding: 0 0.5rem;
   }
-  
+
   .cart-header {
     padding: 1rem;
     border-radius: 12px;
   }
-  
+
   .header-content {
     flex-direction: column;
     gap: 0.75rem;
     text-align: center;
   }
-  
+
   .cart-title {
     font-size: 1.25rem;
   }
-  
+
   .cart-subtitle {
     font-size: 0.85rem;
   }
-  
+
   .cart-icon {
     width: 40px;
     height: 40px;
     font-size: 1rem;
   }
-  
+
   .item-count-badge {
     padding: 0.5rem 1rem;
   }
-  
+
   .count-number {
     font-size: 1.25rem;
   }
-  
+
   .count-text {
     font-size: 0.75rem;
   }
@@ -2308,17 +2288,17 @@ export default {
   .cart-header {
     padding: 1.25rem;
   }
-  
+
   .cart-title {
     font-size: 1.5rem;
   }
-  
+
   .cart-icon {
     width: 50px;
     height: 50px;
     font-size: 1.2rem;
   }
-  
+
   .header-content {
     flex-direction: row;
     text-align: left;
@@ -2330,35 +2310,35 @@ export default {
   .modern-cart-page {
     padding: 1.5rem 0;
   }
-  
+
   .cart-container {
     padding: 0 1rem;
   }
-  
+
   .cart-header {
     padding: 1.5rem;
     border-radius: 16px;
   }
-  
+
   .cart-title {
     font-size: 1.75rem;
   }
-  
+
   .cart-subtitle {
     font-size: 0.95rem;
   }
-  
+
   .cart-icon {
     width: 55px;
     height: 55px;
     font-size: 1.3rem;
   }
-  
+
   .cart-content {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  
+
   .order-summary-section {
     order: -1;
   }
@@ -2369,35 +2349,35 @@ export default {
   .modern-cart-page {
     padding: 2rem 0;
   }
-  
+
   .cart-container {
     padding: 0 1rem;
   }
-  
+
   .cart-header {
     padding: 2rem;
     border-radius: 20px;
   }
-  
+
   .cart-title {
     font-size: 2rem;
   }
-  
+
   .cart-subtitle {
     font-size: 1rem;
   }
-  
+
   .cart-icon {
     width: 60px;
     height: 60px;
     font-size: 1.5rem;
   }
-  
+
   .cart-content {
     grid-template-columns: 1fr 400px;
     gap: 2rem;
   }
-  
+
   .order-summary-section {
     order: 0;
   }
@@ -2409,67 +2389,67 @@ export default {
     padding: 1rem;
     border-radius: 12px;
   }
-  
+
   .cart-item {
     padding: 1rem;
     border-radius: 12px;
   }
-  
+
   .item-content {
     grid-template-columns: 1fr;
     gap: 1rem;
     text-align: center;
   }
-  
+
   .item-image-container {
     width: 100px;
     height: 100px;
     margin: 0 auto;
   }
-  
+
   .item-details {
     text-align: center;
   }
-  
+
   .item-name {
     font-size: 1.1rem;
   }
-  
+
   .item-description {
     font-size: 0.85rem;
   }
-  
+
   .quantity-section {
     flex-direction: row;
     justify-content: center;
     gap: 0.75rem;
   }
-  
+
   .quantity-controls {
     gap: 0.25rem;
   }
-  
+
   .quantity-btn {
     width: 28px;
     height: 28px;
     font-size: 0.8rem;
   }
-  
+
   .quantity-input {
     width: 45px;
     height: 28px;
     font-size: 0.9rem;
   }
-  
+
   .item-actions {
     align-items: center;
     gap: 0.75rem;
   }
-  
+
   .total-price {
     font-size: 1.1rem;
   }
-  
+
   .remove-btn {
     padding: 0.4rem 0.8rem;
     font-size: 0.8rem;
@@ -2496,13 +2476,13 @@ export default {
     order: -1;
     margin-bottom: 1rem;
   }
-  
+
   .points-redemption-card,
   .order-summary-card {
     margin-bottom: 1rem;
     border-radius: 12px;
   }
-  
+
   .card-header,
   .summary-header {
     padding: 1rem;
@@ -2510,94 +2490,94 @@ export default {
     text-align: center;
     gap: 0.5rem;
   }
-  
+
   .header-icon,
   .summary-icon {
     width: 40px;
     height: 40px;
     font-size: 1.2rem;
   }
-  
+
   .card-title,
   .summary-title {
     font-size: 1.1rem;
   }
-  
+
   .card-subtitle,
   .summary-subtitle {
     font-size: 0.8rem;
   }
-  
+
   .card-body,
   .summary-body {
     padding: 1rem;
   }
-  
+
   .balance-section,
   .final-calculation,
   .summary-total {
     padding: 0.75rem;
     border-radius: 8px;
   }
-  
+
   .balance-amount {
     flex-direction: column;
     align-items: center;
     gap: 0.25rem;
   }
-  
+
   .amount {
     font-size: 1.25rem;
   }
-  
+
   .currency {
     font-size: 0.75rem;
   }
-  
+
   .redeem-input-group {
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   .redeem-input {
     font-size: 0.9rem;
     padding: 0.6rem 0.8rem;
   }
-  
+
   .max-btn {
     width: 100%;
     padding: 0.6rem;
     font-size: 0.9rem;
   }
-  
+
   .summary-item {
     padding: 0.5rem 0;
     font-size: 0.9rem;
   }
-  
+
   .item-label {
     font-size: 0.85rem;
   }
-  
+
   .item-value {
     font-size: 0.9rem;
   }
-  
+
   .amount-breakdown {
     padding: 0.75rem;
     margin: 0.75rem 0;
   }
-  
+
   .breakdown-item {
     padding: 0.4rem 0;
     font-size: 0.85rem;
   }
-  
+
   .breakdown-total {
     padding: 0.6rem 0;
     font-size: 1rem;
   }
-  
+
   .checkout-btn {
     padding: 0.8rem 1rem;
     font-size: 1rem;
@@ -2610,30 +2590,30 @@ export default {
   .modal-overlay {
     padding: 0.5rem;
   }
-  
+
   .modal-container {
     max-width: 100%;
     max-height: 95vh;
   }
-  
+
   .modal-content {
     border-radius: 12px;
   }
-  
+
   .modal-header {
     padding: 1rem;
   }
-  
+
   .modal-title {
     font-size: 1.1rem;
   }
-  
+
   .btn-close {
     width: 35px;
     height: 35px;
     font-size: 1.2rem;
   }
-  
+
   .modal-body {
     padding: 1rem;
   }
@@ -2641,6 +2621,7 @@ export default {
 
 /* Touch-friendly improvements */
 @media (max-width: 767px) {
+
   .quantity-btn,
   .remove-btn,
   .checkout-btn,
@@ -2649,16 +2630,16 @@ export default {
     min-height: 44px;
     min-width: 44px;
   }
-  
+
   .form-check-input {
     width: 20px;
     height: 20px;
   }
-  
+
   .list-group-item {
     padding: 1rem;
   }
-  
+
   .btn {
     padding: 0.75rem 1rem;
     font-size: 0.9rem;
@@ -2671,6 +2652,7 @@ export default {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -2681,10 +2663,21 @@ export default {
   animation: fadeInUp 0.3s ease-out;
 }
 
-.cart-item:nth-child(1) { animation-delay: 0.1s; }
-.cart-item:nth-child(2) { animation-delay: 0.2s; }
-.cart-item:nth-child(3) { animation-delay: 0.3s; }
-.cart-item:nth-child(4) { animation-delay: 0.4s; }
+.cart-item:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.cart-item:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.cart-item:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.cart-item:nth-child(4) {
+  animation-delay: 0.4s;
+}
 
 /* Custom Modal Styles */
 .modal-overlay {
@@ -2771,5 +2764,4 @@ export default {
   color: rgba(255, 255, 255, 0.9);
   margin-bottom: 0.25rem;
 }
-
 </style>

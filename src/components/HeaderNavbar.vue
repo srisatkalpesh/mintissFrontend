@@ -2,63 +2,17 @@
   <nav class="modern-navbar sticky-top w-100">
     <div class="container-fluid px-3 px-lg-4">
       <!-- Desktop Navigation -->
-      <div class="d-none d-lg-flex align-items-center justify-content-between w-100 navbar-desktop">
-        <!-- Logo Section -->
+      <div class="d-none d-lg-flex align-items-center w-100 navbar-desktop">
+        <!-- Left Side - Logo -->
         <div class="logo-section d-flex align-items-center">
           <div class="logo-container" @click="$router.push('/')">
             <span class="logo-text">Mintiss</span>
           </div>
         </div>
 
-        <!-- Search Section -->
-        <div class="search-section">
-          <form class="search-form" @submit.prevent="onSearch">
-            <div class="search-input-container">
-              <i class="bi bi-search search-icon"></i>
-              <input 
-                class="search-input" 
-                type="search" 
-                placeholder="Search products, categories..." 
-                aria-label="Search"
-                v-model="searchQuery" 
-                @keyup.enter="onSearch"
-                @focus="onSearchFocus"
-                @blur="onSearchBlur"
-              />
-              <button type="submit" class="search-btn">
-                <i class="bi bi-arrow-right"></i>
-              </button>
-            </div>
-        </form>
-        </div>
-
-        <!-- Actions Section -->
-        <div class="actions-section d-flex align-items-center gap-3">
-          <!-- Cart Button -->
-          <router-link to="/cart" class="nav-link cart-link position-relative">
-            <i class="bi bi-cart3"></i>
-            <span v-if="cartItemCount > 0" class="cart-badge">{{ cartItemCount }}</span>
-          </router-link>
-          
-          <!-- User Section -->
-          <template v-if="isLoggedIn">
-            <!-- Wallet Balance -->
-            <router-link to="/redeem" class="nav-link wallet-link">
-              <i class="bi bi-wallet2"></i>
-              <span class="wallet-balance">₹{{ userBalance || '0.00000000' }}</span>
-            </router-link>
-            
-            <!-- User Profile -->
-            <div class="user-profile">
-              <router-link to="/profile" class="nav-link profile-link">
-                <div class="user-avatar">
-                  <i class="bi bi-person-circle"></i>
-                </div>
-                <span class="user-name">{{ userName }}</span>
-            </router-link>
-            </div>
-          </template>
-          <template v-else>
+        <!-- Center - Login/Signup -->
+        <div class="auth-section d-flex align-items-center justify-content-center flex-grow-1">
+          <template v-if="!isLoggedIn">
             <router-link to="/login" class="btn btn-primary login-btn">
               <i class="bi bi-box-arrow-in-right me-2"></i>
               Login
@@ -68,6 +22,31 @@
               Sign Up
             </router-link>
           </template>
+          <template v-else>
+            <!-- Wallet Balance -->
+            <router-link to="/redeem" class="nav-link wallet-link">
+              <i class="bi bi-wallet2"></i>
+              <span class="wallet-balance">₹{{ userBalance || '0.00000000' }}</span>
+            </router-link>
+
+            <!-- User Profile -->
+            <div class="user-profile">
+              <router-link to="/profile" class="nav-link profile-link">
+                <div class="user-avatar">
+                  <i class="bi bi-person-circle"></i>
+                </div>
+                <span class="user-name">{{ userName }}</span>
+              </router-link>
+            </div>
+          </template>
+        </div>
+
+        <!-- Right Side - Cart -->
+        <div class="cart-section d-flex align-items-center">
+          <router-link to="/cart" class="nav-link cart-link position-relative">
+            <i class="bi bi-cart3"></i>
+            <span v-if="cartItemCount > 0" class="cart-badge">{{ cartItemCount }}</span>
+          </router-link>
         </div>
       </div>
 
@@ -79,14 +58,11 @@
           <div class="mobile-logo" @click="$router.push('/')">
             <span class="logo-text">Mintiss</span>
           </div>
-          
+
           <!-- Center Actions -->
           <div class="mobile-center-actions d-flex align-items-center gap-2">
-            <router-link to="/cart" class="mobile-cart position-relative">
-              <i class="bi bi-cart3"></i>
-              <span v-if="cartItemCount > 0" class="cart-badge">{{ cartItemCount }}</span>
-            </router-link>
-            
+
+
             <template v-if="isLoggedIn">
               <div class="mobile-wallet">
                 <i class="bi bi-wallet2"></i>
@@ -94,7 +70,7 @@
               </div>
             </template>
           </div>
-          
+
           <!-- Right Actions - Login/Signup or Profile -->
           <div class="mobile-right-actions">
             <template v-if="isLoggedIn">
@@ -109,6 +85,10 @@
                 <router-link to="/signup" class="btn btn-sm btn-outline-primary mobile-auth-btn">Sign Up</router-link>
               </div>
             </template>
+            <router-link to="/cart" class="mobile-cart position-relative">
+              <i class="bi bi-cart3"></i>
+              <span v-if="cartItemCount > 0" class="cart-badge">{{ cartItemCount }}</span>
+            </router-link>
           </div>
         </div>
 
@@ -117,13 +97,8 @@
           <form class="mobile-search-form" @submit.prevent="onSearch">
             <div class="mobile-search-container">
               <i class="bi bi-search"></i>
-              <input 
-                class="mobile-search-input" 
-                type="search" 
-                placeholder="Search products..." 
-                v-model="searchQuery" 
-                @keyup.enter="onSearch"
-              />
+              <input class="mobile-search-input" type="search" placeholder="Search products..." v-model="searchQuery"
+                @keyup.enter="onSearch" />
             </div>
           </form>
         </div>
@@ -183,16 +158,16 @@ export default {
       // Start the recurring update on component mount
       this.startProfileUpdateInterval();
     }
-    
+
     // Load cart count
     this.updateCartCount();
-    
+
     // Listen for balance updates from other components
     this._balanceUpdatedHandler = () => {
       this.fetchUserProfileAndUpdateBalance();
     };
     eventBus.on('balance-updated', this._balanceUpdatedHandler);
-    
+
     // Listen for cart updates from cart service
     this._cartUpdatedHandler = () => {
       this.updateCartCount();
@@ -287,15 +262,15 @@ export default {
     onSearch() {
       this.$emit('global-search', this.searchQuery.trim());
     },
-    
+
     onSearchFocus() {
       // Add focus styles or functionality if needed
     },
-    
+
     onSearchBlur() {
       // Add blur styles or functionality if needed
     },
-    
+
     updateCartCount() {
       try {
         this.cartItemCount = cartService.getCartCount();
@@ -322,6 +297,28 @@ export default {
 .navbar-desktop {
   min-height: 70px;
   padding: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Logo Section - Left Side */
+.logo-section {
+  flex: 0 0 auto;
+}
+
+/* Auth Section - Center */
+.auth-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+/* Cart Section - Right Side */
+.cart-section {
+  flex: 0 0 auto;
 }
 
 /* Logo Section */
@@ -436,50 +433,50 @@ export default {
   .modern-header {
     padding: 0.75rem 0;
   }
-  
+
   .header-container {
     padding: 0 0.5rem;
   }
-  
+
   .header-content {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .logo-section {
     justify-content: center;
     width: 100%;
   }
-  
+
   .logo {
     font-size: 1.5rem;
   }
-  
+
   .logo-icon {
     width: 35px;
     height: 35px;
     font-size: 1.2rem;
   }
-  
+
   .search-section {
     width: 100%;
     order: 2;
   }
-  
+
   .search-container {
     padding: 0.75rem;
     border-radius: 8px;
   }
-  
+
   .search-input {
     font-size: 0.9rem;
   }
-  
+
   .search-btn {
     width: 30px;
     height: 30px;
   }
-  
+
   .actions-section {
     flex-direction: row;
     justify-content: center;
@@ -487,24 +484,24 @@ export default {
     width: 100%;
     order: 3;
   }
-  
+
   .nav-link {
     padding: 0.5rem 0.75rem;
     font-size: 0.85rem;
   }
-  
+
   .nav-icon {
     width: 20px;
     height: 20px;
     font-size: 1rem;
   }
-  
+
   .cart-badge {
     width: 18px;
     height: 18px;
     font-size: 0.7rem;
   }
-  
+
   .user-menu {
     position: static;
     transform: none;
@@ -513,12 +510,12 @@ export default {
     border-radius: 8px;
     margin-top: 0.5rem;
   }
-  
+
   .user-menu-item {
     padding: 0.75rem 1rem;
     font-size: 0.9rem;
   }
-  
+
   .user-menu-icon {
     width: 18px;
     height: 18px;
@@ -532,64 +529,64 @@ export default {
     flex-direction: row;
     align-items: center;
   }
-  
+
   .logo-section {
     justify-content: flex-start;
     width: auto;
   }
-  
+
   .logo {
     font-size: 1.75rem;
   }
-  
+
   .logo-icon {
     width: 40px;
     height: 40px;
     font-size: 1.4rem;
   }
-  
+
   .search-section {
     flex: 1;
     order: 0;
     margin: 0 1rem;
   }
-  
+
   .search-container {
     padding: 0.75rem 1rem;
     border-radius: 12px;
   }
-  
+
   .search-input {
     font-size: 0.95rem;
   }
-  
+
   .search-btn {
     width: 35px;
     height: 35px;
   }
-  
+
   .actions-section {
     width: auto;
     order: 0;
   }
-  
+
   .nav-link {
     padding: 0.75rem 1rem;
     font-size: 0.9rem;
   }
-  
+
   .nav-icon {
     width: 22px;
     height: 22px;
     font-size: 1.1rem;
   }
-  
+
   .cart-badge {
     width: 20px;
     height: 20px;
     font-size: 0.75rem;
   }
-  
+
   .user-menu {
     position: absolute;
     transform: translateX(-50%);
@@ -597,12 +594,12 @@ export default {
     border-radius: 12px;
     margin-top: 0;
   }
-  
+
   .user-menu-item {
     padding: 1rem 1.25rem;
     font-size: 0.95rem;
   }
-  
+
   .user-menu-icon {
     width: 20px;
     height: 20px;
@@ -615,69 +612,69 @@ export default {
   .modern-header {
     padding: 1rem 0;
   }
-  
+
   .header-container {
     padding: 0 1rem;
   }
-  
+
   .header-content {
     gap: 1.5rem;
   }
-  
+
   .logo {
     font-size: 2rem;
   }
-  
+
   .logo-icon {
     width: 45px;
     height: 45px;
     font-size: 1.6rem;
   }
-  
+
   .search-section {
     margin: 0 1.5rem;
   }
-  
+
   .search-container {
     padding: 1rem 1.25rem;
     border-radius: 16px;
   }
-  
+
   .search-input {
     font-size: 1rem;
   }
-  
+
   .search-btn {
     width: 40px;
     height: 40px;
   }
-  
+
   .actions-section {
     gap: 1rem;
   }
-  
+
   .nav-link {
     padding: 1rem 1.25rem;
     font-size: 1rem;
   }
-  
+
   .nav-icon {
     width: 24px;
     height: 24px;
     font-size: 1.2rem;
   }
-  
+
   .cart-badge {
     width: 22px;
     height: 22px;
     font-size: 0.8rem;
   }
-  
+
   .user-menu-item {
     padding: 1.25rem 1.5rem;
     font-size: 1rem;
   }
-  
+
   .user-menu-icon {
     width: 22px;
     height: 22px;
@@ -690,69 +687,69 @@ export default {
   .modern-header {
     padding: 1.25rem 0;
   }
-  
+
   .header-container {
     padding: 0 1rem;
   }
-  
+
   .header-content {
     gap: 2rem;
   }
-  
+
   .logo {
     font-size: 2.25rem;
   }
-  
+
   .logo-icon {
     width: 50px;
     height: 50px;
     font-size: 1.8rem;
   }
-  
+
   .search-section {
     margin: 0 2rem;
   }
-  
+
   .search-container {
     padding: 1.25rem 1.5rem;
     border-radius: 20px;
   }
-  
+
   .search-input {
     font-size: 1.1rem;
   }
-  
+
   .search-btn {
     width: 45px;
     height: 45px;
   }
-  
+
   .actions-section {
     gap: 1.25rem;
   }
-  
+
   .nav-link {
     padding: 1.25rem 1.5rem;
     font-size: 1.1rem;
   }
-  
+
   .nav-icon {
     width: 26px;
     height: 26px;
     font-size: 1.3rem;
   }
-  
+
   .cart-badge {
     width: 24px;
     height: 24px;
     font-size: 0.85rem;
   }
-  
+
   .user-menu-item {
     padding: 1.5rem 2rem;
     font-size: 1.1rem;
   }
-  
+
   .user-menu-icon {
     width: 24px;
     height: 24px;
@@ -766,36 +763,36 @@ export default {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .logo-section {
     order: 1;
     width: 100%;
     justify-content: center;
   }
-  
+
   .search-section {
     order: 2;
     width: 100%;
     margin: 0;
   }
-  
+
   .actions-section {
     order: 3;
     width: 100%;
     justify-content: space-around;
   }
-  
+
   .nav-link {
     flex-direction: column;
     gap: 0.25rem;
     padding: 0.5rem;
     text-align: center;
   }
-  
+
   .nav-text {
     font-size: 0.75rem;
   }
-  
+
   .user-menu {
     position: static;
     transform: none;
@@ -805,12 +802,12 @@ export default {
     margin-top: 0.5rem;
     width: 100%;
   }
-  
+
   .user-menu-item {
     padding: 1rem;
     border-bottom: 1px solid #f0f0f0;
   }
-  
+
   .user-menu-item:last-child {
     border-bottom: none;
   }
@@ -818,19 +815,20 @@ export default {
 
 /* Touch-friendly improvements */
 @media (max-width: 767px) {
+
   .nav-link,
   .search-btn,
   .user-menu-item {
     min-height: 44px;
     min-width: 44px;
   }
-  
+
   .nav-link:active,
   .search-btn:active,
   .user-menu-item:active {
     transform: scale(0.98);
   }
-  
+
   .logo-section:active {
     transform: scale(0.98);
   }
@@ -921,7 +919,8 @@ export default {
 }
 
 /* Auth Buttons */
-.login-btn, .signup-btn {
+.login-btn,
+.signup-btn {
   padding: 0.75rem 1.5rem;
   border-radius: 25px;
   font-weight: 600;
@@ -979,9 +978,17 @@ export default {
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* ===== MOBILE NAVBAR ===== */
@@ -1120,20 +1127,20 @@ export default {
   .mobile-logo .logo-text {
     font-size: 1.1rem;
   }
-  
+
   .mobile-wallet {
     font-size: 0.8rem;
   }
-  
+
   .mobile-auth-btn {
     padding: 0.3rem 0.6rem;
     font-size: 0.7rem;
   }
-  
+
   .mobile-center-actions {
     gap: 0.5rem;
   }
-  
+
   .mobile-profile span {
     display: none;
   }
@@ -1143,17 +1150,17 @@ export default {
   .mobile-logo .logo-text {
     font-size: 1rem;
   }
-  
+
   .mobile-auth-btn {
     padding: 0.25rem 0.5rem;
     font-size: 0.65rem;
   }
-  
+
   .mobile-cart {
     font-size: 1.1rem;
     padding: 0.375rem;
   }
-  
+
   .mobile-wallet {
     font-size: 0.75rem;
   }
@@ -1165,6 +1172,7 @@ export default {
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1190,11 +1198,11 @@ export default {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
-  
+
   .search-input {
     color: white;
   }
-  
+
   .search-input::placeholder {
     color: rgba(255, 255, 255, 0.7);
   }
